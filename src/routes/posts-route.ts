@@ -33,7 +33,7 @@ postRoute.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) =>
 
 postRoute.post('/', authMiddleware, postValidation(), (req: RequestWithBody<createPostType>, res: Response) => {
     const newPost = PostRepository.createPost(req.body)
-    res.send(newPost)
+    res.status(201).send(newPost)
 })
 
 postRoute.put('/:id', authMiddleware, postValidation(), (req: RequestWithParamsSndBody<{
@@ -47,7 +47,7 @@ postRoute.put('/:id', authMiddleware, postValidation(), (req: RequestWithParamsS
     res.sendStatus(204)
 })
 
-postRoute.delete('/:id', authMiddleware, postValidation(), (req: RequestWithParams<{ id: string }>, res: Response) => {
+postRoute.delete('/:id', authMiddleware, (req: RequestWithParams<{ id: string }>, res: Response) => {
     const deletePost = PostRepository.deletePost(req.params.id)
     if (!deletePost) {
         res.sendStatus(404)

@@ -16,7 +16,7 @@ exports.blogRoute.get('/:id', (req, res) => {
         res.sendStatus(404);
         return;
     }
-    res.send(blog);
+    res.status(201).send(blog);
 });
 exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => {
     const { name, description, websiteUrl } = req.body;
@@ -28,7 +28,7 @@ exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validator
     };
     // @ts-ignore
     const createBlog = blog_repository_1.BlogRepository.createBlog(newBlog);
-    res.send(createBlog);
+    res.status(201).send(createBlog);
 });
 exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => {
     const findUpdateBlog = blog_repository_1.BlogRepository.getById(req.params.id);

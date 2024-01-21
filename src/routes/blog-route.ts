@@ -30,7 +30,7 @@ blogRoute.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) =>
         res.sendStatus(404)
         return
     }
-    res.send(blog)
+    res.status(201).send(blog)
 })
 blogRoute.post('/', authMiddleware, blogValidation(), (req: Request, res: Response) => {
     const {name, description, websiteUrl} = req.body
@@ -43,7 +43,7 @@ blogRoute.post('/', authMiddleware, blogValidation(), (req: Request, res: Respon
     }
     // @ts-ignore
     const createBlog = BlogRepository.createBlog(newBlog)
-    res.send(createBlog)
+    res.status(201).send(createBlog)
 })
 
 blogRoute.put('/:id', authMiddleware, blogValidation(), (req: RequestWithParamsAndBody<{

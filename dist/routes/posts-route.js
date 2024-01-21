@@ -20,7 +20,7 @@ exports.postRoute.get('/:id', (req, res) => {
 });
 exports.postRoute.post('/', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), (req, res) => {
     const newPost = post_repository_1.PostRepository.createPost(req.body);
-    res.send(newPost);
+    res.status(201).send(newPost);
 });
 exports.postRoute.put('/:id', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), (req, res) => {
     const updatePost = post_repository_1.PostRepository.updatePost(Object.assign(Object.assign({}, req.body), { id: req.params.id }));
@@ -30,7 +30,7 @@ exports.postRoute.put('/:id', auth_middleware_1.authMiddleware, (0, post_validat
     }
     res.sendStatus(204);
 });
-exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), (req, res) => {
+exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) => {
     const deletePost = post_repository_1.PostRepository.deletePost(req.params.id);
     if (!deletePost) {
         res.sendStatus(404);
