@@ -11,7 +11,7 @@ exports.blogRoute.get('/', (req, res) => {
     res.send(blogs);
 });
 exports.blogRoute.get('/:id', (req, res) => {
-    const blog = blog_repository_1.BlogRepository.getById(+req.params.id);
+    const blog = blog_repository_1.BlogRepository.getById(req.params.id);
     if (!blog) {
         res.sendStatus(404);
         return;
@@ -21,30 +21,31 @@ exports.blogRoute.get('/:id', (req, res) => {
 exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => {
     const { name, description, websiteUrl } = req.body;
     const newBlog = {
-        id: +(new Date()),
+        id: new Date(),
         name,
         description,
         websiteUrl
     };
+    // @ts-ignore
     const createBlog = blog_repository_1.BlogRepository.createBlog(newBlog);
     res.send(createBlog);
 });
 exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => {
-    const findUpdateBlog = blog_repository_1.BlogRepository.getById(+req.params.id);
+    const findUpdateBlog = blog_repository_1.BlogRepository.getById(req.params.id);
     if (!findUpdateBlog) {
         res.sendStatus(404);
         return;
     }
-    const putBlog = Object.assign({ id: +req.params.id }, req.body);
+    const putBlog = Object.assign({ id: req.params.id }, req.body);
     blog_repository_1.BlogRepository.updateBlog(putBlog);
     res.sendStatus(204);
 });
 exports.blogRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) => {
-    const findBlog = blog_repository_1.BlogRepository.getById(+req.params.id);
+    const findBlog = blog_repository_1.BlogRepository.getById(req.params.id);
     if (!findBlog) {
         res.sendStatus(404);
         return;
     }
-    blog_repository_1.BlogRepository.deleteById(+req.params.id);
+    blog_repository_1.BlogRepository.deleteById(req.params.id);
     res.sendStatus(204);
 });

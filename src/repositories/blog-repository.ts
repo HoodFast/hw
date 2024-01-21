@@ -1,7 +1,7 @@
 import {db} from "../db/db";
 
 export type blogType = {
-    id: number,
+    id: string,
     name: string
     description: string
     websiteUrl: string
@@ -17,7 +17,7 @@ export class BlogRepository {
         db.blogs.push(createData)
         return createData
     }
-    static getById(id: number) {
+    static getById(id: string) {
         const findBlog = db.blogs.find(b=> b.id===id)
         return findBlog
     }
@@ -32,8 +32,13 @@ export class BlogRepository {
         return
     }
 
-    static deleteById(id:number){
+    static deleteById(id:string){
         db.blogs = db.blogs.filter(b => b.id !== id)
+        return
+    }
+
+    static deleteBlogsAll(){
+        db.blogs = []
         return
     }
 }

@@ -1,5 +1,7 @@
 import express, {Request} from 'express'
 import {blogRoute} from "./routes/blog-route";
+import {postRoute} from "./routes/posts-route";
+import {testingRoute} from "./routes/testing-route";
 
 
 export const app = express()
@@ -7,7 +9,9 @@ export const app = express()
 app.use(express.json())
 
 
-app.use('/blogs', blogRoute)
+app.use('/ht_02/api/blogs', blogRoute)
+app.use('/ht_02/api/posts', postRoute)
+app.use('/ht_02/api/testing', testingRoute)
 
 
 const AvailableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"]

@@ -28,5 +28,9 @@ class BlogRepository {
         db_1.db.blogs = db_1.db.blogs.filter(b => b.id !== id);
         return;
     }
+    static deleteBlogsAll() {
+        db_1.db.blogs = [];
+        return;
+    }
 }
 exports.BlogRepository = BlogRepository;

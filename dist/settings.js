@@ -6,9 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const blog_route_1 = require("./routes/blog-route");
+const posts_route_1 = require("./routes/posts-route");
+const testing_route_1 = require("./routes/testing-route");
 exports.app = (0, express_1.default)();
 exports.app.use(express_1.default.json());
-exports.app.use('/blogs', blog_route_1.blogRoute);
+exports.app.use('/ht_02/api/blogs', blog_route_1.blogRoute);
+exports.app.use('/ht_02/api/posts', posts_route_1.postRoute);
+exports.app.use('/ht_02/api/testing', testing_route_1.testingRoute);
 const AvailableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"];
 const videos = [
     {
