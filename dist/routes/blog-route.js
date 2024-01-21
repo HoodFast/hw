@@ -21,7 +21,7 @@ exports.blogRoute.get('/:id', (req, res) => {
 exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => {
     const { name, description, websiteUrl } = req.body;
     const newBlog = {
-        id: new Date(),
+        id: String(+new Date()),
         name,
         description,
         websiteUrl

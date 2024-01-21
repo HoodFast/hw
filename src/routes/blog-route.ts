@@ -4,7 +4,7 @@ import {blogValidation} from "../validators/blog-validators";
 import {BlogRepository} from "../repositories/blog-repository";
 
 export const blogRoute = Router({})
-type blogType = {
+export type blogType = {
     id: string
     name: string
     description: string
@@ -36,7 +36,7 @@ blogRoute.post('/', authMiddleware, blogValidation(), (req: Request, res: Respon
     const {name, description, websiteUrl} = req.body
 
     const newBlog = {
-        id: new Date(),
+        id: String(+new Date()),
         name,
         description,
         websiteUrl

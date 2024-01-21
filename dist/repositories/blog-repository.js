@@ -11,6 +11,7 @@ class BlogRepository {
         return createData;
     }
     static getById(id) {
+        debugger;
         const findBlog = db_1.db.blogs.find(b => b.id === id);
         return findBlog;
     }

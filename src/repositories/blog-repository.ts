@@ -18,6 +18,7 @@ export class BlogRepository {
         return createData
     }
     static getById(id: string) {
+        debugger
         const findBlog = db.blogs.find(b=> b.id===id)
         return findBlog
     }
