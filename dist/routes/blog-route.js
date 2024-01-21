@@ -16,7 +16,7 @@ exports.blogRoute.get('/:id', (req, res) => {
         res.sendStatus(404);
         return;
     }
-    res.status(201).send(blog);
+    res.send(blog);
 });
 exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => {
     const { name, description, websiteUrl } = req.body;

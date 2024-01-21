@@ -30,7 +30,7 @@ blogRoute.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) =>
         res.sendStatus(404)
         return
     }
-    res.status(201).send(blog)
+    res.send(blog)
 })
 blogRoute.post('/', authMiddleware, blogValidation(), (req: Request, res: Response) => {
     const {name, description, websiteUrl} = req.body
