@@ -1,25 +1,43 @@
-import {blogType} from "../repositories/blog-repository";
+
+import dotenv from 'dotenv'
+import {MongoClient} from "mongodb";
+import {BlogDb} from "../models/blog/db/blog-db";
+import {OutputBlogType} from "../repositories/blog-repository";
+dotenv.config()
+
+// mongodb+srv://holistic:<vjueBUHFNM1234>@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
+
+const uri = process.env.MONGO_URL || "mongodb"
+
+const client = new MongoClient(uri)
+
+const dataBase = client.db('blogs-db')
+
+export const blogsCollection = dataBase.collection<BlogDb>('blogs')
+export const postsCollection = dataBase.collection('posts')
 
 
-export type postType = {
-    id: string,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string,
-    blogName: string
+
+
+
+
+export const runDB = async ()=>{
+    try {
+        await client.connect()
+        console.log("Client connection to DB")
+    }
+    catch (e){
+        console.log(e)
+        await client.close()
+    }
 }
 
-
-type bdType = {
-    blogs:blogType[],
-    posts:postType[]
-}
 
 export const db:bdType = {
     blogs:[
-        {id:'1',description:'йа описание',name:'Favorite name', websiteUrl:'web Url'},
-        {id:'2',description:'йа описание',name:'Best name', websiteUrl:'web Url'},
+        {description:'йа описание',name:'Favorite name', websiteUrl:'web Url',createdAt:'string',isMembership:false},
+        {description:'йа описание',name:'Favorite name', websiteUrl:'web Url',createdAt:'string',isMembership:false},
+
     ],
 
     posts:[
@@ -43,3 +61,17 @@ export const db:bdType = {
 }
 
 
+export type postType = {
+    id: string,
+    title: string,
+    shortDescription: string,
+    content: string,
+    blogId: string,
+    blogName: string
+}
+
+
+type bdType = {
+    blogs:OutputBlogType[],
+    posts:postType[]
+}

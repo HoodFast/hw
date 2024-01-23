@@ -23,8 +23,8 @@ const contentValidator = body('content')
 
 const blogIdValidator = body('blogId')
     .isString().withMessage('websiteUrl must be a string')
-    .custom((value)=>{
-        const blog = BlogRepository.getById(value)
+    .custom(async (value)=>{
+        const blog =await BlogRepository.getById(value)
 
         if(!blog){
             // throw Error('Incorrect blogId')

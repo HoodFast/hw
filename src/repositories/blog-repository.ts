@@ -1,45 +1,62 @@
-import {db} from "../db/db";
+import {blogsCollection} from "../db/db";
+import {blogMapper} from "../models/blog/mappers/blog-mappers";
+import {ObjectId} from "mongodb";
+import {blogType} from "../routes/blog-route";
 
-export type blogType = {
-    id: string,
+export type OutputBlogType = {
     name: string
     description: string
     websiteUrl: string
+    createdAt:string
+    isMembership:boolean
 }
 
 
+// export type blogType = {
+//     id: string,
+//     name: string
+//     description: string
+//     websiteUrl: string
+// }
+
+
 export class BlogRepository {
-    static getAll(){
-        return db.blogs
+    static async getAll(): Promise<OutputBlogType[]> {
+        const blogs = await blogsCollection.find({}).toArray()
+        return blogs.map(blogMapper)
     }
 
-    static createBlog(createData:blogType){
-        db.blogs.push(createData)
-        return createData
-    }
-    static getById(id: string) {
-        debugger
-        const findBlog = db.blogs.find(b=> b.id===id)
-        return findBlog
-    }
-    static updateBlog(data:blogType){
-        const findBlog = db.blogs.find(b=> b.id===data.id)
-        if(findBlog){
-            findBlog.name = data.name
-            findBlog.description = data.description
-            findBlog.websiteUrl = data.websiteUrl
-            return;
+    static async createBlog(createData: OutputBlogType):Promise<OutputBlogType | null> {
+        const res = await blogsCollection.insertOne(createData)
+        const blog = await this.getById(res.insertedId.toString())
+        if (!blog) {
+            return null
         }
-        return
+        return blog
     }
 
-    static deleteById(id:string){
-        db.blogs = db.blogs.filter(b => b.id !== id)
-        return
+    static async getById(id: string): Promise<OutputBlogType | null> {
+        const blog = await blogsCollection.findOne({_id: new ObjectId(id)})
+        if (!blog) {
+            return null
+        }
+        return blogMapper(blog)
     }
 
-    static deleteBlogsAll(){
-        db.blogs = []
-        return
+    static async updateBlog(data: blogType):Promise<boolean> {
+
+        const res = await blogsCollection.updateOne({_id:new ObjectId(data.id)}, {
+            $set : {
+                name:data.name,
+                description:data.description,
+                websiteUrl:data.websiteUrl
+            }
+        })
+        return !!res.matchedCount
+    }
+
+    static async deleteById(id: string):Promise<boolean> {
+        const res = await blogsCollection.deleteOne({_id:new ObjectId(id)})
+        return !!res.deletedCount
     }
 }

@@ -30,10 +30,9 @@ export class PostRepository {
         return post
     }
 
-    static createPost(data: createPostType) {
-        const blog = BlogRepository.getById(data.blogId)
+    static async createPost(data: createPostType) {
+        const blog = await BlogRepository.getById(data.blogId)
         if (!blog) {
-
             return
         }
         const newPost: postType = {

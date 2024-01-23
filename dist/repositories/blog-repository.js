@@ -1,37 +1,67 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BlogRepository = void 0;
 const db_1 = require("../db/db");
+const blog_mappers_1 = require("../models/blog/mappers/blog-mappers");
+const mongodb_1 = require("mongodb");
+// export type blogType = {
+//     id: string,
+//     name: string
+//     description: string
+//     websiteUrl: string
+// }
 class BlogRepository {
     static getAll() {
-        return db_1.db.blogs;
+        return __awaiter(this, void 0, void 0, function* () {
+            const blogs = yield db_1.blogsCollection.find({}).toArray();
+            return blogs.map(blog_mappers_1.blogMapper);
+        });
     }
     static createBlog(createData) {
-        db_1.db.blogs.push(createData);
-        return createData;
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.blogsCollection.insertOne(createData);
+            const blog = yield this.getById(res.insertedId.toString());
+            if (!blog) {
+                return null;
+            }
+            return blog;
+        });
     }
     static getById(id) {
-        debugger;
-        const findBlog = db_1.db.blogs.find(b => b.id === id);
-        return findBlog;
+        return __awaiter(this, void 0, void 0, function* () {
+            const blog = yield db_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            if (!blog) {
+                return null;
+            }
+            return (0, blog_mappers_1.blogMapper)(blog);
+        });
     }
     static updateBlog(data) {
-        const findBlog = db_1.db.blogs.find(b => b.id === data.id);
-        if (findBlog) {
-            findBlog.name = data.name;
-            findBlog.description = data.description;
-            findBlog.websiteUrl = data.websiteUrl;
-            return;
-        }
-        return;
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.blogsCollection.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
+                $set: {
+                    name: data.name,
+                    description: data.description,
+                    websiteUrl: data.websiteUrl
+                }
+            });
+            return !!res.matchedCount;
+        });
     }
     static deleteById(id) {
-        db_1.db.blogs = db_1.db.blogs.filter(b => b.id !== id);
-        return;
-    }
-    static deleteBlogsAll() {
-        db_1.db.blogs = [];
-        return;
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.blogsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+            return !!res.deletedCount;
+        });
     }
 }
 exports.BlogRepository = BlogRepository;
