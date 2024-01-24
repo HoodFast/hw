@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.db = exports.runDB = exports.postsCollection = exports.blogsCollection = void 0;
+exports.runDB = exports.postsCollection = exports.blogsCollection = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const mongodb_1 = require("mongodb");
 ;
@@ -34,27 +34,3 @@ const runDB = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.runDB = runDB;
-exports.db = {
-    blogs: [
-        { description: 'йа описание', name: 'Favorite name', websiteUrl: 'web Url', createdAt: 'string', isMembership: false },
-        { description: 'йа описание', name: 'Favorite name', websiteUrl: 'web Url', createdAt: 'string', isMembership: false },
-    ],
-    posts: [
-        {
-            id: '11',
-            title: 'Ya title',
-            shortDescription: 'it`s very cool short description',
-            content: "content it is girl",
-            blogId: "1",
-            blogName: 'Favorite name'
-        },
-        {
-            id: '22',
-            title: 'Ya title',
-            shortDescription: 'it`s very cool short description',
-            content: "content it is man",
-            blogId: "2",
-            blogName: 'Best Name'
-        }
-    ]
-};
