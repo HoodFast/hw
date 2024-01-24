@@ -13,12 +13,6 @@ exports.BlogRepository = void 0;
 const db_1 = require("../db/db");
 const blog_mappers_1 = require("../models/blog/mappers/blog-mappers");
 const mongodb_1 = require("mongodb");
-// export type blogType = {
-//     id: string,
-//     name: string
-//     description: string
-//     websiteUrl: string
-// }
 class BlogRepository {
     static getAll() {
         return __awaiter(this, void 0, void 0, function* () {

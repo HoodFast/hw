@@ -51,7 +51,7 @@ exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validator
 }));
 exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    if (mongodb_1.ObjectId.isValid(id)) {
+    if (!mongodb_1.ObjectId.isValid(id)) {
         res.sendStatus(404);
         return;
     }
@@ -71,6 +71,10 @@ exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validat
     res.sendStatus(204);
 }));
 exports.blogRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!mongodb_1.ObjectId.isValid(req.params.id)) {
+        res.sendStatus(404);
+        return;
+    }
     const findBlog = yield blog_repository_1.BlogRepository.getById(req.params.id);
     if (!findBlog) {
         res.sendStatus(404);

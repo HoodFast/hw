@@ -1,23 +1,12 @@
 import {blogsCollection} from "../db/db";
 import {blogMapper} from "../models/blog/mappers/blog-mappers";
 import {ObjectId} from "mongodb";
-import {blogType} from "../routes/blog-route";
-
-export type OutputBlogType = {
-    name: string
-    description: string
-    websiteUrl: string
-    createdAt:string
-    isMembership:boolean
-}
+import {BlogType, OutputBlogType} from "../models/common/common";
 
 
-// export type blogType = {
-//     id: string,
-//     name: string
-//     description: string
-//     websiteUrl: string
-// }
+
+
+
 
 
 export class BlogRepository {
@@ -43,7 +32,7 @@ export class BlogRepository {
         return blogMapper(blog)
     }
 
-    static async updateBlog(data: blogType):Promise<boolean> {
+    static async updateBlog(data: BlogType):Promise<boolean> {
 
         const res = await blogsCollection.updateOne({_id:new ObjectId(data.id)}, {
             $set : {

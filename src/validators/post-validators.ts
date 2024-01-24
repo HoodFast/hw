@@ -27,7 +27,6 @@ const blogIdValidator = body('blogId')
         const blog =await BlogRepository.getById(value)
 
         if(!blog){
-            // throw Error('Incorrect blogId')
             return false
         }
         return true

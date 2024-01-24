@@ -2,6 +2,9 @@ import {Request, Response, Router} from "express";
 import {PostRepository} from "../repositories/post-repository";
 import {postValidation} from "../validators/post-validators";
 import {authMiddleware} from "../middlewares/auth/auth-middleware";
+import {PostType, PostTypeDb, ResponseType} from "../models/common/common";
+import {BlogRepository} from "../repositories/blog-repository";
+import {ObjectId} from "mongodb";
 
 
 export type createPostType = {
@@ -17,13 +20,13 @@ type RequestWithParamsSndBody<P, B> = Request<P, {}, B, {}>
 
 export const postRoute = Router({})
 
-postRoute.get('/', (req: Request, res: Response) => {
-    const blogs = PostRepository.getAll()
+postRoute.get('/', async (req: Request, res: Response) => {
+    const blogs = await PostRepository.getAll()
     res.send(blogs)
 })
 
-postRoute.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const foundPost = PostRepository.getById(req.params.id)
+postRoute.get('/:id', async (req: RequestWithParams<{ id: string }>, res: ResponseType<PostType>) => {
+    const foundPost = await PostRepository.getById(req.params.id)
     if (!foundPost) {
         res.sendStatus(404)
         return
@@ -31,15 +34,36 @@ postRoute.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) =>
     res.send(foundPost)
 })
 
-postRoute.post('/', authMiddleware, postValidation(), (req: RequestWithBody<createPostType>, res: Response) => {
-    const newPost = PostRepository.createPost(req.body)
-    res.status(201).send(newPost)
+postRoute.post('/', authMiddleware, postValidation(), async (req: RequestWithBody<createPostType>, res: ResponseType<PostType>) => {
+    const blog = await BlogRepository.getById(req.body.blogId)
+
+    if (!blog) {
+        res.sendStatus(404)
+        return
+    }
+
+    const newPost: PostTypeDb = {
+        title: req.body.title,
+        shortDescription: '',
+        content: req.body.content,
+        blogId: req.body.blogId,
+        blogName: blog.name,
+        createdAt: new Date().toISOString()
+    }
+
+    const post = await PostRepository.createPost(newPost)
+
+    if (!post) {
+        res.sendStatus(404)
+        return
+    }
+    res.status(201).send(post)
 })
 
-postRoute.put('/:id', authMiddleware, postValidation(), (req: RequestWithParamsSndBody<{
+postRoute.put('/:id', authMiddleware, postValidation(), async (req: RequestWithParamsSndBody<{
     id: string
-}, createPostType>, res: Response) => {
-    const updatePost = PostRepository.updatePost({...req.body, id: req.params.id})
+}, createPostType>, res: ResponseType<void>) => {
+    const updatePost = await PostRepository.updatePost({...req.body, id: req.params.id})
     if (!updatePost) {
         res.sendStatus(404)
         return
@@ -47,8 +71,14 @@ postRoute.put('/:id', authMiddleware, postValidation(), (req: RequestWithParamsS
     res.sendStatus(204)
 })
 
-postRoute.delete('/:id', authMiddleware, (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const deletePost = PostRepository.deletePost(req.params.id)
+postRoute.delete('/:id', authMiddleware, async (req: RequestWithParams<{ id: string }>, res: Response) => {
+    const id = req.params.id
+    if (!ObjectId.isValid(id)) {
+        res.sendStatus(404)
+        return
+    }
+
+    const deletePost = await PostRepository.deletePost(id)
     if (!deletePost) {
         res.sendStatus(404)
         return

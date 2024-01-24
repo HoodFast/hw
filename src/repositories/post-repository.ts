@@ -1,77 +1,63 @@
-import {db} from "../db/db";
-import {createPostType} from "../routes/posts-route";
+import {postsCollection} from "../db/db";
 import {BlogRepository} from "./blog-repository";
+import {PostType, PostTypeDb, UpdatePostType} from "../models/common/common";
+import {postMapper} from "../models/blog/mappers/post-mappers";
+import {ObjectId} from "mongodb";
 
-
-type postType = {
-    id: string
-    title: string
-    shortDescription: string
-    content: string
-    blogId: string
-    blogName: string
-}
-
-type updatePostType = {
-    id: string
-    title: string
-    shortDescription: string
-    content: string
-    blogId: string
-}
 
 export class PostRepository {
-    static getAll() {
-        return db.posts
+    static async getAll(): Promise<PostType[]> {
+        const posts = await postsCollection.find({}).toArray()
+        return posts.map(postMapper)
     }
 
-    static getById(id: string) {
-        const post = db.posts.find(p => p.id === id)
+    static async getById(id: string): Promise<PostType | null> {
+        const post = await postsCollection.findOne({_id: new ObjectId(id)})
+        if (!post) {
+            return null
+        }
+        return postMapper(post)
+    }
+
+    static async createPost(data: PostTypeDb): Promise<PostType | null> {
+        const blog = await BlogRepository.getById(data.blogId)
+        if (!blog) {
+            return null
+        }
+
+        const res = await postsCollection.insertOne(data)
+        const post = await this.getById(res.insertedId.toString())
+        if (!post) {
+            return null
+        }
         return post
     }
 
-    static async createPost(data: createPostType) {
-        const blog = await BlogRepository.getById(data.blogId)
-        if (!blog) {
-            return
-        }
-        const newPost: postType = {
-            id: String(+(new Date())),
-            title: data.title,
-            shortDescription: '',
-            content: data.content,
-            blogId: data.blogId,
-            blogName: blog.name,
-        }
+    static async updatePost(data: UpdatePostType): Promise<boolean> {
+        try {
+            const blog = await BlogRepository.getById(data.blogId)
+            if (!blog) {
+                return false
+            }
+            const res = await postsCollection.updateOne({_id: new ObjectId(data.id)}, {
+                $set: {
+                    title: data.title,
+                    shortDescription: data.shortDescription,
+                    content: data.content,
+                    blogId: data.blogId,
+                    blogName: blog.name
+                }
+            })
 
-        db.posts.push(newPost)
-
-        return newPost
-    }
-
-    static updatePost(data:updatePostType) {
-       const foundPost = db.posts.find(p=>p.id===data.id)
-        if(foundPost){
-            foundPost.blogId=data.blogId
-            foundPost.content=data.content
-            foundPost.title=data.title
-            foundPost.shortDescription=data.shortDescription
-            return true
-        }
-        return false
-    }
-
-    static deletePost(id:string){
-        const foundPost = db.posts.find(p=>p.id===id)
-        if(!foundPost){
+            return !!res.matchedCount
+        } catch (e) {
+            console.log(e)
             return false
         }
-        db.posts = db.posts.filter(p=> p.id!==id)
-        return true
     }
 
-    static deletePostAll(){
-        db.posts = []
-        return
+    static async deletePost(id: string) {
+        const res = await postsCollection.deleteOne({_id: new ObjectId(id)})
+        return !!res.deletedCount
     }
 }

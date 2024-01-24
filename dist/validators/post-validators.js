@@ -33,7 +33,6 @@ const blogIdValidator = (0, express_validator_1.body)('blogId')
     .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
     const blog = yield blog_repository_1.BlogRepository.getById(value);
     if (!blog) {
-        // throw Error('Incorrect blogId')
         return false;
     }
     return true;

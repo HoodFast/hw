@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.db = exports.runDB = exports.postsCollection = exports.blogsCollection = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const mongodb_1 = require("mongodb");
+;
 dotenv_1.default.config();
 // mongodb+srv://holistic:<vjueBUHFNM1234>@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
 const uri = process.env.MONGO_URL || "mongodb";
