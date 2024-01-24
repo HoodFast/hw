@@ -6,13 +6,13 @@ export type RequestWithParams<P> = Request<P, {}, {}, {}>
 export type RequestWithParamsAndBody<P, B> = Request<P, {}, B, {}>
 export type RequestWithBody<B> = Request<{}, {}, B, {}>
 
-
-
-
-export type bdType = {
-    blogs:OutputBlogType[],
-    posts:PostType[]
+export type createPostType = {
+    title: string,
+    shortDescription: string,
+    content: string,
+    blogId: string
 }
+
 export type PostTypeDb = {
     title: string
     shortDescription: string
@@ -29,6 +29,7 @@ export type PostType = {
     content: string
     blogId: string
     blogName: string
+    createdAt:string
 }
 
 export type UpdatePostType = {

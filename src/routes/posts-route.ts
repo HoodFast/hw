@@ -2,17 +2,12 @@ import {Request, Response, Router} from "express";
 import {PostRepository} from "../repositories/post-repository";
 import {postValidation} from "../validators/post-validators";
 import {authMiddleware} from "../middlewares/auth/auth-middleware";
-import {PostType, PostTypeDb, ResponseType} from "../models/common/common";
+import {createPostType, PostType, PostTypeDb, ResponseType} from "../models/common/common";
 import {BlogRepository} from "../repositories/blog-repository";
 import {ObjectId} from "mongodb";
 
 
-export type createPostType = {
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string
-}
+
 
 type RequestWithBody<B> = Request<{}, {}, B, {}>
 type RequestWithParams<P> = Request<P, {}, {}, {}>

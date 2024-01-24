@@ -8,7 +8,6 @@ export const app = express()
 
 app.use(express.json())
 
-
 app.use('/ht_02/api/blogs', blogRoute)
 app.use('/ht_02/api/posts', postRoute)
 app.use('/ht_02/api/testing', testingRoute)
