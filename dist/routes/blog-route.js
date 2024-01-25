@@ -17,6 +17,7 @@ const mongodb_1 = require("mongodb");
 const blog_query_repository_1 = require("../repositories/blog.query.repository");
 const post_validators_1 = require("../validators/post-validators");
 const blog_service_1 = require("../services/blog.service");
+const blog_repository_1 = require("../repositories/blog.repository");
 exports.blogRoute = (0, express_1.Router)({});
 exports.blogRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
@@ -33,6 +34,15 @@ exports.blogRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.blogRoute.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _d, _e;
     const id = req.params.id;
+    if (!mongodb_1.ObjectId.isValid(id)) {
+        res.sendStatus(404);
+        return;
+    }
+    const blog = yield blog_repository_1.BlogRepository.getById(id);
+    if (!blog) {
+        res.sendStatus(404);
+        return;
+    }
     const sortData = {
         sortBy: (_d = req.query.sortBy) !== null && _d !== void 0 ? _d : 'createdAt',
         sortDirection: (_e = req.query.sortDirection) !== null && _e !== void 0 ? _e : 'desc',
@@ -40,10 +50,6 @@ exports.blogRoute.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     };
     const posts = yield blog_query_repository_1.BlogQueryRepository.getAllPostsToBlog(id, sortData);
-    if (!posts) {
-        res.sendStatus(404);
-        return;
-    }
     res.send(posts);
 }));
 exports.blogRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

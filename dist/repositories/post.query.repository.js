@@ -24,9 +24,9 @@ class PostQueryRepository {
                 .limit(pageSize)
                 .toArray();
             const totalCount = yield db_1.postsCollection.countDocuments({});
-            const pageCount = Math.ceil(totalCount / pageSize);
+            const pagesCount = Math.ceil(totalCount / pageSize);
             return {
-                pageCount,
+                pagesCount,
                 page: pageNumber,
                 pageSize,
                 totalCount,

@@ -16,6 +16,7 @@ import {BlogQueryRepository} from "../repositories/blog.query.repository";
 import {createPostFromBlogValidation} from "../validators/post-validators";
 import {CreatePostFromBlogInputModel} from "../models/blog/input/create.post.from.blog.input.model";
 import {BlogService} from "../services/blog.service";
+import {BlogRepository} from "../repositories/blog.repository";
 
 export const blogRoute = Router({})
 
@@ -35,6 +36,15 @@ blogRoute.get('/', async (req: RequestWithQuery<QueryBlogInputModel>, res: Respo
 
 blogRoute.get('/:id/posts', async (req: RequestWithQueryAndParams<ParamsType, QueryBlogInputModel>, res: ResponseType<Pagination<PostType>>) => {
     const id = req.params.id
+    if (!ObjectId.isValid(id)) {
+        res.sendStatus(404)
+        return
+    }
+    const blog = await BlogRepository.getById(id)
+    if(!blog){
+        res.sendStatus(404)
+        return
+    }
     const sortData = {
         sortBy: req.query.sortBy ?? 'createdAt',
         sortDirection: req.query.sortDirection ?? 'desc',
@@ -43,10 +53,7 @@ blogRoute.get('/:id/posts', async (req: RequestWithQueryAndParams<ParamsType, Qu
     }
 
     const posts = await BlogQueryRepository.getAllPostsToBlog(id, sortData)
-    if (!posts) {
-        res.sendStatus(404)
-        return
-    }
+
     res.send(posts)
 })
 

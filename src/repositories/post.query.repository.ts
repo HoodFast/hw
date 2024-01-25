@@ -18,10 +18,10 @@ export class PostQueryRepository {
             .toArray()
 
         const totalCount = await postsCollection.countDocuments({})
-        const pageCount = Math.ceil(totalCount / pageSize)
+        const pagesCount = Math.ceil(totalCount / pageSize)
 
         return {
-            pageCount,
+            pagesCount,
             page: pageNumber,
             pageSize,
             totalCount,

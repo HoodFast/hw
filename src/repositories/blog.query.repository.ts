@@ -4,6 +4,7 @@ import {ObjectId} from "mongodb";
 import {BlogType, OutputBlogMapType, OutputBlogType, Pagination, PostType} from "../models/common/common";
 import {QueryBlogInputModel} from "../models/blog/input/query.blog.input.model";
 import {postMapper} from "../models/blog/mappers/post-mappers";
+import {BlogRepository} from "./blog.repository";
 
 type SortDataSearchType = {
     searchNameTerm: string | null
@@ -40,10 +41,10 @@ export class BlogQueryRepository {
             .limit(pageSize)
             .toArray()
         const totalCount = await blogsCollection.countDocuments(filter)
-        const pageCount = Math.ceil(totalCount / pageSize)
+        const pagesCount = Math.ceil(totalCount / pageSize)
 
         return {
-            pageCount,
+            pagesCount,
             page: pageNumber,
             pageSize,
             totalCount,
@@ -51,7 +52,7 @@ export class BlogQueryRepository {
         }
     }
 
-    static async getAllPostsToBlog (blogId:string,sortData:SortDataType):Promise<Pagination<PostType>>{
+    static async getAllPostsToBlog(blogId: string, sortData: SortDataType): Promise<Pagination<PostType>> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
         const posts = await postsCollection
@@ -62,10 +63,10 @@ export class BlogQueryRepository {
             .toArray()
 
         const totalCount = await postsCollection.countDocuments({blogId})
-        const pageCount = Math.ceil(totalCount / pageSize)
+        const pagesCount = Math.ceil(totalCount / pageSize)
 
         return {
-            pageCount,
+            pagesCount,
             page: pageNumber,
             pageSize,
             totalCount,

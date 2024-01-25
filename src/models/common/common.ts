@@ -10,7 +10,7 @@ export type RequestWithBody<B> = Request<{}, {}, B, {}>
 
 export type Pagination<I> = {
     totalCount: number
-    pageCount: number
+    pagesCount: number
     page: number
     pageSize: number
     items: I[]
