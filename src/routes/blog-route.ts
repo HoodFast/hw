@@ -33,7 +33,7 @@ blogRoute.get('/', async (req: RequestWithQuery<QueryBlogInputModel>, res: Respo
     res.send(blogs)
 })
 
-blogRoute.get('/:id/posts', async (req: RequestWithQueryAndParams<ParamsType,QueryBlogInputModel>, res: ResponseType<Pagination<PostType>>) => {
+blogRoute.get('/:id/posts', async (req: RequestWithQueryAndParams<ParamsType, QueryBlogInputModel>, res: ResponseType<Pagination<PostType>>) => {
     const id = req.params.id
     const sortData = {
         sortBy: req.query.sortBy ?? 'createdAt',
@@ -42,8 +42,11 @@ blogRoute.get('/:id/posts', async (req: RequestWithQueryAndParams<ParamsType,Que
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     }
 
-    const posts = await BlogQueryRepository.getAllPostsToBlog(id,sortData)
-
+    const posts = await BlogQueryRepository.getAllPostsToBlog(id, sortData)
+    if (!posts) {
+        res.sendStatus(404)
+        return
+    }
     res.send(posts)
 })
 

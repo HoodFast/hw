@@ -26,10 +26,10 @@ class PostQueryRepository {
             const totalCount = yield db_1.postsCollection.countDocuments({});
             const pageCount = Math.ceil(totalCount / pageSize);
             return {
-                totalCount,
                 pageCount,
                 page: pageNumber,
                 pageSize,
+                totalCount,
                 items: posts.map(post_mappers_1.postMapper)
             };
         });

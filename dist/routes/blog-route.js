@@ -40,6 +40,10 @@ exports.blogRoute.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     };
     const posts = yield blog_query_repository_1.BlogQueryRepository.getAllPostsToBlog(id, sortData);
+    if (!posts) {
+        res.sendStatus(404);
+        return;
+    }
     res.send(posts);
 }));
 exports.blogRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -21,10 +21,10 @@ export class PostQueryRepository {
         const pageCount = Math.ceil(totalCount / pageSize)
 
         return {
-            totalCount,
             pageCount,
             page: pageNumber,
             pageSize,
+            totalCount,
             items: posts.map(postMapper)
         }
     }

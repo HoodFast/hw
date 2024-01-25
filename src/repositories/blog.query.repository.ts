@@ -43,10 +43,10 @@ export class BlogQueryRepository {
         const pageCount = Math.ceil(totalCount / pageSize)
 
         return {
-            totalCount,
             pageCount,
             page: pageNumber,
             pageSize,
+            totalCount,
             items: blogs.map(blogMapper)
         }
     }
@@ -65,10 +65,10 @@ export class BlogQueryRepository {
         const pageCount = Math.ceil(totalCount / pageSize)
 
         return {
-            totalCount,
             pageCount,
             page: pageNumber,
             pageSize,
+            totalCount,
             items: posts.map(postMapper)
         }
     }
