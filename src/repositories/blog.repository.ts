@@ -1,7 +1,10 @@
 import {blogsCollection} from "../db/db";
-import {blogMapper} from "../models/blog/mappers/blog-mappers";
+
 import {ObjectId} from "mongodb";
-import {BlogType, OutputBlogType} from "../models/common/common";
+import {BlogType, OutputBlogMapType, OutputBlogType} from "../models/common/common";
+
+import {BlogQueryRepository} from "./blog.query.repository";
+import {BlogDbType} from "../models/blog/db/blog-db";
 
 
 
@@ -10,26 +13,14 @@ import {BlogType, OutputBlogType} from "../models/common/common";
 
 
 export class BlogRepository {
-    static async getAll(): Promise<OutputBlogType[]> {
-        const blogs = await blogsCollection.find({}).toArray()
-        return blogs.map(blogMapper)
-    }
 
-    static async createBlog(createData: OutputBlogType):Promise<OutputBlogType | null> {
+    static async createBlog(createData: OutputBlogType):Promise<OutputBlogMapType | null> {
         const res = await blogsCollection.insertOne(createData)
-        const blog = await this.getById(res.insertedId.toString())
+        const blog = await BlogQueryRepository.getById(res.insertedId.toString())
         if (!blog) {
             return null
         }
         return blog
-    }
-
-    static async getById(id: string): Promise<OutputBlogType | null> {
-        const blog = await blogsCollection.findOne({_id: new ObjectId(id)})
-        if (!blog) {
-            return null
-        }
-        return blogMapper(blog)
     }
 
     static async updateBlog(data: BlogType):Promise<boolean> {
@@ -42,6 +33,14 @@ export class BlogRepository {
             }
         })
         return !!res.matchedCount
+    }
+
+    static async getById(id: string): Promise<BlogDbType | null> {
+        const blog = await blogsCollection.findOne({_id: new ObjectId(id)})
+        if (!blog) {
+            return null
+        }
+        return blog
     }
 
     static async deleteById(id: string):Promise<boolean> {

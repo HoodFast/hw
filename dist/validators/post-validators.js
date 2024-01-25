@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postValidation = void 0;
+exports.createPostFromBlogValidation = exports.postValidation = void 0;
 const express_validator_1 = require("express-validator");
-const blog_repository_1 = require("../repositories/blog-repository");
 const input_validation_middleware_1 = require("../middlewares/inputValidation/input-validation-middleware");
+const blog_query_repository_1 = require("../repositories/blog.query.repository");
 const titleValidator = (0, express_validator_1.body)('title')
     .isString().withMessage('Title must be a string')
     .trim()
@@ -31,7 +31,7 @@ const contentValidator = (0, express_validator_1.body)('content')
 const blogIdValidator = (0, express_validator_1.body)('blogId')
     .isString().withMessage('websiteUrl must be a string')
     .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
-    const blog = yield blog_repository_1.BlogRepository.getById(value);
+    const blog = yield blog_query_repository_1.BlogQueryRepository.getById(value);
     if (!blog) {
         throw Error('Incorrect blogId');
     }
@@ -46,3 +46,10 @@ const postValidation = () => [
     input_validation_middleware_1.inputValidationMiddleware
 ];
 exports.postValidation = postValidation;
+const createPostFromBlogValidation = () => [
+    titleValidator,
+    shortDescriptionValidator,
+    contentValidator,
+    input_validation_middleware_1.inputValidationMiddleware
+];
+exports.createPostFromBlogValidation = createPostFromBlogValidation;
