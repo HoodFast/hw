@@ -22,7 +22,7 @@ export type createPostFromBlog = {
     content: string
 }
 
-export type createPostType = {
+export type CreatePostType = {
     title: string,
     shortDescription: string,
     content: string,

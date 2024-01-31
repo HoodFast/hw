@@ -1,7 +1,6 @@
 import {BlogRepository} from "../repositories/blog.repository";
 import {
     createPostFromBlog,
-    createPostType,
     OutputBlogType,
     PostType,
     PostTypeDb,

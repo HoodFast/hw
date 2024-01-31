@@ -1,17 +1,16 @@
-import {Request, Response, Router} from "express";
-import {PostRepository} from "../repositories/post.repository";
+import {Response, Router} from "express";
+
 import {postValidation} from "../validators/post-validators";
 import {authMiddleware} from "../middlewares/auth/auth-middleware";
 import {
-    createPostType, Pagination,
+    CreatePostType, Pagination,
     ParamsType,
     PostType, PostTypeCreate,
-    PostTypeDb, RequestWithBody,
+    RequestWithBody,
     RequestWithParams, RequestWithParamsAndBody, RequestWithQuery,
     ResponseType
 } from "../models/common/common";
 import {ObjectId} from "mongodb";
-import {BlogQueryRepository, SortDataType} from "../repositories/blog.query.repository";
 import {PostQueryRepository} from "../repositories/post.query.repository";
 import {QueryPostInputModel} from "../models/post/post.query.input.model";
 import {PostService} from "../services/post.service";
@@ -44,7 +43,7 @@ postRoute.get('/:id', async (req: RequestWithParams<ParamsType>, res: ResponseTy
     res.send(foundPost)
 })
 
-postRoute.post('/', authMiddleware, postValidation(), async (req: RequestWithBody<createPostType>, res: ResponseType<PostType>) => {
+postRoute.post('/', authMiddleware, postValidation(), async (req: RequestWithBody<CreatePostType>, res: ResponseType<PostType>) => {
 
     const newPost: PostTypeCreate = {
         title: req.body.title,
@@ -64,7 +63,7 @@ postRoute.post('/', authMiddleware, postValidation(), async (req: RequestWithBod
 })
 
 
-postRoute.put('/:id', authMiddleware, postValidation(), async (req: RequestWithParamsAndBody<ParamsType, createPostType>, res: ResponseType<void>) => {
+postRoute.put('/:id', authMiddleware, postValidation(), async (req: RequestWithParamsAndBody<ParamsType, CreatePostType>, res: ResponseType<void>) => {
 
 const updateData = {
     id:req.params.id,
