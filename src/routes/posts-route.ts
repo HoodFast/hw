@@ -47,7 +47,7 @@ postRoute.post('/', authMiddleware, postValidation(), async (req: RequestWithBod
 
     const newPost: PostTypeCreate = {
         title: req.body.title,
-        shortDescription: '',
+        shortDescription: req.body.shortDescription,
         content: req.body.content,
         blogId: req.body.blogId,
         createdAt: new Date().toISOString()

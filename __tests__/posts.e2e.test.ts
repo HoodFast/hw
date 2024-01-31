@@ -30,7 +30,7 @@ describe('ht_02/api/blogs', () => {
             title: 'test',
             blogId,
             content: 'test content',
-            shortDescription: "test description"
+            shortDescription: "test"
         }
 
         for (let i = 0; i < 15; i++) {
@@ -56,8 +56,9 @@ describe('ht_02/api/blogs', () => {
             title: 'test',
             blogId,
             content: 'test content',
-            shortDescription: "test description"
+            shortDescription: "test"
         }
+
         const createResponse = await request(app)
             .post(path.posts)
             .auth('admin', 'qwerty')
@@ -67,9 +68,10 @@ describe('ht_02/api/blogs', () => {
         const expectedObject = {
             id: '1',
             title: "string",
-            shortDescription: 'string',
+            shortDescription: '',
             content: 'string',
             blogId: 'string',
+            blogName: 'string',
             createdAt: new Date().toISOString()
         }
         const isValidType = typeof expectedObject
@@ -78,18 +80,11 @@ describe('ht_02/api/blogs', () => {
 
         expect(createResponse.body).toEqual({
             id: expect.any(String),
-            name: newBlog.name,
-            description: newBlog.description,
-            websiteUrl: newBlog.websiteUrl,
-            isMembership: expect.any(Boolean),
-            createdAt: expect.any(String)
-        })
-        expect(createResponse.body).toEqual({
-            id: expect.any(String),
             title: newPost.title,
             shortDescription: newPost.shortDescription,
             content: newPost.content,
             blogId: expect.any(String),
+            blogName:blogs.body.items[0].name,
             createdAt: expect.any(String)
         })
 
@@ -97,7 +92,7 @@ describe('ht_02/api/blogs', () => {
             .get(path.posts)
             .expect(200)
         debugger
-        expect(getPosts.body.pagesCount).toBe(16)
+        expect(getPosts.body.totalCount).toBe(16)
     })
     // it('+update blog with correct data', async () => {
     //     const updateData: UpdateBlogType = {
