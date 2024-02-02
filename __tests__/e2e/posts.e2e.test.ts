@@ -1,6 +1,6 @@
-import {app} from '../src/settings'
+import {app} from '../../src/settings'
 
-import {CreatePostType, UpdateBlogType} from "../src/models/common/common";
+import {CreatePostType, UpdateBlogType} from "../../src/models/common/common";
 
 
 const request = require('supertest');

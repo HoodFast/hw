@@ -1,6 +1,6 @@
-import {app} from '../src/settings'
+import {app} from '../../src/settings'
 
-import {UpdateBlogType} from "../src/models/common/common";
+import {UpdateBlogType} from "../../src/models/common/common";
 
 
 

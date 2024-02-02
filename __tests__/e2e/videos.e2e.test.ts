@@ -1,4 +1,4 @@
-import {app, CreateVideoType} from '../src/settings'
+import {app, CreateVideoType} from '../../src/settings'
 
 const request = require('supertest');
 
