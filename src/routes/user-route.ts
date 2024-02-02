@@ -1,12 +1,13 @@
 import {Router} from "express";
-import {BlogQueryRepository} from "../repositories/blog.query.repository";
-import {UserQueryRepository} from "../repositories/UsersQueryRepository";
+import { UserQueryRepository, UserSortDataSearchType} from "../repositories/UsersQueryRepository";
+import {RequestWithQuery} from "../models/common/common";
 
 export const userRoute = Router({})
 
-userRoute.get('/', (req,res)=>{
-    const sortData = {
-        searchNameTerm: req.query.searchNameTerm ?? null,
+userRoute.get('/', async (req:RequestWithQuery<UserSortDataSearchType>,res)=>{
+    const sortData:UserSortDataSearchType = {
+        searchLoginTerm: req.query.searchLoginTerm ?? null,
+        searchEmailTerm: req.query.searchEmailTerm ?? null,
         sortBy: req.query.sortBy ?? 'createdAt',
         sortDirection: req.query.sortDirection ?? 'desc',
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,

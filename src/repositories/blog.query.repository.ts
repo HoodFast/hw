@@ -1,12 +1,10 @@
 import {blogsCollection, postsCollection} from "../db/db";
 import {blogMapper} from "../models/blog/mappers/blog-mappers";
 import {ObjectId} from "mongodb";
-import {BlogType, OutputBlogMapType, OutputBlogType, Pagination, PostType} from "../models/common/common";
-import {QueryBlogInputModel} from "../models/blog/input/query.blog.input.model";
+import { OutputBlogMapType, OutputBlogType, Pagination, PostType} from "../models/common/common";
 import {postMapper} from "../models/blog/mappers/post-mappers";
-import {BlogRepository} from "./blog.repository";
 
-type SortDataSearchType = {
+export type SortDataSearchType = {
     searchNameTerm: string | null
     sortBy: string
     sortDirection: "asc" | "desc"
