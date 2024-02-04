@@ -17,13 +17,32 @@ class UserQueryRepository {
     static getAll(sortData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { searchLoginTerm, searchEmailTerm, sortBy, sortDirection, pageSize, pageNumber } = sortData;
+            let loginFilter = {};
+            let emailFilter = {};
+            let filter = {};
+            if (searchLoginTerm) {
+                loginFilter = {
+                    login: { $regex: `^(?i)${searchLoginTerm}`, $options: 'i' }
+                };
+            }
+            if (searchEmailTerm) {
+                emailFilter = {
+                    email: { $regex: `^(?i)${searchEmailTerm}`, $options: 'i' }
+                };
+            }
+            if (searchEmailTerm && searchLoginTerm) {
+                filter = { $or: [loginFilter, emailFilter] };
+            }
+            else {
+                filter = { $and: [loginFilter, emailFilter] };
+            }
             const users = yield db_1.usersCollection
-                .find({})
+                .find(filter)
                 .sort(sortBy, sortDirection)
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .toArray();
-            const totalCount = yield db_1.usersCollection.countDocuments({});
+            const totalCount = yield db_1.usersCollection.countDocuments(filter);
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {
                 pagesCount,
