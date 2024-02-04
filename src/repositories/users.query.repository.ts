@@ -1,9 +1,11 @@
 import {usersCollection} from "../db/db";
 import {Pagination, PostType} from "../models/common/common";
 import {ObjectId} from "mongodb";
-import {SortDataType} from "./blog.query.repository";
+
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {userMapper} from "../models/users/mappers/user-mappers";
+import {AuthInputType} from "../models/auth/input/auth.input.model";
+import {UsersTypeDb} from "../models/users/db/usersDBModel";
 
 
 export type UserSortDataSearchType = {
@@ -14,6 +16,8 @@ export type UserSortDataSearchType = {
     pageNumber: number
     pageSize: number
 }
+
+
 
 
 
@@ -46,6 +50,14 @@ export class UserQueryRepository {
             return null
         }
         return userMapper(user)
+    }
+
+    static async getByLoginOrEmail(loginOrEmail:string): Promise<UsersTypeDb | null> {
+        const user = await usersCollection.findOne({$or:[{email:loginOrEmail},{login:loginOrEmail}]})
+        if (!user) {
+            return null
+        }
+        return user
     }
 
 }

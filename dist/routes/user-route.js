@@ -11,7 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRoute = void 0;
 const express_1 = require("express");
-const UsersQueryRepository_1 = require("../repositories/UsersQueryRepository");
+const users_query_repository_1 = require("../repositories/users.query.repository");
+const user_service_1 = require("../services/user.service");
 exports.userRoute = (0, express_1.Router)({});
 exports.userRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
@@ -23,6 +24,14 @@ exports.userRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, funct
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     };
-    const users = yield UsersQueryRepository_1.UserQueryRepository.getAll(sortData);
+    const users = yield users_query_repository_1.UserQueryRepository.getAll(sortData);
     return res.send(users);
+}));
+exports.userRoute.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
+    if (!createdUser) {
+        res.sendStatus(404);
+        return;
+    }
+    res.status(201).send(createdUser);
 }));

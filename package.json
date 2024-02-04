@@ -11,8 +11,10 @@
     "test": "jest --runInBand --detectOpenHandles --forceExit"
   },
   "dependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/jest": "^29.5.11",
     "@types/supertest": "^6.0.2",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.3.2",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",

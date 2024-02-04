@@ -2,6 +2,8 @@ import express, {Request} from 'express'
 import {blogRoute} from "./routes/blog-route";
 import {postRoute} from "./routes/posts-route";
 import {testingRoute} from "./routes/testing-route";
+import {userRoute} from "./routes/user-route";
+import {authRoute} from "./routes/auth.route";
 
 
 export const app = express()
@@ -10,6 +12,8 @@ app.use(express.json())
 
 app.use('/ht_02/api/blogs', blogRoute)
 app.use('/ht_02/api/posts', postRoute)
+app.use('/ht_02/api/users', userRoute)
+app.use('/ht_02/api/auth', authRoute)
 app.use('/ht_02/api/testing', testingRoute)
 
 
