@@ -1,5 +1,4 @@
 import {Response, Router} from "express";
-
 import {postValidation} from "../validators/post-validators";
 import {authMiddleware} from "../middlewares/auth/auth-middleware";
 import {

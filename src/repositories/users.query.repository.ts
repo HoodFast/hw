@@ -1,10 +1,10 @@
-import {blogsCollection, usersCollection} from "../db/db";
+import {usersCollection} from "../db/db";
 import {Pagination, PostType} from "../models/common/common";
 import {ObjectId} from "mongodb";
 
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {userMapper} from "../models/users/mappers/user-mappers";
-import {AuthInputType} from "../models/auth/input/auth.input.model";
+
 import {UsersTypeDb} from "../models/users/db/usersDBModel";
 
 
