@@ -15,6 +15,7 @@ const users_query_repository_1 = require("../repositories/users.query.repository
 const user_service_1 = require("../services/user.service");
 const mongodb_1 = require("mongodb");
 const auth_middleware_1 = require("../middlewares/auth/auth-middleware");
+const users_validator_1 = require("../validators/users-validator");
 exports.userRoute = (0, express_1.Router)({});
 exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
@@ -30,7 +31,7 @@ exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awa
     const users = yield users_query_repository_1.UserQueryRepository.getAll(sortData);
     return res.send(users);
 }));
-exports.userRoute.post('/', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.userRoute.post('/', auth_middleware_1.authMiddleware, (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
     if (!createdUser) {
         res.sendStatus(404);

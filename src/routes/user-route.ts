@@ -13,6 +13,7 @@ import {UserInputModelType} from "../models/users/input/user.input.model";
 import {userService} from "../services/user.service";
 import {ObjectId} from "mongodb";
 import {authMiddleware} from "../middlewares/auth/auth-middleware";
+import {userValidators} from "../validators/users-validator";
 
 export const userRoute = Router({})
 
@@ -30,7 +31,7 @@ debugger
     return res.send(users)
 })
 
-userRoute.post('/',authMiddleware, async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType>) => {
+userRoute.post('/',authMiddleware,userValidators(), async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType>) => {
     const createdUser = await userService.createUser(req.body.login, req.body.email, req.body.password)
     if (!createdUser) {
         res.sendStatus(404)
