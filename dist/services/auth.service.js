@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_query_repository_1 = require("../repositories/users.query.repository");
-exports.authService = {
-    checkCredentials(data) {
+class authService {
+    static checkCredentials(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(data.loginOrEmail);
             if (!user) {
@@ -26,4 +26,5 @@ exports.authService = {
             return res;
         });
     }
-};
+}
+exports.authService = authService;

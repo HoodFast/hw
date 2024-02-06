@@ -11,10 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userService = void 0;
 const user_repository_1 = require("../repositories/user.repository");
+const users_query_repository_1 = require("../repositories/users.query.repository");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-exports.userService = {
-    createUser(login, email, password) {
+class userService {
+    static createUser(login, email, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdAt = new Date().toISOString();
             const salt = bcrypt.genSaltSync(saltRounds);
@@ -27,4 +28,14 @@ exports.userService = {
             return createdUser;
         });
     }
-};
+    static deleteUser(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const findUser = yield users_query_repository_1.UserQueryRepository.getById(id);
+            if (!findUser) {
+                return null;
+            }
+            return yield users_query_repository_1.UserQueryRepository.deleteById(id);
+        });
+    }
+}
+exports.userService = userService;

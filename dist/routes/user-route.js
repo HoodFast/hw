@@ -13,8 +13,10 @@ exports.userRoute = void 0;
 const express_1 = require("express");
 const users_query_repository_1 = require("../repositories/users.query.repository");
 const user_service_1 = require("../services/user.service");
+const mongodb_1 = require("mongodb");
+const auth_middleware_1 = require("../middlewares/auth/auth-middleware");
 exports.userRoute = (0, express_1.Router)({});
-exports.userRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
     const sortData = {
         searchLoginTerm: (_a = req.query.searchLoginTerm) !== null && _a !== void 0 ? _a : null,
@@ -24,14 +26,28 @@ exports.userRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, funct
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     };
+    debugger;
     const users = yield users_query_repository_1.UserQueryRepository.getAll(sortData);
     return res.send(users);
 }));
-exports.userRoute.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.userRoute.post('/', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
     if (!createdUser) {
         res.sendStatus(404);
         return;
     }
     res.status(201).send(createdUser);
+}));
+exports.userRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    if (!mongodb_1.ObjectId.isValid(id)) {
+        res.sendStatus(404);
+        return;
+    }
+    const userIsDeleted = yield user_service_1.userService.deleteUser(id);
+    if (!userIsDeleted) {
+        res.sendStatus(404);
+        return;
+    }
+    return res.sendStatus(204);
 }));

@@ -17,7 +17,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const mongodb_1 = require("mongodb");
 ;
 dotenv_1.default.config();
-// mongodb+srv://holistic:<vjueBUHFNM1234>@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
+// mongodb+srv://holistic:vjueBUHFNM1234@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
 const uri = process.env.MONGO_URL || "mongodb";
 const client = new mongodb_1.MongoClient(uri);
 const dataBase = client.db('blogs-db');

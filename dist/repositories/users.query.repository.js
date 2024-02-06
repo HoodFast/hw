@@ -71,5 +71,11 @@ class UserQueryRepository {
             return user;
         });
     }
+    static deleteById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.usersCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+            return !!res.deletedCount;
+        });
+    }
 }
 exports.UserQueryRepository = UserQueryRepository;

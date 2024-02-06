@@ -6,7 +6,7 @@ import {PostTypeDb} from "../models/common/common";
 import {UsersTypeDb} from "../models/users/db/usersDBModel";
 dotenv.config()
 
-// mongodb+srv://holistic:<vjueBUHFNM1234>@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
+// mongodb+srv://holistic:vjueBUHFNM1234@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
 
 const uri = process.env.MONGO_URL || "mongodb"
 

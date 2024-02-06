@@ -12,8 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRoute = void 0;
 const express_1 = require("express");
 const auth_service_1 = require("../services/auth.service");
+const auth_validators_1 = require("../validators/auth-validators");
 exports.authRoute = (0, express_1.Router)({});
-exports.authRoute.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const loginOrEmail = req.body.loginOrEmail;
     const password = req.body.password;
     const authorisation = yield auth_service_1.authService.checkCredentials({ loginOrEmail, password });

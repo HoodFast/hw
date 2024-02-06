@@ -25,7 +25,7 @@ userRoute.get('/',authMiddleware, async (req: RequestWithQuery<UserSortDataSearc
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     }
-
+debugger
     const users = await UserQueryRepository.getAll(sortData)
     return res.send(users)
 })
