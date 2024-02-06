@@ -21,8 +21,8 @@ const AvailableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "
 const videos = [
     {
         id: 0,
-        title: "string",
-        author: "string",
+        title: "123",
+        author: "123",
         canBeDownloaded: true,
         minAgeRestriction: null,
         createdAt: "2024-01-02T21:03:04.165Z",

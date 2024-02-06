@@ -1,4 +1,5 @@
 import {body} from "express-validator";
+import {inputValidationMiddleware} from "../middlewares/inputValidation/input-validation-middleware";
 
 const loginValidator = body('login')
     .trim()
@@ -20,4 +21,4 @@ const emailValidator = body('email')
     .withMessage('Incorrect login')
 
 
-export const userValidators = ()=>[loginValidator,passwordValidator,emailValidator]
+export const userValidators = ()=>[loginValidator,passwordValidator,emailValidator,inputValidationMiddleware]

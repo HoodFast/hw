@@ -26,12 +26,12 @@ export class UserQueryRepository {
         let filter = {}
         if (searchLoginTerm) {
             loginFilter = {
-                login: {$regex: `^(?i)${searchLoginTerm}`, $options: 'i'}
+                login: {$regex: `${searchLoginTerm}`, $options: 'i'}
             }
         }
         if (searchEmailTerm) {
             emailFilter = {
-                email: {$regex: `^(?i)${searchEmailTerm}`, $options: 'i'}
+                email: {$regex: `${searchEmailTerm}`, $options: 'i'}
             }
         }
         if (searchEmailTerm && searchLoginTerm) {
