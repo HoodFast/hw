@@ -1,14 +1,23 @@
-import {Router} from "express";
-import { UserQueryRepository, UserSortDataSearchType} from "../repositories/users.query.repository";
-import {RequestWithBody, RequestWithQuery, ResponseType} from "../models/common/common";
+import {Response, Router} from "express";
+import {UserQueryRepository, UserSortDataSearchType} from "../repositories/users.query.repository";
+import {
+    Pagination,
+    ParamsType,
+    RequestWithBody,
+    RequestWithParams,
+    RequestWithQuery,
+    ResponseType
+} from "../models/common/common";
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {UserInputModelType} from "../models/users/input/user.input.model";
 import {userService} from "../services/user.service";
+import {ObjectId} from "mongodb";
+import {authMiddleware} from "../middlewares/auth/auth-middleware";
 
 export const userRoute = Router({})
 
-userRoute.get('/', async (req:RequestWithQuery<UserSortDataSearchType>,res)=>{
-    const sortData:UserSortDataSearchType = {
+userRoute.get('/',authMiddleware, async (req: RequestWithQuery<UserSortDataSearchType>, res:ResponseType<Pagination<OutputUsersType>> | any) => {
+    const sortData: UserSortDataSearchType = {
         searchLoginTerm: req.query.searchLoginTerm ?? null,
         searchEmailTerm: req.query.searchEmailTerm ?? null,
         sortBy: req.query.sortBy ?? 'createdAt',
@@ -21,11 +30,25 @@ userRoute.get('/', async (req:RequestWithQuery<UserSortDataSearchType>,res)=>{
     return res.send(users)
 })
 
-userRoute.post('/',async (req:RequestWithBody<UserInputModelType>,res:ResponseType<OutputUsersType>)=>{
-    const createdUser = await userService.createUser(req.body.login,req.body.email,req.body.password)
+userRoute.post('/',authMiddleware, async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType>) => {
+    const createdUser = await userService.createUser(req.body.login, req.body.email, req.body.password)
     if (!createdUser) {
         res.sendStatus(404)
         return
     }
     res.status(201).send(createdUser)
+})
+
+userRoute.delete('/:id',authMiddleware, async (req: RequestWithParams<ParamsType>, res: Response) => {
+    const id = req.params.id
+    if (!ObjectId.isValid(id)) {
+        res.sendStatus(404)
+        return
+    }
+    const userIsDeleted = await userService.deleteUser(id)
+    if (!userIsDeleted) {
+        res.sendStatus(404)
+        return
+    }
+    return res.sendStatus(204)
 })

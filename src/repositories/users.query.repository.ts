@@ -1,4 +1,4 @@
-import {usersCollection} from "../db/db";
+import {blogsCollection, usersCollection} from "../db/db";
 import {Pagination, PostType} from "../models/common/common";
 import {ObjectId} from "mongodb";
 
@@ -80,6 +80,11 @@ export class UserQueryRepository {
             return null
         }
         return user
+    }
+
+    static async deleteById(id: string):Promise<boolean> {
+        const res = await usersCollection.deleteOne({_id:new ObjectId(id)})
+        return !!res.deletedCount
     }
 
 }
