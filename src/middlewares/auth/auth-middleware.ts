@@ -1,21 +1,26 @@
-import {NextFunction, raw, Request, Response} from "express";
+import {NextFunction,  Request, Response} from "express";
 import {jwtService} from "../../application/jwt.service";
-import {userService} from "../../services/user.service";
 import {UserQueryRepository} from "../../repositories/users.query.repository";
+import {OutputUsersType} from "../../models/users/output/output.users.models";
 
+export interface UserAuthInfoRequest extends Request {
+    user: OutputUsersType | null
+}
 
-const loginCurrent = 'admin'
-const passwordCurrent = 'qwerty'
-export const authMiddleware = async (req:any, res: Response, next: NextFunction) => {
+// const loginCurrent = 'admin'
+// const passwordCurrent = 'qwerty'
+export const authMiddleware = async (req:UserAuthInfoRequest, res: Response, next: NextFunction) => {
     if(!req.headers.authorization){
         res.sendStatus(401)
         return
     }
     const token = req.headers.authorization.split(' ')[1]
 
-    const userId =await jwtService.getUserByToken(token)
+    const userId = await jwtService.getUserByToken(token)
     if(userId){
+        const user =
         req.user = await UserQueryRepository.getById(userId)
+        next()
     }
     res.sendStatus(401)
     return

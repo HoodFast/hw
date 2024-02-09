@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
 const jwt_service_1 = require("../../application/jwt.service");
 const users_query_repository_1 = require("../../repositories/users.query.repository");
-const loginCurrent = 'admin';
-const passwordCurrent = 'qwerty';
+// const loginCurrent = 'admin'
+// const passwordCurrent = 'qwerty'
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.headers.authorization) {
         res.sendStatus(401);
@@ -22,7 +22,8 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     const token = req.headers.authorization.split(' ')[1];
     const userId = yield jwt_service_1.jwtService.getUserByToken(token);
     if (userId) {
-        req.user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+        const user = req.user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+        next();
     }
     res.sendStatus(401);
     return;
