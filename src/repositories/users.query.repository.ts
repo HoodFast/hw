@@ -1,6 +1,6 @@
 import {usersCollection} from "../db/db";
 import {Pagination, PostType} from "../models/common/common";
-import {ObjectId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {userMapper} from "../models/users/mappers/user-mappers";
@@ -36,7 +36,7 @@ export class UserQueryRepository {
         }
         if (searchEmailTerm && searchLoginTerm) {
             filter = {$or: [loginFilter, emailFilter]}
-        }else{
+        } else {
             filter = {$and: [loginFilter, emailFilter]}
         }
 
@@ -71,19 +71,16 @@ export class UserQueryRepository {
         return userMapper(user)
     }
 
-    static async getByLoginOrEmail(loginOrEmail: string):
-        Promise<UsersTypeDb | null> {
+    static async getByLoginOrEmail(loginOrEmail: string):Promise<WithId<UsersTypeDb> | null> {
         const user = await usersCollection.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
-        if (!
-            user
-        ) {
+        if (!user) {
             return null
         }
         return user
     }
 
-    static async deleteById(id: string):Promise<boolean> {
-        const res = await usersCollection.deleteOne({_id:new ObjectId(id)})
+    static async deleteById(id: string): Promise<boolean> {
+        const res = await usersCollection.deleteOne({_id: new ObjectId(id)})
         return !!res.deletedCount
     }
 

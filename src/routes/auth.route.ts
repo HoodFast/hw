@@ -3,16 +3,19 @@ import {authService} from "../services/auth.service";
 import {RequestWithBody} from "../models/common/common";
 import {AuthInputType} from "../models/auth/input/auth.input.model";
 import {authValidation} from "../validators/auth-validators";
+import {jwtService} from "../application/jwt.service";
+
 
 export const authRoute = Router({})
 
 authRoute.post('/login',authValidation(), async (req:RequestWithBody<AuthInputType>,res:Response)=>{
-    const loginOrEmail = req.body.loginOrEmail
-    const password = req.body.password
-    const authorisation = await authService.checkCredentials({loginOrEmail, password})
-    if (!authorisation) {
-        res.sendStatus(401)
-        return
+
+    const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)
+    if (user) {
+        const token = jwtService.createJWT(user)
+        return res.status(201).send({accessToken:token})
+    }else{
+        return res.sendStatus(401)
     }
-    res.sendStatus(204)
+
 })

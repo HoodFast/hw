@@ -8,28 +8,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authService = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const users_query_repository_1 = require("../repositories/users.query.repository");
-class authService {
-    static checkCredentials(loginOrEmail, password) {
+exports.jwtService = void 0;
+let jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || '123';
+class jwtService {
+    static createJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(loginOrEmail);
-            if (!user) {
-                return null;
+            const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+            return token;
+        });
+    }
+    static getUserByToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = jwt.verify(token, JWT_SECRET);
+                return result.userId;
             }
-            const res = yield bcrypt_1.default.compare(password, user._passwordHash);
-            if (!res) {
+            catch (err) {
                 return null;
-            }
-            else {
-                return user;
             }
         });
     }
 }
-exports.authService = authService;
+exports.jwtService = jwtService;

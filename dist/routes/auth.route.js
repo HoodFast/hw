@@ -13,14 +13,15 @@ exports.authRoute = void 0;
 const express_1 = require("express");
 const auth_service_1 = require("../services/auth.service");
 const auth_validators_1 = require("../validators/auth-validators");
+const jwt_service_1 = require("../application/jwt.service");
 exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const loginOrEmail = req.body.loginOrEmail;
-    const password = req.body.password;
-    const authorisation = yield auth_service_1.authService.checkCredentials({ loginOrEmail, password });
-    if (!authorisation) {
-        res.sendStatus(401);
-        return;
+    const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
+    if (user) {
+        const token = jwt_service_1.jwtService.createJWT(user);
+        return res.status(201).send({ accessToken: token });
     }
-    res.sendStatus(204);
+    else {
+        return res.sendStatus(401);
+    }
 }));

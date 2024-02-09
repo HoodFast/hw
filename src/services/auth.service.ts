@@ -1,16 +1,19 @@
 import bcrypt from "bcrypt";
-import {UsersTypeDb} from "../models/users/db/usersDBModel";
-import {UserRepository} from "../repositories/user.repository";
-import {AuthInputType} from "../models/auth/input/auth.input.model";
 import {UserQueryRepository} from "../repositories/users.query.repository";
+import {WithId} from "mongodb";
+import {UsersTypeDb} from "../models/users/db/usersDBModel";
 
 export class authService {
-    static async checkCredentials(data: AuthInputType): Promise<boolean> {
-        const user = await UserQueryRepository.getByLoginOrEmail(data.loginOrEmail)
+    static async checkCredentials(loginOrEmail: string, password: string): Promise<WithId<UsersTypeDb>|null> {
+        const user = await UserQueryRepository.getByLoginOrEmail(loginOrEmail)
         if (!user) {
-            return false
+            return null
         }
-        const res = bcrypt.compare(data.password, user._passwordHash)
-        return res
+        const res = await bcrypt.compare(password, user._passwordHash)
+        if(!res){
+            return null
+        }else{
+            return user
+        }
     }
 }
