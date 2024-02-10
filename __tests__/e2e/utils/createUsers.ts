@@ -12,8 +12,8 @@ export const createUser = async (app:any)=>{
         .send({
             login: 'test',
             email: 'test@gmail.com',
-            pass: '123'
-        }).expect(200)
+            password: '123456'
+        }).expect(201)
     return resp.body
 }
 
@@ -26,9 +26,18 @@ export const createUsers=async (app:any,count:any)=>{
             .send({
                 login: `test ${i}`,
                 email: `test${i}@gmail.com`,
-                pass: '123'
-            }).expect(200)
+                password: '123456'
+            }).expect(201)
         users.push(resp.body)
     }
     return users
+}
+
+
+export const createUserJwtToken=async (app:any)=>{
+    const newUser = await createUser(app)
+
+    const resp = await request(app)
+        .post(routerPaths.login).auth('admin', 'qwerty').send({loginOrEmail:newUser.login,password:'123456'})
+    return resp.body.accessToken
 }

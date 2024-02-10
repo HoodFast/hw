@@ -15,15 +15,20 @@ const users_query_repository_1 = require("../../repositories/users.query.reposit
 // const loginCurrent = 'admin'
 // const passwordCurrent = 'qwerty'
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (req.headers['authorization'] === "Basic YWRtaW46cXdlcnR5") {
+        return next();
+    }
     if (!req.headers.authorization) {
         res.sendStatus(401);
         return;
     }
-    const token = req.headers.authorization.split(' ')[1];
-    const userId = yield jwt_service_1.jwtService.getUserByToken(token);
+    let tokenBearer = req.headers.authorization;
+    const token = tokenBearer.split(' ');
+    const userId = yield jwt_service_1.jwtService.getUserByToken(token[1]);
     if (userId) {
-        const user = req.user = yield users_query_repository_1.UserQueryRepository.getById(userId);
-        next();
+        // @ts-ignore
+        req.user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+        return next();
     }
     res.sendStatus(401);
     return;

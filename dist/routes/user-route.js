@@ -27,7 +27,6 @@ exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awa
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     };
-    debugger;
     const users = yield users_query_repository_1.UserQueryRepository.getAll(sortData);
     return res.send(users);
 }));

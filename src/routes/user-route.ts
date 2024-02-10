@@ -17,7 +17,7 @@ import {userValidators} from "../validators/users-validator";
 
 export const userRoute = Router({})
 
-userRoute.get('/',authMiddleware, async (req: RequestWithQuery<UserSortDataSearchType>, res:ResponseType<Pagination<OutputUsersType>> | any) => {
+userRoute.get('/', authMiddleware, async (req: RequestWithQuery<UserSortDataSearchType>, res: ResponseType<Pagination<OutputUsersType>> | any) => {
     const sortData: UserSortDataSearchType = {
         searchLoginTerm: req.query.searchLoginTerm ?? null,
         searchEmailTerm: req.query.searchEmailTerm ?? null,
@@ -26,12 +26,13 @@ userRoute.get('/',authMiddleware, async (req: RequestWithQuery<UserSortDataSearc
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     }
-debugger
+
     const users = await UserQueryRepository.getAll(sortData)
+
     return res.send(users)
 })
 
-userRoute.post('/',authMiddleware,userValidators(), async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType>) => {
+userRoute.post('/', authMiddleware, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType>) => {
     const createdUser = await userService.createUser(req.body.login, req.body.email, req.body.password)
     if (!createdUser) {
         res.sendStatus(404)
@@ -40,7 +41,7 @@ userRoute.post('/',authMiddleware,userValidators(), async (req: RequestWithBody<
     res.status(201).send(createdUser)
 })
 
-userRoute.delete('/:id',authMiddleware, async (req: RequestWithParams<ParamsType>, res: Response) => {
+userRoute.delete('/:id', authMiddleware, async (req: RequestWithParams<ParamsType>, res: Response) => {
     const id = req.params.id
     if (!ObjectId.isValid(id)) {
         res.sendStatus(404)

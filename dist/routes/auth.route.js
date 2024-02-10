@@ -18,7 +18,7 @@ exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
     if (user) {
-        const token = jwt_service_1.jwtService.createJWT(user);
+        const token = yield jwt_service_1.jwtService.createJWT(user);
         return res.status(201).send({ accessToken: token });
     }
     else {
