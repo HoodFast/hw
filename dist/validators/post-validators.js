@@ -24,7 +24,7 @@ const shortDescriptionValidator = (0, express_validator_1.body)('shortDescriptio
     .isLength({ min: 1, max: 100 })
     .withMessage('Incorrect shortDescription');
 const contentValidator = (0, express_validator_1.body)('content')
-    .isString().withMessage('WebsiteUrl must be a string')
+    .isString().withMessage('Content must be a string')
     .trim()
     .isLength({ min: 1, max: 1000 })
     .withMessage('Incorrect content');

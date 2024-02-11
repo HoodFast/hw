@@ -8,7 +8,7 @@ export class jwtService {
         const token = jwt.sign({userId:user._id}, JWT_SECRET, {expiresIn:'1h'})
         return token
     }
-    static async getUserByToken(token:string){
+    static async getUserIdByToken(token:string){
         try{
             const result = jwt.verify(token,JWT_SECRET)
 

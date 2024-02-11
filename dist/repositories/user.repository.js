@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserRepository = void 0;
 const db_1 = require("../db/db");
 const users_query_repository_1 = require("./users.query.repository");
+const mongodb_1 = require("mongodb");
 class UserRepository {
     static createUser(data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -21,6 +22,12 @@ class UserRepository {
                 return null;
             }
             return user;
+        });
+    }
+    static doesExistById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            return !!res;
         });
     }
 }

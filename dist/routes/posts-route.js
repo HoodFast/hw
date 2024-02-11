@@ -16,6 +16,11 @@ const auth_middleware_1 = require("../middlewares/auth/auth-middleware");
 const mongodb_1 = require("mongodb");
 const post_query_repository_1 = require("../repositories/post.query.repository");
 const post_service_1 = require("../services/post.service");
+const comments_validators_1 = require("../validators/comments-validators");
+const comments_service_1 = require("../services/comments.service");
+const blog_repository_1 = require("../repositories/blog.repository");
+const blog_query_repository_1 = require("../repositories/blog.query.repository");
+const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
 exports.postRoute = (0, express_1.Router)({});
 exports.postRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
@@ -82,4 +87,39 @@ exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) =>
         return;
     }
     res.sendStatus(204);
+}));
+exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const createCommentData = {
+        userId: req.user.id,
+        postId: req.params.id,
+        content: req.body.content,
+        createdAt: new Date().toISOString()
+    };
+    const createCommentToPost = yield comments_service_1.CommentsService.createComment(createCommentData);
+    if (!createCommentToPost) {
+        res.sendStatus(404);
+        return;
+    }
+    res.sendStatus(204);
+}));
+exports.postRoute.get('/:id/comments', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c, _d;
+    const id = req.params.id;
+    if (!mongodb_1.ObjectId.isValid(id)) {
+        res.sendStatus(404);
+        return;
+    }
+    const blog = yield blog_repository_1.BlogRepository.getById(id);
+    if (!blog) {
+        res.sendStatus(404);
+        return;
+    }
+    const sortData = {
+        sortBy: (_c = req.query.sortBy) !== null && _c !== void 0 ? _c : 'createdAt',
+        sortDirection: (_d = req.query.sortDirection) !== null && _d !== void 0 ? _d : 'desc',
+        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+        pageSize: req.query.pageSize ? +req.query.pageSize : 10
+    };
+    const posts = yield blog_query_repository_1.BlogQueryRepository.getAllPostsToBlog(id, sortData);
+    res.send(posts);
 }));

@@ -28,7 +28,6 @@ describe('ht_02/api/blogs', () => {
     beforeAll(async () => {
 
         token = await createUserJwtToken(app)
-        debugger
         await request(app).delete('/ht_02/api/testing/all-data')
         const blogs = await request(app).get(path.blogs)
         await request(app).post(path.blogs).auth('admin', 'qwerty').send(newBlog)

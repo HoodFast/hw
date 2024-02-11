@@ -19,7 +19,7 @@ class jwtService {
             return token;
         });
     }
-    static getUserByToken(token) {
+    static getUserIdByToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const result = jwt.verify(token, JWT_SECRET);
