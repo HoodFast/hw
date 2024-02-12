@@ -31,6 +31,7 @@ export class CommentsService {
 
         const newComment: CommentDbType = {
             content,
+            postId,
             commentatorInfo: {
                 userId,
                 userLogin:user.login

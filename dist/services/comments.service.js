@@ -28,6 +28,7 @@ class CommentsService {
             }
             const newComment = {
                 content,
+                postId,
                 commentatorInfo: {
                     userId,
                     userLogin: user.login

@@ -18,9 +18,9 @@ const post_query_repository_1 = require("../repositories/post.query.repository")
 const post_service_1 = require("../services/post.service");
 const comments_validators_1 = require("../validators/comments-validators");
 const comments_service_1 = require("../services/comments.service");
-const blog_repository_1 = require("../repositories/blog.repository");
-const blog_query_repository_1 = require("../repositories/blog.query.repository");
 const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
+const comment_query_repository_1 = require("../repositories/comment.query.repository");
+const db_1 = require("../db/db");
 exports.postRoute = (0, express_1.Router)({});
 exports.postRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
@@ -100,7 +100,7 @@ exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuar
         res.sendStatus(404);
         return;
     }
-    res.sendStatus(204);
+    return res.sendStatus(201);
 }));
 exports.postRoute.get('/:id/comments', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c, _d;
@@ -109,17 +109,17 @@ exports.postRoute.get('/:id/comments', (req, res) => __awaiter(void 0, void 0, v
         res.sendStatus(404);
         return;
     }
-    const blog = yield blog_repository_1.BlogRepository.getById(id);
-    if (!blog) {
-        res.sendStatus(404);
-        return;
-    }
+    const post = yield db_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+    if (!post)
+        return res.sendStatus(404);
     const sortData = {
         sortBy: (_c = req.query.sortBy) !== null && _c !== void 0 ? _c : 'createdAt',
         sortDirection: (_d = req.query.sortDirection) !== null && _d !== void 0 ? _d : 'desc',
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     };
-    const posts = yield blog_query_repository_1.BlogQueryRepository.getAllPostsToBlog(id, sortData);
-    res.send(posts);
+    const comments = yield comment_query_repository_1.CommentsQueryRepository.getAllByPostId(id, sortData);
+    if (!comments)
+        return res.sendStatus(404);
+    return res.send(comments);
 }));

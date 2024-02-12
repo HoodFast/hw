@@ -1,8 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 
 
-
-
 const loginCurrent = 'admin'
 const passwordCurrent = 'qwerty'
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -30,5 +28,5 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         res.sendStatus(401)
         return
     }
-
+    next()
 }

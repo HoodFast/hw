@@ -20,7 +20,8 @@ describe('ht_02/api/blogs', () => {
     let commentatorUserId:string
     let commentatorUserLogin:string='test'
     beforeAll(async () => {
-        commentatorUserId = await createUserJwtToken(app)
+
+
         await request(app).delete(routerPaths.deleteAll)
 
         await request(app).post(routerPaths.blogs).auth('admin', 'qwerty').send(newBlog)
@@ -38,6 +39,7 @@ describe('ht_02/api/blogs', () => {
         }
         const posts = await request(app).get(routerPaths.posts)
         postId = posts.body.items[1].id
+        commentatorUserId = await createUserJwtToken(app)
     })
 
     afterAll(async () => {
@@ -91,14 +93,13 @@ describe('ht_02/api/blogs', () => {
         const getPosts = await request(app)
             .get(routerPaths.posts)
             .expect(200)
-        debugger
         expect(getPosts.body.totalCount).toBe(16)
     })
 
     it('+create comment to post with correct data', async () => {
 
         const newComment: CreateCommentInputType = {
-            content: 'test content'
+            content: 'test content should be min 20 characters'
         }
 
         const createComment = await request(app)
@@ -112,7 +113,7 @@ describe('ht_02/api/blogs', () => {
             .set('Authorization', `Bearer ${commentatorUserId}`)
             .expect(200)
 
-        allCommentsToPost.body.items.length.toBe(1)
+        expect(allCommentsToPost.body.items.length).toBe(1)
 
         const expectedObject = {
             id: '1111',
@@ -126,7 +127,7 @@ describe('ht_02/api/blogs', () => {
         const isValidType = typeof expectedObject
         expect(isValidType).toEqual(typeof allCommentsToPost.body.items[0])
 
-        allCommentsToPost.body.items[0].commentatorInfo.userLogin.toBe(commentatorUserLogin)
+        expect(allCommentsToPost.body.items[0].commentatorInfo.userLogin).toBe(commentatorUserLogin)
 
     })
     // it('+update blog with correct data', async () => {

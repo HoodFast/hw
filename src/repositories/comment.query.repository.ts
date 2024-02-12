@@ -1,25 +1,10 @@
-import {blogsCollection, commentsCollection, postsCollection} from "../db/db";
-import {blogMapper} from "../models/blog/mappers/blog-mappers";
+import {commentsCollection, postsCollection} from "../db/db";
 import {ObjectId} from "mongodb";
-import { OutputBlogMapType, OutputBlogType, Pagination, PostType} from "../models/common/common";
+import {Pagination, PostType} from "../models/common/common";
 import {postMapper} from "../models/blog/mappers/post-mappers";
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 import {commentMapper} from "../models/comments/mappers/comment-mappers";
-
-export type SortDataSearchType = {
-    searchNameTerm: string | null
-    sortBy: string
-    sortDirection: "asc" | "desc"
-    pageNumber: number
-    pageSize: number
-}
-
-export type SortDataType = {
-    sortBy: string
-    sortDirection: "asc" | "desc"
-    pageNumber: number
-    pageSize: number
-}
+import {SortDataType} from "./blog.query.repository";
 
 
 export class CommentsQueryRepository {
@@ -53,5 +38,29 @@ export class CommentsQueryRepository {
             return null
         }
         return commentMapper(comment)
+    }
+
+    static async getAllByPostId(id: string, sortData: SortDataType):Promise<Pagination<CommentsOutputType> | null> {
+        const {sortBy, sortDirection, pageSize, pageNumber} = sortData
+
+        const comments = await commentsCollection
+            .find({postId: id})
+            .sort(sortBy, sortDirection)
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
+
+        const totalCount = await commentsCollection.countDocuments({postId: id})
+        const pagesCount = Math.ceil(totalCount / pageSize)
+
+        return {
+            pagesCount,
+            page: pageNumber,
+            pageSize,
+            totalCount,
+            items:  comments.map(commentMapper)
+        }
+
+
     }
 }

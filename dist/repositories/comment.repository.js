@@ -36,15 +36,6 @@ class CommentRepository {
             return !!res.matchedCount;
         });
     }
-    static getById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield db_1.commentsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
-            if (!blog) {
-                return null;
-            }
-            return blog;
-        });
-    }
     static deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.commentsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });

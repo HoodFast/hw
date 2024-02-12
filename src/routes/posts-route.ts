@@ -16,12 +16,13 @@ import {PostService} from "../services/post.service";
 import {CreateCommentInputType} from "../models/comments/input/create.comment.input.model";
 import {commentsValidation} from "../validators/comments-validators";
 import {CommentsService, CreateCommentDataType} from "../services/comments.service";
-import {QueryBlogInputModel} from "../models/blog/input/query.blog.input.model";
-import {BlogRepository} from "../repositories/blog.repository";
 import {BlogQueryRepository} from "../repositories/blog.query.repository";
-import {blogRoute} from "./blog-route";
 import {QueryParamsInputCommentType} from "../models/comments/input/qwery.comment.input.model";
 import {accessTokenGuard} from "../middlewares/auth/accesstoken-middleware";
+import {CommentRepository} from "../repositories/comment.repository";
+import {CommentsQueryRepository} from "../repositories/comment.query.repository";
+import {postsCollection} from "../db/db";
+import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 
 
 export const postRoute = Router({})
@@ -107,7 +108,9 @@ postRoute.delete('/:id', authMiddleware, async (req: RequestWithParams<{ id: str
 
 postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), async (req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: ResponseType<void>) => {
 
+
     const createCommentData:CreateCommentDataType = {
+
         userId:req.user!.id,
         postId : req.params.id,
         content : req.body.content,
@@ -119,21 +122,20 @@ postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), async (r
         res.sendStatus(404)
         return
     }
-    res.sendStatus(204)
+    return res.sendStatus(201)
 })
 
 
-postRoute.get('/:id/comments', async (req: RequestWithQueryAndParams<ParamsType, QueryParamsInputCommentType>, res: ResponseType<Pagination<PostType>>) => {
+postRoute.get('/:id/comments', async (req: RequestWithQueryAndParams<ParamsType, QueryParamsInputCommentType>, res: ResponseType<Pagination<CommentsOutputType>>) => {
     const id = req.params.id
     if (!ObjectId.isValid(id)) {
         res.sendStatus(404)
         return
     }
-    const blog = await BlogRepository.getById(id)
-    if(!blog){
-        res.sendStatus(404)
-        return
-    }
+    const post = await postsCollection.findOne({_id:new ObjectId(id)})
+
+    if(!post) return res.sendStatus(404)
+
     const sortData = {
         sortBy: req.query.sortBy ?? 'createdAt',
         sortDirection: req.query.sortDirection ?? 'desc',
@@ -141,7 +143,8 @@ postRoute.get('/:id/comments', async (req: RequestWithQueryAndParams<ParamsType,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     }
 
-    const posts = await BlogQueryRepository.getAllPostsToBlog(id, sortData)
+    const comments = await CommentsQueryRepository.getAllByPostId(id,sortData)
+    if(!comments) return res.sendStatus(404)
 
-    res.send(posts)
+    return res.send(comments)
 })

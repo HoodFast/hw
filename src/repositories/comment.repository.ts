@@ -4,6 +4,7 @@ import {BlogType} from "../models/common/common";
 import {CommentDbType} from "../models/comments/db/comment.db.model";
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 import {CommentsQueryRepository} from "./comment.query.repository";
+import {commentMapper} from "../models/comments/mappers/comment-mappers";
 
 
 
@@ -28,14 +29,6 @@ export class CommentRepository {
             }
         })
         return !!res.matchedCount
-    }
-
-    static async getById(id: string): Promise<WithId<CommentDbType> | null> {
-        const blog = await commentsCollection.findOne({_id: new ObjectId(id)})
-        if (!blog) {
-            return null
-        }
-        return blog
     }
 
     static async deleteById(id: string):Promise<boolean> {

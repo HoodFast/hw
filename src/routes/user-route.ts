@@ -18,6 +18,7 @@ import {userValidators} from "../validators/users-validator";
 export const userRoute = Router({})
 
 userRoute.get('/', authMiddleware, async (req: RequestWithQuery<UserSortDataSearchType>, res: ResponseType<Pagination<OutputUsersType>> | any) => {
+
     const sortData: UserSortDataSearchType = {
         searchLoginTerm: req.query.searchLoginTerm ?? null,
         searchEmailTerm: req.query.searchEmailTerm ?? null,
@@ -28,8 +29,8 @@ userRoute.get('/', authMiddleware, async (req: RequestWithQuery<UserSortDataSear
     }
 
     const users = await UserQueryRepository.getAll(sortData)
-
-    return res.send(users)
+    res.send(users)
+    return
 })
 
 userRoute.post('/', authMiddleware, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType>) => {

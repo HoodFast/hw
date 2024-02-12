@@ -13,6 +13,7 @@ export const authRoute = Router({})
 
 authRoute.get('/me', accessTokenGuard,
     async (req: Request, res:Response) => {
+
         const userId = req.user?.id
         if(!userId) return res.sendStatus(401)
         const me = await UserQueryRepository.getById(userId)

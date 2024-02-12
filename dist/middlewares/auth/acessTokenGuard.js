@@ -27,7 +27,7 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     const userId = yield jwt_service_1.jwtService.getUserIdByToken(token[1]);
     if (userId) {
         const user = yield user_repository_1.UserRepository.doesExistById(userId);
-        // @ts-ignore
+
         req.user = yield users_query_repository_1.UserQueryRepository.getById(userId);
         return next();
     }

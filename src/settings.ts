@@ -90,7 +90,6 @@ app.get('/', (req, res) => {
         availableResolutions: ['144']
     }
     const test = {123: '123'}
-
     res.send(newVideo)
 })
 
@@ -129,6 +128,7 @@ const validate = (
     if (publicationDate && typeof publicationDate !== 'string') {
         errors.errorsMessages.push({message: "invalid publicationDate!", field: 'publicationDate'})
     }
+
     // @ts-ignore
     if (minAgeRestriction && minAgeRestriction > 18 || minAgeRestriction < 1) {
         errors.errorsMessages.push({message: "invalid minAgeRestriction!", field: 'minAgeRestriction'})

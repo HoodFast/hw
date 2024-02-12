@@ -25,6 +25,7 @@ const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         if (!user) {
             return res.sendStatus(401);
         }
+        debugger;
         req.user = yield users_query_repository_1.UserQueryRepository.getById(userId);
         return next();
     }

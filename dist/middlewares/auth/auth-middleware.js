@@ -33,5 +33,6 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         res.sendStatus(401);
         return;
     }
+    next();
 });
 exports.authMiddleware = authMiddleware;

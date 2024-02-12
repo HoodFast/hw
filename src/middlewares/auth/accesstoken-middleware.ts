@@ -21,6 +21,8 @@ export const accessTokenGuard = async (req: Request, res: Response, next: NextFu
         if (!user) {
             return res.sendStatus(401)
         }
+        debugger
+
         req.user = await UserQueryRepository.getById(userId)
         return next()
     }

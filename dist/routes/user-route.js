@@ -28,7 +28,8 @@ exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awa
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     };
     const users = yield users_query_repository_1.UserQueryRepository.getAll(sortData);
-    return res.send(users);
+    res.send(users);
+    return;
 }));
 exports.userRoute.post('/', auth_middleware_1.authMiddleware, (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);

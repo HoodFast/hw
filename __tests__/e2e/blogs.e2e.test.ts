@@ -23,10 +23,9 @@ describe('ht_02/api/blogs', () => {
         description: "string",
         websiteUrl: "https://2MZjvsQkpz3JI_Z-cVql4fftm4AdjS_PPsHMs0aB9.6b4A7UT31-KsZs2c0ZX_mdLK"
     }
-
     let token:string
     beforeAll(async () => {
-
+debugger
         token = await createUserJwtToken(app)
         await request(app).delete('/ht_02/api/testing/all-data')
         const blogs = await request(app).get(path.blogs)

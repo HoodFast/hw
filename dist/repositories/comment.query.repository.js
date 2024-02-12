@@ -44,5 +44,25 @@ class CommentsQueryRepository {
             return (0, comment_mappers_1.commentMapper)(comment);
         });
     }
+    static getAllByPostId(id, sortData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
+            const comments = yield db_1.commentsCollection
+                .find({ postId: id })
+                .sort(sortBy, sortDirection)
+                .skip((pageNumber - 1) * pageSize)
+                .limit(pageSize)
+                .toArray();
+            const totalCount = yield db_1.commentsCollection.countDocuments({ postId: id });
+            const pagesCount = Math.ceil(totalCount / pageSize);
+            return {
+                pagesCount,
+                page: pageNumber,
+                pageSize,
+                totalCount,
+                items: comments.map(comment_mappers_1.commentMapper)
+            };
+        });
+    }
 }
 exports.CommentsQueryRepository = CommentsQueryRepository;
