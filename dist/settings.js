@@ -47,8 +47,8 @@ exports.app.get('/', (req, res) => {
         publicationDate: publicationDate.toISOString(),
         availableResolutions: ['144']
     };
-    const test = { 123: '123' };
-    res.send(newVideo);
+    const test = { message: 'server is work!' };
+    res.send(test);
 });
 exports.app.get('/videos', (req, res) => {
     res.send(videos);

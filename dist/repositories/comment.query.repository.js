@@ -12,29 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentsQueryRepository = void 0;
 const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
-const post_mappers_1 = require("../models/blog/mappers/post-mappers");
 const comment_mappers_1 = require("../models/comments/mappers/comment-mappers");
 class CommentsQueryRepository {
-    static getAllCommentsToPost(blogId, sortData) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
-            const posts = yield db_1.postsCollection
-                .find({ blogId })
-                .sort(sortBy, sortDirection)
-                .skip((pageNumber - 1) * pageSize)
-                .limit(pageSize)
-                .toArray();
-            const totalCount = yield db_1.postsCollection.countDocuments({ blogId });
-            const pagesCount = Math.ceil(totalCount / pageSize);
-            return {
-                pagesCount,
-                page: pageNumber,
-                pageSize,
-                totalCount,
-                items: posts.map(post_mappers_1.postMapper)
-            };
-        });
-    }
     static getById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const comment = yield db_1.commentsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });

@@ -24,13 +24,11 @@ class CommentRepository {
             return comment;
         });
     }
-    static updateBlog(data) {
+    static updateComment(id, content) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.commentsCollection.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
+            const res = yield db_1.commentsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
                 $set: {
-                    name: data.name,
-                    description: data.description,
-                    websiteUrl: data.websiteUrl
+                    content,
                 }
             });
             return !!res.matchedCount;

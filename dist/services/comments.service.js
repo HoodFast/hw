@@ -10,10 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentsService = void 0;
-const post_repository_1 = require("../repositories/post.repository");
+const common_1 = require("../models/common/common");
 const post_query_repository_1 = require("../repositories/post.query.repository");
 const users_query_repository_1 = require("../repositories/users.query.repository");
 const comment_repository_1 = require("../repositories/comment.repository");
+const comment_query_repository_1 = require("../repositories/comment.query.repository");
 class CommentsService {
     static createComment(data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -42,14 +43,36 @@ class CommentsService {
             return createComment;
         });
     }
-    static updateComment(data) {
+    static updateComment(id, content, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield post_repository_1.PostRepository.updatePost(data);
+            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(id);
+            if (!comment)
+                return { code: common_1.ResultCode.NotFound };
+            const user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+            if (!user)
+                return { code: common_1.ResultCode.NotFound };
+            if (comment.commentatorInfo.userId !== user.id)
+                return { code: common_1.ResultCode.Forbidden };
+            const update = yield comment_repository_1.CommentRepository.updateComment(id, content);
+            if (!update)
+                return { code: common_1.ResultCode.NotFound };
+            return { code: common_1.ResultCode.Success };
         });
     }
-    static deleteComment(id) {
+    static deleteCommentById(id, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield post_repository_1.PostRepository.deletePost(id);
+            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(id);
+            if (!comment)
+                return { code: common_1.ResultCode.NotFound };
+            const user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+            if (!user)
+                return { code: common_1.ResultCode.NotFound };
+            if (comment.commentatorInfo.userId !== user.id)
+                return { code: common_1.ResultCode.Forbidden };
+            const deleted = yield comment_repository_1.CommentRepository.deleteById(id);
+            if (!deleted)
+                return { code: common_1.ResultCode.NotFound };
+            return { code: common_1.ResultCode.Success };
         });
     }
 }

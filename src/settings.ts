@@ -89,8 +89,8 @@ app.get('/', (req, res) => {
         publicationDate: publicationDate.toISOString(),
         availableResolutions: ['144']
     }
-    const test = {123: '123'}
-    res.send('server is work!')
+    const test = {message: 'server is work!'}
+    res.send(test)
 })
 
 app.get('/videos', (req, res) => {
