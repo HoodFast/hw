@@ -8,6 +8,12 @@ export type RequestWithQueryAndParams<P,Q> = Request<P, {}, {}, Q>
 export type RequestWithParamsAndBody<P, B> = Request<P, {}, B, {}>
 export type RequestWithBody<B> = Request<{}, {}, B, {}>
 
+export enum ResultCode  {
+    Success='Success',
+    NotFound = 'NotFound',
+    Forbidden = 'Forbidden'
+}
+
 export type Pagination<I> = {
     totalCount: number
     pagesCount: number

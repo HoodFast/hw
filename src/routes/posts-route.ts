@@ -110,7 +110,6 @@ postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), async (r
 
 
     const createCommentData:CreateCommentDataType = {
-
         userId:req.user!.id,
         postId : req.params.id,
         content : req.body.content,

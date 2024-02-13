@@ -90,7 +90,7 @@ app.get('/', (req, res) => {
         availableResolutions: ['144']
     }
     const test = {123: '123'}
-    res.send(newVideo)
+    res.send('server is work!')
 })
 
 app.get('/videos', (req, res) => {

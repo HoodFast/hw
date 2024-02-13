@@ -19,13 +19,11 @@ export class CommentRepository {
         return comment
     }
 
-    static async updateBlog(data: BlogType):Promise<boolean> {
+    static async updateComment(id:string,content:string):Promise<boolean> {
 
-        const res = await commentsCollection.updateOne({_id:new ObjectId(data.id)}, {
+        const res = await commentsCollection.updateOne({_id:new ObjectId(id)}, {
             $set : {
-                name:data.name,
-                description:data.description,
-                websiteUrl:data.websiteUrl
+                content,
             }
         })
         return !!res.matchedCount

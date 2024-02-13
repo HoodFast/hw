@@ -1,11 +1,12 @@
-
-import {UpdatePostType} from "../models/common/common";
+import {ResultCode, UpdatePostType} from "../models/common/common";
 import {PostRepository} from "../repositories/post.repository";
 import {PostQueryRepository} from "../repositories/post.query.repository";
 import {UserQueryRepository} from "../repositories/users.query.repository";
 import {CommentDbType} from "../models/comments/db/comment.db.model";
 import {CommentRepository} from "../repositories/comment.repository";
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
+import {CommentsQueryRepository} from "../repositories/comment.query.repository";
+import {Result} from "../types/result.type";
 
 export type CreateCommentDataType = {
     userId: string,
@@ -46,12 +47,41 @@ export class CommentsService {
         return createComment
     }
 
-    static async updateComment(data: UpdatePostType): Promise<boolean | null> {
-        return await PostRepository.updatePost(data)
+    static async updateComment(id:string,content:string,userId:string): Promise<Result> {
+        const comment = await CommentsQueryRepository.getById(id)
+
+        if (!comment) return {code: ResultCode.NotFound}
+
+        const user = await UserQueryRepository.getById(userId)
+
+        if (!user) return {code: ResultCode.NotFound}
+
+        if (comment.commentatorInfo.userId !== user.id) return {code: ResultCode.Forbidden}
+
+        const update = await CommentRepository.updateComment(id,content)
+
+        if (!update) return {code: ResultCode.NotFound}
+
+        return {code: ResultCode.Success}
     }
 
-    static async deleteComment(id: string): Promise<boolean> {
-        return await PostRepository.deletePost(id)
+    static async deleteCommentById(id: string,userId:string): Promise<Result> {
+
+        const comment = await CommentsQueryRepository.getById(id)
+
+        if (!comment) return {code: ResultCode.NotFound}
+
+        const user = await UserQueryRepository.getById(userId)
+
+        if (!user) return {code: ResultCode.NotFound}
+
+        if (comment.commentatorInfo.userId !== user.id) return {code: ResultCode.Forbidden}
+
+        const deleted = await CommentRepository.deleteById(id)
+
+        if (!deleted) return {code: ResultCode.NotFound}
+
+        return {code: ResultCode.Success}
     }
 
 }
