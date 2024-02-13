@@ -106,7 +106,7 @@ postRoute.delete('/:id', authMiddleware, async (req: RequestWithParams<{ id: str
 })
 
 
-postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), async (req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: ResponseType<void>) => {
+postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), async (req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: ResponseType<CommentsOutputType>) => {
 
 
     const createCommentData:CreateCommentDataType = {
@@ -121,7 +121,7 @@ postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), async (r
         res.sendStatus(404)
         return
     }
-    return res.sendStatus(201)
+    return res.status(201).send(createCommentToPost)
 })
 
 

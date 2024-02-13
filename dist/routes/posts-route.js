@@ -100,7 +100,7 @@ exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuar
         res.sendStatus(404);
         return;
     }
-    return res.sendStatus(201);
+    return res.status(201).send(createCommentToPost);
 }));
 exports.postRoute.get('/:id/comments', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c, _d;

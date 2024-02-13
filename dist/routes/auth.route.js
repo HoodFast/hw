@@ -29,7 +29,7 @@ exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, 
     const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
     if (user) {
         const token = yield jwt_service_1.jwtService.createJWT(user);
-        return res.status(201).send({ accessToken: token });
+        return res.status(200).send({ accessToken: token });
     }
     else {
         return res.sendStatus(401);
