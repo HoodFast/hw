@@ -5,6 +5,7 @@ import {testingRoute} from "./routes/testing-route";
 import {userRoute} from "./routes/user-route";
 import {authRoute} from "./routes/auth.route";
 import {commentsRoute} from "./routes/comments-route";
+import {emailAdapter} from "./adapters/email.adapter";
 
 
 export const app = express()
@@ -75,7 +76,11 @@ type ErrorType = {
     errorsMessages: ErrorMessage[]
 }
 
-
+app.post('/email',async (req:any,res:any)=>{
+    const info = await emailAdapter.sendEmail(req.body.email,req.body.subject,req.body.subject)
+    if(!info) return res.sendStatus(404)
+    res.status(201).send({email:req.body.email,message:req.body.message,subject:req.body.subject})
+})
 app.get('/', (req, res) => {
     const createdAt = new Date()
     const publicationDate = new Date()
