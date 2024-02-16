@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
 import {authService} from "../services/auth.service";
-import {RequestWithBody} from "../models/common/common";
+import {RequestWithBody, RequestWithQuery} from "../models/common/common";
 import {AuthInputType} from "../models/auth/input/auth.input.model";
 import {authValidation} from "../validators/auth-validators";
 import {jwtService} from "../application/jwt.service";
@@ -31,5 +31,8 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
     } else {
         return res.sendStatus(401)
     }
+})
 
+authRoute.post('/registration-email-resending',async (req:RequestWithBody<{email:string}>,res:Response)=>{
+    
 })

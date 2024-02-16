@@ -11,7 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userService = void 0;
 const user_repository_1 = require("../repositories/user.repository");
+const uuid_1 = require("uuid");
 const users_query_repository_1 = require("../repositories/users.query.repository");
+const add_1 = require("date-fns/add");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 class userService {
@@ -20,8 +22,18 @@ class userService {
             const createdAt = new Date().toISOString();
             const salt = bcrypt.genSaltSync(saltRounds);
             const hash = bcrypt.hashSync(password, salt);
-            const data = { _passwordHash: hash, createdAt, email, login };
-            const createdUser = yield user_repository_1.UserRepository.createUser(data);
+            const userData = {
+                accountData: { _passwordHash: hash, createdAt, email, login },
+                emailConfirmation: {
+                    confirmationCode: (0, uuid_1.v4)(),
+                    expirationDate: (0, add_1.add)(new Date(), {
+                        hours: 1,
+                        minutes: 30
+                    }).toISOString(),
+                    isConfirmed: false
+                }
+            };
+            const createdUser = yield user_repository_1.UserRepository.createUser(userData);
             if (!createdUser) {
                 return null;
             }

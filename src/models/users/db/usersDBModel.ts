@@ -1,6 +1,15 @@
+
 export type UsersTypeDb = {
-    _passwordHash:string
-    login:string,
-    email:string,
-    createdAt:string
+    accountData: {
+        _passwordHash: string
+        login: string,
+        email: string,
+        createdAt: string
+    }
+    emailConfirmation: {
+        confirmationCode: string
+        expirationDate: Date
+        isConfirmed: boolean
+    }
+
 }

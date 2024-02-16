@@ -22,7 +22,7 @@ class authService {
             if (!user) {
                 return null;
             }
-            const res = yield bcrypt_1.default.compare(password, user._passwordHash);
+            const res = yield bcrypt_1.default.compare(password, user.accountData._passwordHash);
             if (!res) {
                 return null;
             }

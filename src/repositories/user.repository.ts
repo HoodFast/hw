@@ -13,8 +13,17 @@ export class UserRepository {
         return user
     }
 
-    static async doesExistById(id:string) :Promise<boolean>{
-        const res = await usersCollection.findOne({_id:new ObjectId(id)})
+    static async updateConfirmation(userId: ObjectId): Promise<boolean> {
+        const res = await usersCollection.updateOne({_id: userId}, {
+            $set: {
+                "emailConfirmation.isConfirmed": true
+            }
+        })
+        return res.modifiedCount === 1
+    }
+
+    static async doesExistById(id: string): Promise<boolean> {
+        const res = await usersCollection.findOne({_id: new ObjectId(id)})
         return !!res
     }
 };
