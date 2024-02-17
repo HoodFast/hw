@@ -34,7 +34,7 @@ userRoute.get('/', authMiddleware, async (req: RequestWithQuery<UserSortDataSear
 })
 
 userRoute.post('/', authMiddleware, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType>) => {
-    const createdUser = await userService.createUser(req.body.login, req.body.email, req.body.password)
+    const createdUser = await userService.createUser(req.body.login, req.body.email, req.body.password,true)
     if (!createdUser) {
         res.sendStatus(404)
         return

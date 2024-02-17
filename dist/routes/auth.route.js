@@ -16,6 +16,8 @@ const auth_validators_1 = require("../validators/auth-validators");
 const jwt_service_1 = require("../application/jwt.service");
 const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
 const users_query_repository_1 = require("../repositories/users.query.repository");
+const users_validator_1 = require("../validators/users-validator");
+const user_service_1 = require("../services/user.service");
 exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -34,4 +36,25 @@ exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, 
     else {
         return res.sendStatus(401);
     }
+}));
+exports.authRoute.post('/registration-email-resending', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const sendEmail = yield auth_service_1.authService.resendConfirmationCode(req.body.email);
+    if (!sendEmail)
+        return res.sendStatus(404);
+    return res.sendStatus(204);
+}));
+exports.authRoute.post('/registration', (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
+    if (!createdUser)
+        return res.sendStatus(404);
+    return res.sendStatus(204);
+}));
+exports.authRoute.post('/registration-confirmation', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const code = req.query.code;
+    if (!code)
+        return res.sendStatus(404);
+    const confirm = yield auth_service_1.authService.confirmEmail(code);
+    if (!confirm)
+        return res.sendStatus(404);
+    return res.sendStatus(204);
 }));

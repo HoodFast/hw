@@ -14,10 +14,15 @@ const user_repository_1 = require("../repositories/user.repository");
 const uuid_1 = require("uuid");
 const users_query_repository_1 = require("../repositories/users.query.repository");
 const add_1 = require("date-fns/add");
+const auth_service_1 = require("./auth.service");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 class userService {
-    static createUser(login, email, password) {
+    static updateConfirmCode() {
+        return __awaiter(this, void 0, void 0, function* () {
+        });
+    }
+    static createUser(login, email, password, isConfirmed) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdAt = new Date().toISOString();
             const salt = bcrypt.genSaltSync(saltRounds);
@@ -29,12 +34,19 @@ class userService {
                     expirationDate: (0, add_1.add)(new Date(), {
                         hours: 1,
                         minutes: 30
-                    }).toISOString(),
-                    isConfirmed: false
+                    }),
+                    isConfirmed: isConfirmed ? isConfirmed : false
                 }
             };
             const createdUser = yield user_repository_1.UserRepository.createUser(userData);
             if (!createdUser) {
+                return null;
+            }
+            try {
+                yield auth_service_1.authService.sendConfirmCode(createdUser.email);
+            }
+            catch (e) {
+                console.log(e);
                 return null;
             }
             return createdUser;

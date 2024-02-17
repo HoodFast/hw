@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
 import {authService} from "../services/auth.service";
-import {RequestWithBody, RequestWithQuery} from "../models/common/common";
+import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../models/common/common";
 import {AuthInputType} from "../models/auth/input/auth.input.model";
 import {authValidation} from "../validators/auth-validators";
 import {jwtService} from "../application/jwt.service";
@@ -9,7 +9,6 @@ import {UserQueryRepository} from "../repositories/users.query.repository";
 import {UserInputModelType} from "../models/users/input/user.input.model";
 import {userValidators} from "../validators/users-validator";
 import {userService} from "../services/user.service";
-import {emailAdapter} from "../adapters/email.adapter";
 import {OutputUsersType} from "../models/users/output/output.users.models";
 
 
@@ -39,21 +38,22 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
 })
 
 authRoute.post('/registration-email-resending', async (req: RequestWithBody<{ email: string }>, res: Response) => {
-    const sendEmail = await authService.sendConfirmCode(req.body.email)
+    const sendEmail = await authService.resendConfirmationCode(req.body.email)
     if (!sendEmail) return res.sendStatus(404)
     return res.sendStatus(204)
 })
 
 authRoute.post('/registration', userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
+
     const createdUser: OutputUsersType | null = await userService.createUser(req.body.login, req.body.email, req.body.password)
+
     if (!createdUser) return res.sendStatus(404)
-    const sendEmail = await authService.sendConfirmCode(createdUser.email)
-    if (!sendEmail) return res.sendStatus(404)
+
     return res.sendStatus(204)
 })
 
-authRoute.post('/registration-confirmation', async (req: RequestWithBody<{ code: string }>, res: Response) => {
-    const code = req.body.code
+authRoute.post('/registration-confirmation', async (req: RequestWithQuery<{ code: string }  >, res: Response) => {
+    const code = req.query.code
     if(!code) return res.sendStatus(404)
     const confirm = await authService.confirmEmail(code)
     if(!confirm) return res.sendStatus(404)

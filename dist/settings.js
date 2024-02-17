@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -20,7 +11,6 @@ const testing_route_1 = require("./routes/testing-route");
 const user_route_1 = require("./routes/user-route");
 const auth_route_1 = require("./routes/auth.route");
 const comments_route_1 = require("./routes/comments-route");
-const email_adapter_1 = require("./adapters/email.adapter");
 exports.app = (0, express_1.default)();
 exports.app.use(express_1.default.json());
 exports.app.use('/ht_02/api/blogs', blog_route_1.blogRoute);
@@ -44,12 +34,6 @@ const videos = [
         ]
     }
 ];
-exports.app.post('/email', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const info = yield email_adapter_1.emailAdapter.sendEmail(req.body.email, req.body.subject, req.body.subject);
-    if (!info)
-        return res.sendStatus(404);
-    res.status(201).send({ email: req.body.email, message: req.body.message, subject: req.body.subject });
-}));
 exports.app.get('/', (req, res) => {
     const createdAt = new Date();
     const publicationDate = new Date();

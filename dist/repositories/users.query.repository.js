@@ -22,12 +22,12 @@ class UserQueryRepository {
             let filter = {};
             if (searchLoginTerm) {
                 loginFilter = {
-                    login: { $regex: `${searchLoginTerm}`, $options: 'i' }
+                    "accountData.login": { $regex: `${searchLoginTerm}`, $options: 'i' }
                 };
             }
             if (searchEmailTerm) {
                 emailFilter = {
-                    email: { $regex: `${searchEmailTerm}`, $options: 'i' }
+                    "accountData.email": { $regex: `${searchEmailTerm}`, $options: 'i' }
                 };
             }
             if (searchEmailTerm && searchLoginTerm) {
@@ -64,7 +64,17 @@ class UserQueryRepository {
     }
     static getByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({ $or: [{ email: loginOrEmail }, { login: loginOrEmail }] });
+            debugger;
+            const user = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.email': loginOrEmail }, { 'accountData.login': loginOrEmail }] });
+            if (!user) {
+                return null;
+            }
+            return user;
+        });
+    }
+    static getByCode(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield db_1.usersCollection.findOne({ "emailConfirmation.confirmationCode": code });
             if (!user) {
                 return null;
             }

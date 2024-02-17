@@ -72,7 +72,8 @@ export class UserQueryRepository {
     }
 
     static async getByLoginOrEmail(loginOrEmail: string): Promise<WithId<UsersTypeDb> | null> {
-        const user = await usersCollection.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
+        debugger
+        const user = await usersCollection.findOne({$or: [{'accountData.email': loginOrEmail}, {'accountData.login': loginOrEmail}]})
         if (!user) {
             return null
         }

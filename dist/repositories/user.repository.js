@@ -24,6 +24,26 @@ class UserRepository {
             return user;
         });
     }
+    static updateConfirmation(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.usersCollection.updateOne({ _id: userId }, {
+                $set: {
+                    "emailConfirmation.isConfirmed": true
+                }
+            });
+            return res.modifiedCount === 1;
+        });
+    }
+    static updateNewConfirmCode(userId, code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.usersCollection.updateOne({ _id: userId }, {
+                $set: {
+                    "emailConfirmation.confirmationCode": code
+                }
+            });
+            return res.modifiedCount === 1;
+        });
+    }
     static doesExistById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(id) });

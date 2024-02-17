@@ -32,7 +32,7 @@ exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awa
     return;
 }));
 exports.userRoute.post('/', auth_middleware_1.authMiddleware, (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
+    const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password, true);
     if (!createdUser) {
         res.sendStatus(404);
         return;

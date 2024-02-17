@@ -5,6 +5,7 @@ import {v4 as uuidv4} from 'uuid'
 import {UserQueryRepository} from "../repositories/users.query.repository";
 import {add} from "date-fns/add";
 import {OutputUsersType} from "../models/users/output/output.users.models";
+import {authService} from "./auth.service";
 
 
 const bcrypt = require('bcrypt');
@@ -14,7 +15,7 @@ export class userService {
     static async updateConfirmCode(){
 
     }
-    static async createUser(login: string, email: string, password: string): Promise<OutputUsersType | null> {
+    static async createUser(login: string, email: string, password: string, isConfirmed?:boolean): Promise<OutputUsersType | null> {
         const createdAt = new Date().toISOString()
         const salt = bcrypt.genSaltSync(saltRounds)
         const hash = bcrypt.hashSync(password, salt)
@@ -27,7 +28,7 @@ export class userService {
                     hours: 1,
                     minutes: 30
                 }),
-                isConfirmed: false
+                isConfirmed: isConfirmed ? isConfirmed : false
             }
         }
         const createdUser = await UserRepository.createUser(userData)
@@ -35,7 +36,7 @@ export class userService {
             return null
         }
         try {
-            //sendEmail
+             await authService.sendConfirmCode(createdUser.email)
         } catch (e) {
             console.log(e)
             return null
