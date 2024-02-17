@@ -6,16 +6,21 @@ import {authValidation} from "../validators/auth-validators";
 import {jwtService} from "../application/jwt.service";
 import {accessTokenGuard} from "../middlewares/auth/accesstoken-middleware";
 import {UserQueryRepository} from "../repositories/users.query.repository";
+import {UserInputModelType} from "../models/users/input/user.input.model";
+import {userValidators} from "../validators/users-validator";
+import {userService} from "../services/user.service";
+import {emailAdapter} from "../adapters/email.adapter";
+import {OutputUsersType} from "../models/users/output/output.users.models";
 
 
 export const authRoute = Router({})
 
 
 authRoute.get('/me', accessTokenGuard,
-    async (req: Request, res:Response) => {
+    async (req: Request, res: Response) => {
 
         const userId = req.user?.id
-        if(!userId) return res.sendStatus(401)
+        if (!userId) return res.sendStatus(401)
         const me = await UserQueryRepository.getById(userId)
         return res.status(200).send(me)
 
@@ -33,6 +38,24 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
     }
 })
 
-authRoute.post('/registration-email-resending',async (req:RequestWithBody<{email:string}>,res:Response)=>{
-    
+authRoute.post('/registration-email-resending', async (req: RequestWithBody<{ email: string }>, res: Response) => {
+    const sendEmail = await authService.sendConfirmCode(req.body.email)
+    if (!sendEmail) return res.sendStatus(404)
+    return res.sendStatus(204)
+})
+
+authRoute.post('/registration', userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
+    const createdUser: OutputUsersType | null = await userService.createUser(req.body.login, req.body.email, req.body.password)
+    if (!createdUser) return res.sendStatus(404)
+    const sendEmail = await authService.sendConfirmCode(createdUser.email)
+    if (!sendEmail) return res.sendStatus(404)
+    return res.sendStatus(204)
+})
+
+authRoute.post('/registration-confirmation', async (req: RequestWithBody<{ code: string }>, res: Response) => {
+    const code = req.body.code
+    if(!code) return res.sendStatus(404)
+    const confirm = await authService.confirmEmail(code)
+    if(!confirm) return res.sendStatus(404)
+    return res.sendStatus(204)
 })

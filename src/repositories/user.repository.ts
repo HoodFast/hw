@@ -22,6 +22,15 @@ export class UserRepository {
         return res.modifiedCount === 1
     }
 
+    static async updateNewConfirmCode(userId: ObjectId, code: string): Promise<boolean> {
+        const res = await usersCollection.updateOne({_id: userId}, {
+            $set: {
+                "emailConfirmation.confirmationCode": code
+            }
+        })
+        return res.modifiedCount === 1
+    }
+
     static async doesExistById(id: string): Promise<boolean> {
         const res = await usersCollection.findOne({_id: new ObjectId(id)})
         return !!res

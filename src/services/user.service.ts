@@ -11,6 +11,9 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 export class userService {
+    static async updateConfirmCode(){
+
+    }
     static async createUser(login: string, email: string, password: string): Promise<OutputUsersType | null> {
         const createdAt = new Date().toISOString()
         const salt = bcrypt.genSaltSync(saltRounds)
@@ -41,16 +44,7 @@ export class userService {
         return createdUser
     }
 
-    static async confirmEmail(code: string): Promise<boolean> {
-        const user = await UserQueryRepository.getByCode(code)
-        if (!user) return false
-        if (user.emailConfirmation.expirationDate < new Date()) return false
-        if (user.emailConfirmation.isConfirmed) return false
-        if (user.emailConfirmation.confirmationCode !== code) return false
 
-        return await UserRepository.updateConfirmation(user._id)
-
-    }
 
     static async deleteUser(id: string): Promise<boolean | null> {
         const findUser = await UserQueryRepository.getById(id)
