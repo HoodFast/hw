@@ -19,7 +19,8 @@ export class userService {
 
         const isExistEmail = await UserQueryRepository.getByLoginOrEmail(email)
         const isExistLogin = await UserQueryRepository.getByLoginOrEmail(login)
-        if(isExistEmail || isExistLogin )return {code:ResultCode.Forbidden,errorMessage:'email or login is exist'}
+        if(isExistEmail )return {code:ResultCode.Forbidden,errorMessage:'email'}
+        if(isExistLogin )return {code:ResultCode.Forbidden,errorMessage:'login'}
         const createdAt = new Date().toISOString()
         const salt = bcrypt.genSaltSync(saltRounds)
         const hash = bcrypt.hashSync(password, salt)

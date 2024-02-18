@@ -1,15 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.codeValidation = void 0;
+exports.emailValidation = void 0;
 const express_validator_1 = require("express-validator");
 const input_validation_middleware_1 = require("../middlewares/inputValidation/input-validation-middleware");
-const codeValidator = (0, express_validator_1.query)('code')
-    .isString().withMessage('code must be a string')
+const emailValidator = (0, express_validator_1.body)('email')
     .trim()
+    .isString()
     .isLength({ min: 1 })
-    .withMessage('Incorrect code');
-const codeValidation = () => [
-    codeValidator,
+    .matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
+    .withMessage('Incorrect login');
+const emailValidation = () => [
+    emailValidator,
     input_validation_middleware_1.inputValidationMiddleware
 ];
-exports.codeValidation = codeValidation;
+exports.emailValidation = emailValidation;

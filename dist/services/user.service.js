@@ -23,8 +23,10 @@ class userService {
         return __awaiter(this, void 0, void 0, function* () {
             const isExistEmail = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
             const isExistLogin = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(login);
-            if (isExistEmail || isExistLogin)
-                return { code: common_1.ResultCode.Forbidden, errorMessage: 'email or login is exist' };
+            if (isExistEmail)
+                return { code: common_1.ResultCode.Forbidden, errorMessage: 'email' };
+            if (isExistLogin)
+                return { code: common_1.ResultCode.Forbidden, errorMessage: 'login' };
             const createdAt = new Date().toISOString();
             const salt = bcrypt.genSaltSync(saltRounds);
             const hash = bcrypt.hashSync(password, salt);

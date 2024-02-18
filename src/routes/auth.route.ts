@@ -12,6 +12,7 @@ import {userService} from "../services/user.service";
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {Result} from "../types/result.type";
 import {codeValidation} from "../validators/confirm-validators";
+import {emailValidation} from "../validators/email-validators";
 
 
 export const authRoute = Router({})
@@ -39,7 +40,7 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
     }
 })
 
-authRoute.post('/registration-email-resending',userValidators(), async (req: RequestWithBody<{ email: string }>, res: Response) => {
+authRoute.post('/registration-email-resending',emailValidation(), async (req: RequestWithBody<{ email: string }>, res: Response) => {
     const sendEmail = await authService.resendConfirmationCode(req.body.email)
     if (!sendEmail) return res.sendStatus(404)
     return res.sendStatus(204)
@@ -53,7 +54,7 @@ authRoute.post('/registration', userValidators(), async (req: RequestWithBody<Us
         case ResultCode.NotFound:
             return res.sendStatus(404)
         case ResultCode.Forbidden:
-            return res.status(400).send({ errorsMessages: { message: createdUser.errorMessage, field: createdUser.errorMessage } })
+            return res.status(400).send({ errorsMessages: [{ message: createdUser.errorMessage, field: createdUser.errorMessage }] })
         case ResultCode.Success:
             return  res.sendStatus(204)
     }
