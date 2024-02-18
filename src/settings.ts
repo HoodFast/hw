@@ -91,6 +91,7 @@ app.get('/', (req, res) => {
         availableResolutions: ['144']
     }
     const test = {message: 'server is work 2.0 !'}
+
     res.send(test)
 })
 
