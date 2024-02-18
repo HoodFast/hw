@@ -25,7 +25,7 @@ describe('ht_02/api/blogs', () => {
     }
     let token:string
     beforeAll(async () => {
-debugger
+
         token = await createUserJwtToken(app)
         await request(app).delete('/ht_02/api/testing/all-data')
         const blogs = await request(app).get(path.blogs)
@@ -48,7 +48,8 @@ debugger
     it('+create blog with correct data', async () => {
         const createResponse = await request(app)
             .post(path.blogs)
-            .set('Authorization', `Bearer ${token}`)
+            // .set('Authorization', `Bearer ${token}`)
+            .auth('admin', 'qwerty')
             .send(newBlog)
             .expect(201)
 
