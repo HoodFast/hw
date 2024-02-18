@@ -12,12 +12,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRoute = void 0;
 const express_1 = require("express");
 const auth_service_1 = require("../services/auth.service");
+const common_1 = require("../models/common/common");
 const auth_validators_1 = require("../validators/auth-validators");
 const jwt_service_1 = require("../application/jwt.service");
 const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
 const users_query_repository_1 = require("../repositories/users.query.repository");
 const users_validator_1 = require("../validators/users-validator");
 const user_service_1 = require("../services/user.service");
+const confirm_validators_1 = require("../validators/confirm-validators");
 exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -37,7 +39,7 @@ exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, 
         return res.sendStatus(401);
     }
 }));
-exports.authRoute.post('/registration-email-resending', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/registration-email-resending', (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sendEmail = yield auth_service_1.authService.resendConfirmationCode(req.body.email);
     if (!sendEmail)
         return res.sendStatus(404);
@@ -45,11 +47,16 @@ exports.authRoute.post('/registration-email-resending', (req, res) => __awaiter(
 }));
 exports.authRoute.post('/registration', (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
-    if (!createdUser)
-        return res.sendStatus(404);
-    return res.sendStatus(204);
+    switch (createdUser.code) {
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        case common_1.ResultCode.Forbidden:
+            return res.status(400).send({ errorsMessages: { message: createdUser.errorMessage, field: createdUser.errorMessage } });
+        case common_1.ResultCode.Success:
+            return res.sendStatus(204);
+    }
 }));
-exports.authRoute.post('/registration-confirmation', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.codeValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const code = req.query.code;
     if (!code)
         return res.sendStatus(404);

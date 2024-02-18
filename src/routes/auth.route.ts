@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
 import {authService} from "../services/auth.service";
-import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../models/common/common";
+import {RequestWithBody, RequestWithParams, RequestWithQuery, ResultCode} from "../models/common/common";
 import {AuthInputType} from "../models/auth/input/auth.input.model";
 import {authValidation} from "../validators/auth-validators";
 import {jwtService} from "../application/jwt.service";
@@ -10,6 +10,8 @@ import {UserInputModelType} from "../models/users/input/user.input.model";
 import {userValidators} from "../validators/users-validator";
 import {userService} from "../services/user.service";
 import {OutputUsersType} from "../models/users/output/output.users.models";
+import {Result} from "../types/result.type";
+import {codeValidation} from "../validators/confirm-validators";
 
 
 export const authRoute = Router({})
@@ -37,7 +39,7 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
     }
 })
 
-authRoute.post('/registration-email-resending', async (req: RequestWithBody<{ email: string }>, res: Response) => {
+authRoute.post('/registration-email-resending',userValidators(), async (req: RequestWithBody<{ email: string }>, res: Response) => {
     const sendEmail = await authService.resendConfirmationCode(req.body.email)
     if (!sendEmail) return res.sendStatus(404)
     return res.sendStatus(204)
@@ -45,14 +47,19 @@ authRoute.post('/registration-email-resending', async (req: RequestWithBody<{ em
 
 authRoute.post('/registration', userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
 
-    const createdUser: OutputUsersType | null = await userService.createUser(req.body.login, req.body.email, req.body.password)
+    const createdUser: Result<OutputUsersType | null> = await userService.createUser(req.body.login, req.body.email, req.body.password)
 
-    if (!createdUser) return res.sendStatus(404)
-
-    return res.sendStatus(204)
+    switch (createdUser.code) {
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
+        case ResultCode.Forbidden:
+            return res.status(400).send({ errorsMessages: { message: createdUser.errorMessage, field: createdUser.errorMessage } })
+        case ResultCode.Success:
+            return  res.sendStatus(204)
+    }
 })
 
-authRoute.post('/registration-confirmation', async (req: RequestWithQuery<{ code: string }  >, res: Response) => {
+authRoute.post('/registration-confirmation',codeValidation(), async (req: RequestWithQuery<{ code: string }  >, res: Response) => {
     const code = req.query.code
     if(!code) return res.sendStatus(404)
     const confirm = await authService.confirmEmail(code)

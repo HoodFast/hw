@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRoute = void 0;
 const express_1 = require("express");
 const users_query_repository_1 = require("../repositories/users.query.repository");
+const common_1 = require("../models/common/common");
 const user_service_1 = require("../services/user.service");
 const mongodb_1 = require("mongodb");
 const auth_middleware_1 = require("../middlewares/auth/auth-middleware");
@@ -33,11 +34,14 @@ exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awa
 }));
 exports.userRoute.post('/', auth_middleware_1.authMiddleware, (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password, true);
-    if (!createdUser) {
-        res.sendStatus(404);
-        return;
+    switch (createdUser.code) {
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        case common_1.ResultCode.Forbidden:
+            return res.status(400).send({ errorsMessages: { message: createdUser.errorMessage, field: createdUser.errorMessage } });
+        case common_1.ResultCode.Success:
+            return res.status(201).send(createdUser.data);
     }
-    res.status(201).send(createdUser);
 }));
 exports.userRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;

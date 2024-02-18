@@ -15,15 +15,16 @@ const uuid_1 = require("uuid");
 const users_query_repository_1 = require("../repositories/users.query.repository");
 const add_1 = require("date-fns/add");
 const auth_service_1 = require("./auth.service");
+const common_1 = require("../models/common/common");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 class userService {
-    static updateConfirmCode() {
-        return __awaiter(this, void 0, void 0, function* () {
-        });
-    }
     static createUser(login, email, password, isConfirmed) {
         return __awaiter(this, void 0, void 0, function* () {
+            const isExistEmail = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
+            const isExistLogin = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(login);
+            if (isExistEmail || isExistLogin)
+                return { code: common_1.ResultCode.Forbidden, errorMessage: 'email or login is exist' };
             const createdAt = new Date().toISOString();
             const salt = bcrypt.genSaltSync(saltRounds);
             const hash = bcrypt.hashSync(password, salt);
@@ -40,16 +41,16 @@ class userService {
             };
             const createdUser = yield user_repository_1.UserRepository.createUser(userData);
             if (!createdUser) {
-                return null;
+                return { code: common_1.ResultCode.NotFound };
             }
             try {
                 yield auth_service_1.authService.sendConfirmCode(createdUser.email);
             }
             catch (e) {
                 console.log(e);
-                return null;
+                return { code: common_1.ResultCode.NotFound };
             }
-            return createdUser;
+            return { code: common_1.ResultCode.Success, data: createdUser };
         });
     }
     static deleteUser(id) {

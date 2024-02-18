@@ -6,7 +6,7 @@ import {
     RequestWithBody,
     RequestWithParams,
     RequestWithQuery,
-    ResponseType
+    ResponseType, ResultCode
 } from "../models/common/common";
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {UserInputModelType} from "../models/users/input/user.input.model";
@@ -33,13 +33,17 @@ userRoute.get('/', authMiddleware, async (req: RequestWithQuery<UserSortDataSear
     return
 })
 
-userRoute.post('/', authMiddleware, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType>) => {
+userRoute.post('/', authMiddleware, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType | any>) => {
     const createdUser = await userService.createUser(req.body.login, req.body.email, req.body.password,true)
-    if (!createdUser) {
-        res.sendStatus(404)
-        return
+
+    switch (createdUser.code) {
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
+        case ResultCode.Forbidden:
+            return res.status(400).send({ errorsMessages: { message: createdUser.errorMessage, field: createdUser.errorMessage } })
+        case ResultCode.Success:
+            return res.status(201).send(createdUser.data)
     }
-    res.status(201).send(createdUser)
 })
 
 userRoute.delete('/:id', authMiddleware, async (req: RequestWithParams<ParamsType>, res: Response) => {
