@@ -1,8 +1,8 @@
-import {query} from "express-validator";
+import {body, query} from "express-validator";
 import {inputValidationMiddleware} from "../middlewares/inputValidation/input-validation-middleware";
 
 
-const codeValidator = query('code')
+const codeValidator = body('code')
     .isString().withMessage('code must be a string')
     .trim()
     .isLength({min: 1})

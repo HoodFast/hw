@@ -58,7 +58,7 @@ exports.authRoute.post('/registration', (0, users_validator_1.userValidators)(),
     }
 }));
 exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.codeValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const code = req.query.code;
+    const code = req.body.code;
     if (!code)
         return res.sendStatus(404);
     const confirm = yield auth_service_1.authService.confirmEmail(code);

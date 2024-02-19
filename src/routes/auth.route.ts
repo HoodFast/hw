@@ -41,6 +41,7 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
 })
 
 authRoute.post('/registration-email-resending',emailValidation(), async (req: RequestWithBody<{ email: string }>, res: Response) => {
+
     const sendEmail = await authService.resendConfirmationCode(req.body.email)
     if (!sendEmail) return res.sendStatus(404)
     return res.sendStatus(204)
@@ -60,8 +61,8 @@ authRoute.post('/registration', userValidators(), async (req: RequestWithBody<Us
     }
 })
 
-authRoute.post('/registration-confirmation',codeValidation(), async (req: RequestWithQuery<{ code: string }  >, res: Response) => {
-    const code = req.query.code
+authRoute.post('/registration-confirmation',codeValidation(), async (req: RequestWithBody<{ code: string }  >, res: Response) => {
+    const code = req.body.code
     if(!code) return res.sendStatus(404)
     const confirm = await authService.confirmEmail(code)
     if(!confirm) return res.sendStatus(404)
