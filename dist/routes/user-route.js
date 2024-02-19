@@ -41,6 +41,8 @@ exports.userRoute.post('/', auth_middleware_1.authMiddleware, (0, users_validato
             return res.status(400).send({ errorsMessages: { message: createdUser.errorMessage, field: createdUser.errorMessage } });
         case common_1.ResultCode.Success:
             return res.status(201).send(createdUser.data);
+        default:
+            return res.sendStatus(404);
     }
 }));
 exports.userRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {

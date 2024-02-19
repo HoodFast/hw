@@ -39,7 +39,8 @@ commentsRoute.delete('/:id', accessTokenGuard, async (req: RequestWithParams<Par
             return res.sendStatus(403)
         case ResultCode.Success:
             return res.sendStatus(204)
-
+        default:
+            return res.sendStatus(404)
     }
 })
 
@@ -55,5 +56,7 @@ commentsRoute.put('/:id', accessTokenGuard, commentsValidation(), async (req: Re
             return res.sendStatus(403)
         case ResultCode.Success:
             return res.sendStatus(204)
+        default:
+            return res.sendStatus(404)
     }
 })

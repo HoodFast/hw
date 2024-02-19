@@ -42,19 +42,28 @@ exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, 
 }));
 exports.authRoute.post('/registration-email-resending', (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sendEmail = yield auth_service_1.authService.resendConfirmationCode(req.body.email);
-    if (!sendEmail)
-        return res.sendStatus(404);
-    return res.sendStatus(204);
+    switch (sendEmail.code) {
+        case common_1.ResultCode.Success:
+            return res.sendStatus(204);
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        case common_1.ResultCode.Error:
+            return res.status(400).send({ errorsMessages: [sendEmail.errorMessage] });
+        default:
+            return res.sendStatus(404);
+    }
 }));
 exports.authRoute.post('/registration', (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
     switch (createdUser.code) {
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
-        case common_1.ResultCode.Forbidden:
-            return res.status(400).send({ errorsMessages: [{ message: createdUser.errorMessage, field: createdUser.errorMessage }] });
+        case common_1.ResultCode.Error:
+            return res.status(400).send({ errorsMessages: [createdUser.errorMessage] });
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
+        default:
+            return res.sendStatus(404);
     }
 }));
 exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.codeValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -62,7 +71,14 @@ exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.co
     if (!code)
         return res.sendStatus(404);
     const confirm = yield auth_service_1.authService.confirmEmail(code);
-    if (!confirm)
-        return res.sendStatus(404);
-    return res.sendStatus(204);
+    switch (confirm.code) {
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        case common_1.ResultCode.Error:
+            return res.status(400).send({ errorsMessages: [confirm.errorMessage] });
+        case common_1.ResultCode.Success:
+            return res.sendStatus(204);
+        default:
+            return res.sendStatus(404);
+    }
 }));

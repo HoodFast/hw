@@ -43,6 +43,8 @@ userRoute.post('/', authMiddleware, userValidators(), async (req: RequestWithBod
             return res.status(400).send({ errorsMessages: { message: createdUser.errorMessage, field: createdUser.errorMessage } })
         case ResultCode.Success:
             return res.status(201).send(createdUser.data)
+        default:
+            return res.sendStatus(404)
     }
 })
 

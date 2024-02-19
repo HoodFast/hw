@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
 import {authService} from "../services/auth.service";
-import {RequestWithBody, RequestWithParams, RequestWithQuery, ResultCode} from "../models/common/common";
+import {RequestWithBody, RequestWithParams, RequestWithQuery, ResponseType, ResultCode} from "../models/common/common";
 import {AuthInputType} from "../models/auth/input/auth.input.model";
 import {authValidation} from "../validators/auth-validators";
 import {jwtService} from "../application/jwt.service";
@@ -43,8 +43,17 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
 authRoute.post('/registration-email-resending',emailValidation(), async (req: RequestWithBody<{ email: string }>, res: Response) => {
 
     const sendEmail = await authService.resendConfirmationCode(req.body.email)
-    if (!sendEmail) return res.sendStatus(404)
-    return res.sendStatus(204)
+    switch (sendEmail.code) {
+        case ResultCode.Success:
+            return  res.sendStatus(204)
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
+        case ResultCode.Error:
+            return res.status(400).send({ errorsMessages: [sendEmail.errorMessage] })
+        default:
+            return res.sendStatus(404)
+    }
+
 })
 
 authRoute.post('/registration', userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
@@ -54,10 +63,12 @@ authRoute.post('/registration', userValidators(), async (req: RequestWithBody<Us
     switch (createdUser.code) {
         case ResultCode.NotFound:
             return res.sendStatus(404)
-        case ResultCode.Forbidden:
-            return res.status(400).send({ errorsMessages: [{ message: createdUser.errorMessage, field: createdUser.errorMessage }] })
+        case ResultCode.Error:
+            return res.status(400).send({ errorsMessages: [createdUser.errorMessage] })
         case ResultCode.Success:
             return  res.sendStatus(204)
+        default:
+            return res.sendStatus(404)
     }
 })
 
@@ -65,6 +76,16 @@ authRoute.post('/registration-confirmation',codeValidation(), async (req: Reques
     const code = req.body.code
     if(!code) return res.sendStatus(404)
     const confirm = await authService.confirmEmail(code)
-    if(!confirm) return res.sendStatus(404)
-    return res.sendStatus(204)
+
+    switch (confirm.code) {
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
+        case ResultCode.Error:
+            return res.status(400).send({ errorsMessages: [confirm.errorMessage] })
+        case ResultCode.Success:
+            return  res.sendStatus(204)
+        default:
+            return res.sendStatus(404)
+    }
+
 })

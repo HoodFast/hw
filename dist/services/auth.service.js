@@ -18,16 +18,27 @@ const users_query_repository_1 = require("../repositories/users.query.repository
 const email_adapter_1 = require("../adapters/email.adapter");
 const user_repository_1 = require("../repositories/user.repository");
 const uuid_1 = require("uuid");
+const common_1 = require("../models/common/common");
 class authService {
     static resendConfirmationCode(email) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
             if (!user)
-                return false;
+                return {
+                    code: common_1.ResultCode.Error,
+                    errorMessage: { message: 'email doesnt exist', field: 'email' }
+                };
+            if (user.emailConfirmation.isConfirmed)
+                return {
+                    code: common_1.ResultCode.Error,
+                    errorMessage: { message: 'email is already confirmed', field: 'email' }
+                };
+            if (!user)
+                return { code: common_1.ResultCode.NotFound };
             const newConfirmationCode = (0, uuid_1.v4)();
             const updateConfirmCode = yield user_repository_1.UserRepository.updateNewConfirmCode(user._id, newConfirmationCode);
             if (!updateConfirmCode)
-                return false;
+                return { code: common_1.ResultCode.NotFound };
             const subject = "Email Confirmation";
             const message = `<h1>Thank for your registration</h1>
         <p>To finish registration please follow the link below:
@@ -35,8 +46,8 @@ class authService {
         </p>`;
             const sendCode = yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
             if (!sendCode)
-                return false;
-            return true;
+                return { code: common_1.ResultCode.NotFound };
+            return { code: common_1.ResultCode.Success };
         });
     }
     static sendConfirmCode(email) {
@@ -59,14 +70,23 @@ class authService {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByCode(code);
             if (!user)
-                return false;
+                return { code: common_1.ResultCode.Error, errorMessage: { message: 'code doesnt exist', field: 'code' } };
             if (user.emailConfirmation.expirationDate < new Date())
-                return false;
+                return {
+                    code: common_1.ResultCode.Error,
+                    errorMessage: { message: 'code is expiration', field: 'code' }
+                };
             if (user.emailConfirmation.isConfirmed)
-                return false;
+                return {
+                    code: common_1.ResultCode.Error,
+                    errorMessage: { message: 'code already confirmed', field: 'code' }
+                };
             if (user.emailConfirmation.confirmationCode !== code)
-                return false;
-            return yield user_repository_1.UserRepository.updateConfirmation(user._id);
+                return { code: common_1.ResultCode.Error };
+            const updateConfirm = yield user_repository_1.UserRepository.updateConfirmation(user._id);
+            if (updateConfirm)
+                return { code: common_1.ResultCode.Success };
+            return { code: common_1.ResultCode.Error };
         });
     }
     static checkCredentials(loginOrEmail, password) {

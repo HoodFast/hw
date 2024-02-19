@@ -40,6 +40,8 @@ exports.commentsRoute.delete('/:id', accesstoken_middleware_1.accessTokenGuard, 
             return res.sendStatus(403);
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
+        default:
+            return res.sendStatus(404);
     }
 }));
 exports.commentsRoute.put('/:id', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -55,5 +57,7 @@ exports.commentsRoute.put('/:id', accesstoken_middleware_1.accessTokenGuard, (0,
             return res.sendStatus(403);
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
+        default:
+            return res.sendStatus(404);
     }
 }));
