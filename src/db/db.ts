@@ -1,10 +1,12 @@
-
 import dotenv from 'dotenv'
 import {MongoClient} from "mongodb";
-import {BlogDbType} from "../models/blog/db/blog-db";;
+import {BlogDbType} from "../models/blog/db/blog-db";
+
+;
 import {PostTypeDb} from "../models/common/common";
 import {UsersTypeDb} from "../models/users/db/usersDBModel";
 import {CommentDbType} from "../models/comments/db/comment.db.model";
+
 dotenv.config()
 
 // mongodb+srv://holistic:vjueBUHFNM1234@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
@@ -21,18 +23,21 @@ export const usersCollection = dataBase.collection<UsersTypeDb>('users')
 export const commentsCollection = dataBase.collection<CommentDbType>('comments')
 
 
+export const db = {
+    async drop() {
+        return null
+    },
+    async stop() {
+        return null
+    }
+}
 
 
-
-
-
-
-export const runDB = async ()=>{
+export const runDB = async () => {
     try {
         await client.connect()
         console.log("Client connection to DB")
-    }
-    catch (e){
+    } catch (e) {
         console.log(e)
         await client.close()
     }
