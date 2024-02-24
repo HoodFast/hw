@@ -48,8 +48,6 @@ authRoute.post('/registration-email-resending',emailValidation(), async (req: Re
             return  res.sendStatus(204)
         case ResultCode.NotFound:
             return res.sendStatus(404)
-        case ResultCode.Error:
-            return res.status(400).send({ errorsMessages: [sendEmail.errorMessage] })
         default:
             return res.sendStatus(404)
     }
@@ -63,8 +61,6 @@ authRoute.post('/registration', userValidators(), async (req: RequestWithBody<Us
     switch (createdUser.code) {
         case ResultCode.NotFound:
             return res.sendStatus(404)
-        case ResultCode.Error:
-            return res.status(400).send({ errorsMessages: [createdUser.errorMessage] })
         case ResultCode.Success:
             return  res.sendStatus(204)
         default:
@@ -80,8 +76,6 @@ authRoute.post('/registration-confirmation',codeValidation(), async (req: Reques
     switch (confirm.code) {
         case ResultCode.NotFound:
             return res.sendStatus(404)
-        case ResultCode.Error:
-            return res.status(400).send({ errorsMessages: [confirm.errorMessage] })
         case ResultCode.Success:
             return  res.sendStatus(204)
         default:

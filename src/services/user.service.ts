@@ -17,10 +17,6 @@ export class userService {
 
     static async createUser(login: string, email: string, password: string, isConfirmed?:boolean): Promise<Result<OutputUsersType>> {
 
-        const isExistEmail = await UserQueryRepository.getByLoginOrEmail(email)
-        const isExistLogin = await UserQueryRepository.getByLoginOrEmail(login)
-        if(isExistEmail )return {code:ResultCode.Error,errorMessage: {message:'Email is exist',field:'email'}}
-        if(isExistLogin )return {code:ResultCode.Error,errorMessage:{message:'Login is exist',field:'login'}}
         const createdAt = new Date().toISOString()
         const salt = bcrypt.genSaltSync(saltRounds)
         const hash = bcrypt.hashSync(password, salt)

@@ -21,12 +21,6 @@ const saltRounds = 10;
 class userService {
     static createUser(login, email, password, isConfirmed) {
         return __awaiter(this, void 0, void 0, function* () {
-            const isExistEmail = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
-            const isExistLogin = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(login);
-            if (isExistEmail)
-                return { code: common_1.ResultCode.Error, errorMessage: { message: 'Email is exist', field: 'email' } };
-            if (isExistLogin)
-                return { code: common_1.ResultCode.Error, errorMessage: { message: 'Login is exist', field: 'login' } };
             const createdAt = new Date().toISOString();
             const salt = bcrypt.genSaltSync(saltRounds);
             const hash = bcrypt.hashSync(password, salt);

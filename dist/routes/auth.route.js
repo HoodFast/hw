@@ -47,8 +47,6 @@ exports.authRoute.post('/registration-email-resending', (0, email_validators_1.e
             return res.sendStatus(204);
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
-        case common_1.ResultCode.Error:
-            return res.status(400).send({ errorsMessages: [sendEmail.errorMessage] });
         default:
             return res.sendStatus(404);
     }
@@ -58,8 +56,6 @@ exports.authRoute.post('/registration', (0, users_validator_1.userValidators)(),
     switch (createdUser.code) {
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
-        case common_1.ResultCode.Error:
-            return res.status(400).send({ errorsMessages: [createdUser.errorMessage] });
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
         default:
@@ -74,8 +70,6 @@ exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.co
     switch (confirm.code) {
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
-        case common_1.ResultCode.Error:
-            return res.status(400).send({ errorsMessages: [confirm.errorMessage] });
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
         default:

@@ -11,14 +11,7 @@ import {ResultCode} from "../models/common/common";
 export class authService {
     static async resendConfirmationCode(email: string):Promise<Result> {
         const user = await UserQueryRepository.getByLoginOrEmail(email)
-        if (!user) return {
-            code: ResultCode.Error,
-            errorMessage: {message: 'email doesnt exist', field: 'email'}
-        }
-        if (user.emailConfirmation.isConfirmed) return {
-            code: ResultCode.Error,
-            errorMessage: {message: 'email is already confirmed', field: 'email'}
-        }
+
         if (!user) return {code:ResultCode.NotFound}
         const newConfirmationCode = uuidv4()
         const updateConfirmCode = await UserRepository.updateNewConfirmCode(user._id, newConfirmationCode)
@@ -48,19 +41,9 @@ export class authService {
 
     static async confirmEmail(code: string): Promise<Result> {
         const user = await UserQueryRepository.getByCode(code)
-        if (!user) return {code: ResultCode.Error, errorMessage: {message: 'code doesnt exist', field: 'code'}}
-        if (user.emailConfirmation.expirationDate < new Date()) return {
-            code: ResultCode.Error,
-            errorMessage: {message: 'code is expiration', field: 'code'}
-        }
-        if (user.emailConfirmation.isConfirmed) return {
-            code: ResultCode.Error,
-            errorMessage: {message: 'code already confirmed', field: 'code'}
-        }
-        if (user.emailConfirmation.confirmationCode !== code) return {code: ResultCode.Error}
-        const updateConfirm = await UserRepository.updateConfirmation(user._id)
+        const updateConfirm = await UserRepository.updateConfirmation(user!._id)
         if (updateConfirm) return {code: ResultCode.Success}
-        return {code: ResultCode.Error}
+        return {code: ResultCode.NotFound}
     }
 
     static async checkCredentials(loginOrEmail: string, password: string): Promise<WithId<UsersTypeDb> | null> {

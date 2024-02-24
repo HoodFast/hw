@@ -24,16 +24,6 @@ class authService {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
             if (!user)
-                return {
-                    code: common_1.ResultCode.Error,
-                    errorMessage: { message: 'email doesnt exist', field: 'email' }
-                };
-            if (user.emailConfirmation.isConfirmed)
-                return {
-                    code: common_1.ResultCode.Error,
-                    errorMessage: { message: 'email is already confirmed', field: 'email' }
-                };
-            if (!user)
                 return { code: common_1.ResultCode.NotFound };
             const newConfirmationCode = (0, uuid_1.v4)();
             const updateConfirmCode = yield user_repository_1.UserRepository.updateNewConfirmCode(user._id, newConfirmationCode);
@@ -69,24 +59,10 @@ class authService {
     static confirmEmail(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByCode(code);
-            if (!user)
-                return { code: common_1.ResultCode.Error, errorMessage: { message: 'code doesnt exist', field: 'code' } };
-            if (user.emailConfirmation.expirationDate < new Date())
-                return {
-                    code: common_1.ResultCode.Error,
-                    errorMessage: { message: 'code is expiration', field: 'code' }
-                };
-            if (user.emailConfirmation.isConfirmed)
-                return {
-                    code: common_1.ResultCode.Error,
-                    errorMessage: { message: 'code already confirmed', field: 'code' }
-                };
-            if (user.emailConfirmation.confirmationCode !== code)
-                return { code: common_1.ResultCode.Error };
             const updateConfirm = yield user_repository_1.UserRepository.updateConfirmation(user._id);
             if (updateConfirm)
                 return { code: common_1.ResultCode.Success };
-            return { code: common_1.ResultCode.Error };
+            return { code: common_1.ResultCode.NotFound };
         });
     }
     static checkCredentials(loginOrEmail, password) {
