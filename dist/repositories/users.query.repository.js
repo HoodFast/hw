@@ -64,7 +64,6 @@ class UserQueryRepository {
     }
     static getByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             const user = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.email': loginOrEmail }, { 'accountData.login': loginOrEmail }] });
             if (!user) {
                 return null;

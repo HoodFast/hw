@@ -10,19 +10,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtService = void 0;
+const config_1 = require("../app/config");
 let jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || '123';
 class jwtService {
     static createJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ userId: user._id }, config_1.appConfig.AC_SECRET, { expiresIn: config_1.appConfig.AC_TIME });
             return token;
         });
     }
     static getUserIdByToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = jwt.verify(token, JWT_SECRET);
+                const result = jwt.verify(token, config_1.appConfig.AC_SECRET);
                 return result.userId;
             }
             catch (err) {
