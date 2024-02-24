@@ -18,6 +18,7 @@ const blog_query_repository_1 = require("../repositories/blog.query.repository")
 const post_validators_1 = require("../validators/post-validators");
 const blog_service_1 = require("../services/blog.service");
 const blog_repository_1 = require("../repositories/blog.repository");
+const sortQueryFields_util_1 = require("../utils/sortQueryFields.util");
 exports.blogRoute = (0, express_1.Router)({});
 exports.blogRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
@@ -32,7 +33,6 @@ exports.blogRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, funct
     res.send(blogs);
 }));
 exports.blogRoute.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d, _e;
     const id = req.params.id;
     if (!mongodb_1.ObjectId.isValid(id)) {
         res.sendStatus(404);
@@ -43,12 +43,8 @@ exports.blogRoute.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void
         res.sendStatus(404);
         return;
     }
-    const sortData = {
-        sortBy: (_d = req.query.sortBy) !== null && _d !== void 0 ? _d : 'createdAt',
-        sortDirection: (_e = req.query.sortDirection) !== null && _e !== void 0 ? _e : 'desc',
-        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
-        pageSize: req.query.pageSize ? +req.query.pageSize : 10
-    };
+    const { sortBy, sortDirection, pageNumber, pageSize } = req.query;
+    const sortData = (0, sortQueryFields_util_1.sortQueryFieldsUtil)({ sortBy, sortDirection, pageNumber, pageSize });
     const posts = yield blog_query_repository_1.BlogQueryRepository.getAllPostsToBlog(id, sortData);
     res.send(posts);
 }));
