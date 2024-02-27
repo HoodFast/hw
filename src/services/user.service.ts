@@ -30,7 +30,8 @@ export class userService {
                     minutes: 30
                 }),
                 isConfirmed: isConfirmed ? isConfirmed : false
-            }
+            },
+            tokensBlackList:[]
         }
         const createdUser = await UserRepository.createUser(userData)
         if (!createdUser) {

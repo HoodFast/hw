@@ -71,20 +71,23 @@ export class UserQueryRepository {
         return userMapper(user)
     }
 
+    static async getDBUserById(id: string):
+        Promise<WithId<UsersTypeDb> | null> {
+        const user = await usersCollection.findOne({_id: new ObjectId(id)})
+        if (!user) return null
+        return user
+    }
+
     static async getByLoginOrEmail(loginOrEmail: string): Promise<WithId<UsersTypeDb> | null> {
 
         const user = await usersCollection.findOne({$or: [{'accountData.email': loginOrEmail}, {'accountData.login': loginOrEmail}]})
-        if (!user) {
-            return null
-        }
+        if (!user) return null
         return user
     }
 
     static async getByCode(code: string): Promise<WithId<UsersTypeDb> | null> {
         const user = await usersCollection.findOne({"emailConfirmation.confirmationCode": code})
-        if (!user) {
-            return null
-        }
+        if (!user) return null
         return user
     }
 

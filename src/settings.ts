@@ -5,12 +5,15 @@ import {testingRoute} from "./routes/testing-route";
 import {userRoute} from "./routes/user-route";
 import {authRoute} from "./routes/auth.route";
 import {commentsRoute} from "./routes/comments-route";
-import {emailAdapter} from "./adapters/email.adapter";
 
+const cookieParser = require('cookie-parser');
 
 export const app = express()
 
 app.use(express.json())
+
+app.use(cookieParser('secret key'));
+
 
 app.use('/ht_02/api/blogs', blogRoute)
 app.use('/ht_02/api/posts', postRoute)

@@ -24,6 +24,22 @@ class UserRepository {
             return user;
         });
     }
+    static putTokenInBL(userId, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.usersCollection.updateOne({ _id: new mongodb_1.ObjectId(userId) }, {
+                $push: { tokensBlackList: token }
+            });
+            return res.modifiedCount === 1;
+        });
+    }
+    static getBlackList(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(userId) });
+            if (!res)
+                return null;
+            return res.tokensBlackList;
+        });
+    }
     static updateConfirmation(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.usersCollection.updateOne({ _id: userId }, {

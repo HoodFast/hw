@@ -19,7 +19,22 @@ const email_adapter_1 = require("../adapters/email.adapter");
 const user_repository_1 = require("../repositories/user.repository");
 const uuid_1 = require("uuid");
 const common_1 = require("../models/common/common");
+const jwt_service_1 = require("../application/jwt.service");
 class authService {
+    static refreshToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = yield jwt_service_1.jwtService.getUserIdByRefreshToken(token);
+            if (!userId)
+                return { code: common_1.ResultCode.Forbidden };
+            const user = yield users_query_repository_1.UserQueryRepository.getDBUserById(userId);
+            if (!user)
+                return { code: common_1.ResultCode.NotFound };
+            const accessToken = yield jwt_service_1.jwtService.createJWT(user);
+            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user);
+            yield user_repository_1.UserRepository.putTokenInBL(userId, token);
+            return { code: common_1.ResultCode.Success, data: { accessToken, refreshToken } };
+        });
+    }
     static resendConfirmationCode(email) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);

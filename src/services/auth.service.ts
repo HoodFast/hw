@@ -7,23 +7,36 @@ import {UserRepository} from "../repositories/user.repository";
 import {v4 as uuidv4} from "uuid";
 import {Result} from "../types/result.type";
 import {ResultCode} from "../models/common/common";
+import {jwtService} from "../application/jwt.service";
 
 export class authService {
-    static async resendConfirmationCode(email: string):Promise<Result> {
+    static async refreshToken(token: string) {
+        const userId = await jwtService.getUserIdByRefreshToken(token)
+        if(!userId)return {code: ResultCode.Forbidden}
+        const user = await UserQueryRepository.getDBUserById(userId)
+        if(!user) return {code: ResultCode.NotFound}
+        const accessToken =await jwtService.createJWT(user)
+        const refreshToken = await jwtService.createRefreshJWT(user)
+        await UserRepository.putTokenInBL(userId,token)
+        return {code: ResultCode.Success,data:{accessToken,refreshToken}}
+    }
+
+
+    static async resendConfirmationCode(email: string): Promise<Result> {
         const user = await UserQueryRepository.getByLoginOrEmail(email)
 
-        if (!user) return {code:ResultCode.NotFound}
+        if (!user) return {code: ResultCode.NotFound}
         const newConfirmationCode = uuidv4()
         const updateConfirmCode = await UserRepository.updateNewConfirmCode(user._id, newConfirmationCode)
-        if (!updateConfirmCode) return {code:ResultCode.NotFound}
+        if (!updateConfirmCode) return {code: ResultCode.NotFound}
         const subject = "Email Confirmation"
         const message = `<h1>Thank for your registration</h1>
         <p>To finish registration please follow the link below:
             <a href='https://somesite.com/confirm-email?code=${newConfirmationCode}'>complete registration</a>
         </p>`
         const sendCode = await emailAdapter.sendEmail(email, subject, message)
-        if (!sendCode) return {code:ResultCode.NotFound}
-        return {code:ResultCode.Success}
+        if (!sendCode) return {code: ResultCode.NotFound}
+        return {code: ResultCode.Success}
     }
 
     static async sendConfirmCode(email: string) {

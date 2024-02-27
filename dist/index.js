@@ -13,6 +13,6 @@ const settings_1 = require("./settings");
 const db_1 = require("./db/db");
 const port = process.env.PORT || 3000;
 settings_1.app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, db_1.runDB)();
+    yield db_1.db.run();
     console.log(`App start on port ${port}`);
 }));

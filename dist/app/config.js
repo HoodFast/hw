@@ -10,6 +10,7 @@ exports.appConfig = {
     DB_TYPE: process.env.DB_TYPE,
     AC_SECRET: process.env.AC_SECRET,
     AC_TIME: process.env.AC_TIME,
+    RT_TIME: process.env.AC_TIME,
     RT_SECRET: process.env.RT_SECRET,
     EMAIL: process.env.EMAIL,
     EMAIL_PASS: process.env.EMAIL_PASS

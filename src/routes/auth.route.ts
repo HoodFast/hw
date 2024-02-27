@@ -32,20 +32,22 @@ authRoute.get('/me', accessTokenGuard,
 authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInputType>, res: Response) => {
 
     const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)
-    if (user) {
-        const token = await jwtService.createJWT(user)
-        return res.status(200).send({accessToken: token})
-    } else {
-        return res.sendStatus(401)
-    }
+    if (!user) return res.sendStatus(401)
+    const accessToken = await jwtService.createJWT(user)
+    const refreshToken = await jwtService.createRefreshJWT(user)
+    res.cookie('refreshToken', refreshToken)
+    return res.status(200).send({accessToken})
+
 })
 
-authRoute.post('/registration-email-resending',emailValidation(), async (req: RequestWithBody<{ email: string }>, res: Response) => {
+authRoute.post('/registration-email-resending', emailValidation(), async (req: RequestWithBody<{
+    email: string
+}>, res: Response) => {
 
     const sendEmail = await authService.resendConfirmationCode(req.body.email)
     switch (sendEmail.code) {
         case ResultCode.Success:
-            return  res.sendStatus(204)
+            return res.sendStatus(204)
         case ResultCode.NotFound:
             return res.sendStatus(404)
         default:
@@ -62,24 +64,43 @@ authRoute.post('/registration', userValidators(), async (req: RequestWithBody<Us
         case ResultCode.NotFound:
             return res.sendStatus(404)
         case ResultCode.Success:
-            return  res.sendStatus(204)
+            return res.sendStatus(204)
         default:
             return res.sendStatus(404)
     }
 })
 
-authRoute.post('/registration-confirmation',codeValidation(), async (req: RequestWithBody<{ code: string }  >, res: Response) => {
+authRoute.post('/registration-confirmation', codeValidation(), async (req: RequestWithBody<{
+    code: string
+}>, res: Response) => {
     const code = req.body.code
-    if(!code) return res.sendStatus(404)
+    if (!code) return res.sendStatus(404)
     const confirm = await authService.confirmEmail(code)
 
     switch (confirm.code) {
         case ResultCode.NotFound:
             return res.sendStatus(404)
         case ResultCode.Success:
-            return  res.sendStatus(204)
+            return res.sendStatus(204)
         default:
             return res.sendStatus(404)
     }
 
+})
+
+authRoute.post('/refresh-token', async (req: Request, res: Response) => {
+
+    const tokens = await authService.refreshToken(req.cookies.refreshToken)
+
+    switch (tokens.code) {
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
+        case ResultCode.Success:
+            res.cookie('refreshToken', tokens.data!.refreshToken)
+            return res.status(200).send({accessToken: tokens.data!.accessToken})
+        case ResultCode.Forbidden:
+            return res.sendStatus(401)
+        default:
+            return res.sendStatus(404)
+    }
 })

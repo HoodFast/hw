@@ -32,13 +32,12 @@ exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, re
 }));
 exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
-    if (user) {
-        const token = yield jwt_service_1.jwtService.createJWT(user);
-        return res.status(200).send({ accessToken: token });
-    }
-    else {
+    if (!user)
         return res.sendStatus(401);
-    }
+    const accessToken = yield jwt_service_1.jwtService.createJWT(user);
+    const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user);
+    res.cookie('refreshToken', refreshToken);
+    return res.status(200).send({ accessToken });
 }));
 exports.authRoute.post('/registration-email-resending', (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sendEmail = yield auth_service_1.authService.resendConfirmationCode(req.body.email);
@@ -72,6 +71,20 @@ exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.co
             return res.sendStatus(404);
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
+        default:
+            return res.sendStatus(404);
+    }
+}));
+exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const tokens = yield auth_service_1.authService.refreshToken(req.cookies.refreshToken);
+    switch (tokens.code) {
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        case common_1.ResultCode.Success:
+            res.cookie('refreshToken', tokens.data.refreshToken);
+            return res.status(200).send({ accessToken: tokens.data.accessToken });
+        case common_1.ResultCode.Forbidden:
+            return res.sendStatus(401);
         default:
             return res.sendStatus(404);
     }

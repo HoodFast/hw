@@ -1,4 +1,3 @@
-
 export type UsersTypeDb = {
     accountData: {
         _passwordHash: string
@@ -11,5 +10,5 @@ export type UsersTypeDb = {
         expirationDate: Date
         isConfirmed: boolean
     }
-
+    tokensBlackList: string[]
 }

@@ -13,6 +13,18 @@ export class UserRepository {
         return user
     }
 
+    static async putTokenInBL(userId:string,token: string) {
+        const res = await usersCollection.updateOne({_id:new ObjectId(userId)},{
+                $push: {tokensBlackList:token}
+        })
+        return res.modifiedCount === 1
+    }
+    static async getBlackList(userId:string) {
+        const res = await usersCollection.findOne({_id:new ObjectId(userId)})
+        if(!res)return null
+        return res.tokensBlackList
+    }
+
     static async updateConfirmation(userId: ObjectId): Promise<boolean> {
         const res = await usersCollection.updateOne({_id: userId}, {
             $set: {

@@ -33,7 +33,8 @@ class userService {
                         minutes: 30
                     }),
                     isConfirmed: isConfirmed ? isConfirmed : false
-                }
+                },
+                tokensBlackList: []
             };
             const createdUser = yield user_repository_1.UserRepository.createUser(userData);
             if (!createdUser) {

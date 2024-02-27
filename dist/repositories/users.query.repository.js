@@ -62,21 +62,27 @@ class UserQueryRepository {
             return (0, user_mappers_1.userMapper)(user);
         });
     }
+    static getDBUserById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            if (!user)
+                return null;
+            return user;
+        });
+    }
     static getByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.email': loginOrEmail }, { 'accountData.login': loginOrEmail }] });
-            if (!user) {
+            if (!user)
                 return null;
-            }
             return user;
         });
     }
     static getByCode(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield db_1.usersCollection.findOne({ "emailConfirmation.confirmationCode": code });
-            if (!user) {
+            if (!user)
                 return null;
-            }
             return user;
         });
     }
