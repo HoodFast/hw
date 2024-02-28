@@ -10,10 +10,7 @@ import {ResultCode} from "../models/common/common";
 import {jwtService} from "../application/jwt.service";
 
 export class authService {
-    static async me(token: string) {
-        const userId = await jwtService.getUserIdByRefreshToken(token)
-        debugger
-        if (!userId) return {code: ResultCode.Forbidden}
+    static async me(userId: string) {
         const user = await UserQueryRepository.getById(userId)
         if (!user) return {code: ResultCode.NotFound}
         return {code: ResultCode.Success,data: {email: user.email, login: user.login, userId: user.id}}

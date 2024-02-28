@@ -15,17 +15,18 @@ const auth_service_1 = require("../services/auth.service");
 const common_1 = require("../models/common/common");
 const auth_validators_1 = require("../validators/auth-validators");
 const jwt_service_1 = require("../application/jwt.service");
+const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
 const users_validator_1 = require("../validators/users-validator");
 const user_service_1 = require("../services/user.service");
 const confirm_validators_1 = require("../validators/confirm-validators");
 const email_validators_1 = require("../validators/email-validators");
 exports.authRoute = (0, express_1.Router)({});
-exports.authRoute.get('/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.cookies.refreshToken;
-    if (!token)
+exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    if (!userId)
         return res.sendStatus(401);
-    const me = yield auth_service_1.authService.me(token);
-    debugger;
+    const me = yield auth_service_1.authService.me(userId);
     switch (me.code) {
         case common_1.ResultCode.Success:
             return res.status(200).send(me.data);

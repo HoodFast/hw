@@ -21,12 +21,8 @@ const uuid_1 = require("uuid");
 const common_1 = require("../models/common/common");
 const jwt_service_1 = require("../application/jwt.service");
 class authService {
-    static me(token) {
+    static me(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userId = yield jwt_service_1.jwtService.getUserIdByRefreshToken(token);
-            debugger;
-            if (!userId)
-                return { code: common_1.ResultCode.Forbidden };
             const user = yield users_query_repository_1.UserQueryRepository.getById(userId);
             if (!user)
                 return { code: common_1.ResultCode.NotFound };

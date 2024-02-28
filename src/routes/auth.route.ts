@@ -18,13 +18,11 @@ import {emailValidation} from "../validators/email-validators";
 export const authRoute = Router({})
 
 
-authRoute.get('/me',
-    async (req: Request, res: Response) => {
+authRoute.get('/me', accessTokenGuard, async (req: Request, res: Response) => {
 
-        const token = req.cookies.refreshToken
-        if (!token) return res.sendStatus(401)
-        const me = await authService.me(token)
-debugger
+        const userId = req.user?.id
+        if (!userId) return res.sendStatus(401)
+        const me = await authService.me(userId)
         switch (me.code) {
             case ResultCode.Success:
                 return res.status(200).send(me.data)
@@ -46,7 +44,7 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
     if (!user) return res.sendStatus(401)
     const accessToken = await jwtService.createJWT(user)
     const refreshToken = await jwtService.createRefreshJWT(user)
-    res.cookie('refreshToken', refreshToken,{httpOnly: true, secure: true})
+    res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
     return res.status(200).send({accessToken})
 
 })
