@@ -71,8 +71,7 @@ export class UserQueryRepository {
         return userMapper(user)
     }
 
-    static async getDBUserById(id: string):
-        Promise<WithId<UsersTypeDb> | null> {
+    static async getDBUserById(id: string): Promise<WithId<UsersTypeDb> | null> {
         const user = await usersCollection.findOne({_id: new ObjectId(id)})
         if (!user) return null
         return user

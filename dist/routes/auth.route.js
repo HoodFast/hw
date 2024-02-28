@@ -16,19 +16,27 @@ const common_1 = require("../models/common/common");
 const auth_validators_1 = require("../validators/auth-validators");
 const jwt_service_1 = require("../application/jwt.service");
 const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
-const users_query_repository_1 = require("../repositories/users.query.repository");
 const users_validator_1 = require("../validators/users-validator");
 const user_service_1 = require("../services/user.service");
 const confirm_validators_1 = require("../validators/confirm-validators");
 const email_validators_1 = require("../validators/email-validators");
 exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-    if (!userId)
+    const token = req.cookies.refreshToken;
+    debugger;
+    if (!token)
         return res.sendStatus(401);
-    const me = yield users_query_repository_1.UserQueryRepository.getById(userId);
-    return res.status(200).send(me);
+    const me = yield auth_service_1.authService.me(token);
+    switch (me.code) {
+        case common_1.ResultCode.Success:
+            return res.status(200).send(me.data);
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        case common_1.ResultCode.Forbidden:
+            return res.sendStatus(401);
+        default:
+            return res.sendStatus(404);
+    }
 }));
 exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
@@ -81,8 +89,21 @@ exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0,
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
         case common_1.ResultCode.Success:
-            res.cookie('refreshToken', tokens.data.refreshToken);
+            res.cookie('refreshToken', tokens.data.refreshToken, { httpOnly: true, sameSite: 'strict' });
             return res.status(200).send({ accessToken: tokens.data.accessToken });
+        case common_1.ResultCode.Forbidden:
+            return res.sendStatus(401);
+        default:
+            return res.sendStatus(404);
+    }
+}));
+exports.authRoute.post('/logout', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const deleteToken = yield auth_service_1.authService.deleteToken(req.cookies.refreshToken);
+    switch (deleteToken.code) {
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        case common_1.ResultCode.Success:
+            return res.sendStatus(204);
         case common_1.ResultCode.Forbidden:
             return res.sendStatus(401);
         default:

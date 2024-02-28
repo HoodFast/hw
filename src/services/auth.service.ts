@@ -10,15 +10,30 @@ import {ResultCode} from "../models/common/common";
 import {jwtService} from "../application/jwt.service";
 
 export class authService {
+    static async me(token: string) {
+        const userId = await jwtService.getUserIdByRefreshToken(token)
+        if (!userId) return {code: ResultCode.Forbidden}
+        const user = await UserQueryRepository.getById(userId)
+        if (!user) return {code: ResultCode.NotFound}
+        return {code: ResultCode.Success,data: {email: user.email, login: user.login, userId: user.id}}
+    }
+
+    static async deleteToken(token: string) {
+        const userId = await jwtService.getUserIdByRefreshToken(token)
+        if (!userId) return {code: ResultCode.Forbidden}
+        await UserRepository.putTokenInBL(userId, token)
+        return {code: ResultCode.Success}
+    }
+
     static async refreshToken(token: string) {
         const userId = await jwtService.getUserIdByRefreshToken(token)
-        if(!userId)return {code: ResultCode.Forbidden}
+        if (!userId) return {code: ResultCode.Forbidden}
         const user = await UserQueryRepository.getDBUserById(userId)
-        if(!user) return {code: ResultCode.NotFound}
-        const accessToken =await jwtService.createJWT(user)
+        if (!user) return {code: ResultCode.NotFound}
+        const accessToken = await jwtService.createJWT(user)
         const refreshToken = await jwtService.createRefreshJWT(user)
-        await UserRepository.putTokenInBL(userId,token)
-        return {code: ResultCode.Success,data:{accessToken,refreshToken}}
+        await UserRepository.putTokenInBL(userId, token)
+        return {code: ResultCode.Success, data: {accessToken, refreshToken}}
     }
 
 

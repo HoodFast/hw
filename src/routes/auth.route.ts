@@ -20,11 +20,22 @@ export const authRoute = Router({})
 
 authRoute.get('/me', accessTokenGuard,
     async (req: Request, res: Response) => {
+        const token = req.cookies.refreshToken
+debugger
+        if (!token) return res.sendStatus(401)
+        const me = await authService.me(token)
 
-        const userId = req.user?.id
-        if (!userId) return res.sendStatus(401)
-        const me = await UserQueryRepository.getById(userId)
-        return res.status(200).send(me)
+        switch (me.code) {
+            case ResultCode.Success:
+                return res.status(200).send(me.data)
+            case ResultCode.NotFound:
+                return res.sendStatus(404)
+            case ResultCode.Forbidden:
+                return res.sendStatus(401)
+            default:
+                return res.sendStatus(404)
+        }
+
 
     }
 )
@@ -96,8 +107,24 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
         case ResultCode.NotFound:
             return res.sendStatus(404)
         case ResultCode.Success:
-            res.cookie('refreshToken', tokens.data!.refreshToken)
+            res.cookie('refreshToken', tokens.data!.refreshToken, {httpOnly: true, sameSite: 'strict'})
             return res.status(200).send({accessToken: tokens.data!.accessToken})
+        case ResultCode.Forbidden:
+            return res.sendStatus(401)
+        default:
+            return res.sendStatus(404)
+    }
+})
+
+authRoute.post('/logout', async (req: Request, res: Response) => {
+
+    const deleteToken = await authService.deleteToken(req.cookies.refreshToken)
+
+    switch (deleteToken.code) {
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
+        case ResultCode.Success:
+            return res.sendStatus(204)
         case ResultCode.Forbidden:
             return res.sendStatus(401)
         default:
