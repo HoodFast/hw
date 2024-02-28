@@ -107,7 +107,7 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
         case ResultCode.NotFound:
             return res.sendStatus(404)
         case ResultCode.Success:
-            res.cookie('refreshToken', tokens.data!.refreshToken, {httpOnly: true, sameSite: 'strict'})
+            res.cookie('refreshToken', tokens.data!.refreshToken, {httpOnly: true, sameSite: 'strict',secure: true})
             return res.status(200).send({accessToken: tokens.data!.accessToken})
         case ResultCode.Forbidden:
             return res.sendStatus(401)

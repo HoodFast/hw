@@ -89,7 +89,7 @@ exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0,
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
         case common_1.ResultCode.Success:
-            res.cookie('refreshToken', tokens.data.refreshToken, { httpOnly: true, sameSite: 'strict' });
+            res.cookie('refreshToken', tokens.data.refreshToken, { httpOnly: true, sameSite: 'strict', secure: true });
             return res.status(200).send({ accessToken: tokens.data.accessToken });
         case common_1.ResultCode.Forbidden:
             return res.sendStatus(401);
