@@ -5,7 +5,7 @@ import {UserRepository} from "../../repositories/user.repository";
 
 
 export const accessTokenGuard = async (req: Request, res: Response, next: NextFunction) => {
-
+debugger
     if (!req.headers.authorization) {
         return res.sendStatus(401)
     }

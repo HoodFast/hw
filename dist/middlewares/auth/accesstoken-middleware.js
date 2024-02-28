@@ -14,6 +14,7 @@ const jwt_service_1 = require("../../application/jwt.service");
 const users_query_repository_1 = require("../../repositories/users.query.repository");
 const user_repository_1 = require("../../repositories/user.repository");
 const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    debugger;
     if (!req.headers.authorization) {
         return res.sendStatus(401);
     }
