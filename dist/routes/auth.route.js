@@ -43,7 +43,7 @@ exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, 
         return res.sendStatus(401);
     const accessToken = yield jwt_service_1.jwtService.createJWT(user);
     const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user);
-    res.cookie('refreshToken', refreshToken);
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
     return res.status(200).send({ accessToken });
 }));
 exports.authRoute.post('/registration-email-resending', (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -88,7 +88,7 @@ exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0,
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
         case common_1.ResultCode.Success:
-            res.cookie('refreshToken', tokens.data.refreshToken, { httpOnly: true, sameSite: 'strict', secure: true });
+            res.cookie('refreshToken', tokens.data.refreshToken, { httpOnly: true, secure: true });
             return res.status(200).send({ accessToken: tokens.data.accessToken });
         case common_1.ResultCode.Forbidden:
             return res.sendStatus(401);

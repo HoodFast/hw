@@ -46,7 +46,7 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
     if (!user) return res.sendStatus(401)
     const accessToken = await jwtService.createJWT(user)
     const refreshToken = await jwtService.createRefreshJWT(user)
-    res.cookie('refreshToken', refreshToken)
+    res.cookie('refreshToken', refreshToken,{httpOnly: true, secure: true})
     return res.status(200).send({accessToken})
 
 })
@@ -107,7 +107,7 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
         case ResultCode.NotFound:
             return res.sendStatus(404)
         case ResultCode.Success:
-            res.cookie('refreshToken', tokens.data!.refreshToken, {httpOnly: true, sameSite: 'strict',secure: true})
+            res.cookie('refreshToken', tokens.data!.refreshToken, {httpOnly: true, secure: true})
             return res.status(200).send({accessToken: tokens.data!.accessToken})
         case ResultCode.Forbidden:
             return res.sendStatus(401)
