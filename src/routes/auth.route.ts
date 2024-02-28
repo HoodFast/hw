@@ -20,8 +20,8 @@ export const authRoute = Router({})
 
 authRoute.get('/me', accessTokenGuard,
     async (req: Request, res: Response) => {
+    debugger
         const token = req.cookies.refreshToken
-debugger
         if (!token) return res.sendStatus(401)
         const me = await authService.me(token)
 

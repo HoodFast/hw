@@ -22,8 +22,8 @@ const confirm_validators_1 = require("../validators/confirm-validators");
 const email_validators_1 = require("../validators/email-validators");
 exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.cookies.refreshToken;
     debugger;
+    const token = req.cookies.refreshToken;
     if (!token)
         return res.sendStatus(401);
     const me = yield auth_service_1.authService.me(token);
