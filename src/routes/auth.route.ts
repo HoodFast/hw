@@ -18,13 +18,13 @@ import {emailValidation} from "../validators/email-validators";
 export const authRoute = Router({})
 
 
-authRoute.get('/me', accessTokenGuard,
+authRoute.get('/me',
     async (req: Request, res: Response) => {
-    debugger
+
         const token = req.cookies.refreshToken
         if (!token) return res.sendStatus(401)
         const me = await authService.me(token)
-
+debugger
         switch (me.code) {
             case ResultCode.Success:
                 return res.status(200).send(me.data)

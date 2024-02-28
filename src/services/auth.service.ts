@@ -12,6 +12,7 @@ import {jwtService} from "../application/jwt.service";
 export class authService {
     static async me(token: string) {
         const userId = await jwtService.getUserIdByRefreshToken(token)
+        debugger
         if (!userId) return {code: ResultCode.Forbidden}
         const user = await UserQueryRepository.getById(userId)
         if (!user) return {code: ResultCode.NotFound}
