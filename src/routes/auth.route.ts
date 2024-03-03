@@ -1,11 +1,10 @@
 import {Request, Response, Router} from "express";
 import {authService} from "../services/auth.service";
-import {RequestWithBody, RequestWithParams, RequestWithQuery, ResponseType, ResultCode} from "../models/common/common";
+import {RequestWithBody, ResultCode} from "../models/common/common";
 import {AuthInputType} from "../models/auth/input/auth.input.model";
 import {authValidation} from "../validators/auth-validators";
 import {jwtService} from "../application/jwt.service";
 import {accessTokenGuard} from "../middlewares/auth/accesstoken-middleware";
-import {UserQueryRepository} from "../repositories/users.query.repository";
 import {UserInputModelType} from "../models/users/input/user.input.model";
 import {userValidators} from "../validators/users-validator";
 import {userService} from "../services/user.service";
