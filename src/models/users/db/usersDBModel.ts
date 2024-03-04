@@ -3,7 +3,7 @@ export type UsersTypeDb = {
         _passwordHash: string
         login: string,
         email: string,
-        createdAt: string
+        createdAt: Date
     }
     emailConfirmation: {
         confirmationCode: string

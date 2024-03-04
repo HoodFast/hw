@@ -8,7 +8,7 @@
     "build": "tsc",
     "dev": "yarn nodemon --inspect dist/index.js",
     "watch": "tsc -w",
-    "test": "jest --runInBand --detectOpenHandles --forceExit"
+    "test": "jest --config jest.config.js --runInBand --detectOpenHandles --forceExit"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",

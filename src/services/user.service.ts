@@ -17,7 +17,7 @@ export class userService {
 
     static async createUser(login: string, email: string, password: string, isConfirmed?:boolean): Promise<Result<OutputUsersType>> {
 
-        const createdAt = new Date().toISOString()
+        const createdAt = new Date()
         const salt = bcrypt.genSaltSync(saltRounds)
         const hash = bcrypt.hashSync(password, salt)
 

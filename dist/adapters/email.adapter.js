@@ -30,7 +30,7 @@ exports.emailAdapter = {
                 subject,
                 html: message
             });
-            return info;
+            return !!info;
         });
     }
 };

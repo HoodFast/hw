@@ -21,7 +21,7 @@ const saltRounds = 10;
 class userService {
     static createUser(login, email, password, isConfirmed) {
         return __awaiter(this, void 0, void 0, function* () {
-            const createdAt = new Date().toISOString();
+            const createdAt = new Date();
             const salt = bcrypt.genSaltSync(saltRounds);
             const hash = bcrypt.hashSync(password, salt);
             const userData = {

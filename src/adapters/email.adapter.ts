@@ -24,7 +24,7 @@ export const emailAdapter= {
                 html: message
             })
 
-           return info
+           return !!info
         }
     }
 
