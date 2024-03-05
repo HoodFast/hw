@@ -7,9 +7,9 @@ type RegisterUserType = {
     login:string,
     pass:string,
     email:string,
-    code:string,
-    expirationDate:Date,
-    isConfirmed:boolean
+    code?:string,
+    expirationDate?:Date,
+    isConfirmed?:boolean
 }
 export const testSeeder = {
     createUserDto() {

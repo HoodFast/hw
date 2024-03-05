@@ -66,6 +66,12 @@ class UserRepository {
             return !!res;
         });
     }
+    static doesExistByLoginOrEmail(login, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.email': email }, { 'accountData.login': login }] });
+            return !!user;
+        });
+    }
 }
 exports.UserRepository = UserRepository;
 ;

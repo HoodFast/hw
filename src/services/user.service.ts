@@ -15,8 +15,10 @@ const saltRounds = 10;
 
 export class userService {
 
-    static async createUser(login: string, email: string, password: string, isConfirmed?:boolean): Promise<Result<OutputUsersType>> {
+    static async createUser(login: string, email: string, password: string, isConfirmed?: boolean): Promise<Result<OutputUsersType>> {
+        const user = await UserRepository.doesExistByLoginOrEmail(login, email)
 
+        if(user) return {code: ResultCode.Forbidden}
         const createdAt = new Date()
         const salt = bcrypt.genSaltSync(saltRounds)
         const hash = bcrypt.hashSync(password, salt)
@@ -31,22 +33,21 @@ export class userService {
                 }),
                 isConfirmed: isConfirmed ? isConfirmed : false
             },
-            tokensBlackList:[]
+            tokensBlackList: []
         }
         const createdUser = await UserRepository.createUser(userData)
         if (!createdUser) {
-            return {code:ResultCode.NotFound}
+            return {code: ResultCode.NotFound}
         }
         try {
-             await authService.sendConfirmCode(createdUser.email)
+            await authService.sendConfirmCode(createdUser.email)
         } catch (e) {
             console.log(e)
-            return {code:ResultCode.NotFound}
+            return {code: ResultCode.NotFound}
         }
 
-        return {code:ResultCode.Success, data:createdUser}
+        return {code: ResultCode.Success, data: createdUser}
     }
-
 
 
     static async deleteUser(id: string): Promise<boolean | null> {

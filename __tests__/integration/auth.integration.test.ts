@@ -7,47 +7,53 @@ import {userService} from "../../src/services/user.service";
 import {testSeeder} from "../test.seeder";
 import {ResultCode} from "../../src/models/common/common";
 import {emailAdapter} from "../../src/adapters/email.adapter";
-import {emailServiceMock} from "./mocks";
 
 describe('AUTH-INTEGRATION', () => {
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create()
         const url = mongoServer.getUri()
         appConfig.MONGO_URL = url
-    }),
+    })
 
-        beforeEach(async () => {
-            await db.drop()
-        })
+    beforeEach(async () => {
+        await db.drop()
+    })
     afterAll(async () => {
         await db.drop()
         await db.stop()
-    }),
-        afterAll((done: DoneCallback) => done()),
-        describe('USER Registration', () => {
-            const registerUserUseCase = userService.createUser
-            emailAdapter.sendEmail = emailServiceMock.sendEmail
-            it('should register user with correct data', async () => {
-                const {login, pass, email} = testSeeder.createUserDto()
-                const result = await registerUserUseCase(login, pass, email)
+    })
+    afterAll((done: DoneCallback) => done())
+    describe('USER Registration', () => {
+        const registerUserUseCase = userService.createUser
+        // emailAdapter.sendEmail = emailServiceMock.sendEmail
+        // emailAdapter.sendEmail=jest.fn()
+        emailAdapter.sendEmail = jest.fn().mockImplementation((email: string, subject: string, message: string) => {
+            return true
+        })
 
-                expect(result).toEqual({
-                    code: ResultCode.Success,
-                    data: {
-                        accountData: {
-                            _passwordHash: expect.any(String),
-                            createdAt: expect.any(Date),
-                            email,
-                            login
-                        },
-                        emailConfirmation: {
-                            confirmationCode: expect.any(String),
-                            expirationDate: expect.any(Date),
-                            isConfirmed: false
-                        },
-                        tokensBlackList: []
-                    }
-                })
+        it('should register user with correct data', async () => {
+            const {login, pass, email} = testSeeder.createUserDto()
+            const result = await registerUserUseCase(login, email, pass)
+
+            expect(result).toEqual({
+                code: ResultCode.Success,
+                data: {
+                    id: expect.any(String),
+                    login: expect.any(String),
+                    email: expect.any(String),
+                    createdAt: expect.any(Date)
+                }
+            })
+            expect(emailAdapter.sendEmail).toBeCalled()
+            expect(emailAdapter.sendEmail).toBeCalledTimes(1)
+        })
+        it('Should not register user twice', async () => {
+            const {login, pass, email} = testSeeder.createUserDto()
+            await testSeeder.registerUser({login, pass, email})
+            const result = await registerUserUseCase(login, email, pass)
+            expect(result).toEqual({
+                code: ResultCode.Forbidden
             })
         })
+    })
 })
