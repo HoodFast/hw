@@ -4,24 +4,24 @@ import {db} from "../../src/db/db";
 import {app} from "../../src/settings";
 import {routerPaths} from "../../src/models/common/paths/paths";
 import {ADMIN_LOGIN, ADMIN_PASS} from "../../src/auth/guards/base.auth.guard";
-import {testSeeder} from "../test.seeder";
+import {RegisterUserType, testSeeder} from "../test.seeder";
 
 const request = require('supertest');
 
 describe("USER TESTS", () => {
     beforeAll(async () => {
-        // const mongoServer = await MongoMemoryServer.create()
-        // appConfig.MONGO_URL = mongoServer.getUri()
-        // await db.run()
-        await request(app).delete(routerPaths.deleteAll)
+        const mongoServer = await MongoMemoryServer.create()
+        appConfig.MONGO_URL = mongoServer.getUri()
+        await db.run()
+
     })
 
     beforeEach(async () => {
-        // await db.drop()
+        await db.drop()
     })
 
     afterAll(async () => {
-        // await db.stop()
+        await db.stop()
     })
 
 
@@ -40,4 +40,5 @@ describe("USER TESTS", () => {
             .send(userDto)
             .expect(201)
     })
+
 })

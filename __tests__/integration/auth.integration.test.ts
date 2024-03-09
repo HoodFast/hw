@@ -12,6 +12,7 @@ describe('AUTH-INTEGRATION', () => {
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create()
         const url = mongoServer.getUri()
+        console.log(url)
         appConfig.MONGO_URL = url
     })
 
@@ -32,8 +33,8 @@ describe('AUTH-INTEGRATION', () => {
         })
 
         it('should register user with correct data', async () => {
-            const {login, pass, email} = testSeeder.createUserDto()
-            const result = await registerUserUseCase(login, email, pass)
+            const {login, password, email} = testSeeder.createUserDto()
+            const result = await registerUserUseCase(login, email, password)
 
             expect(result).toEqual({
                 code: ResultCode.Success,
@@ -48,9 +49,9 @@ describe('AUTH-INTEGRATION', () => {
             expect(emailAdapter.sendEmail).toBeCalledTimes(1)
         })
         it('Should not register user twice', async () => {
-            const {login, pass, email} = testSeeder.createUserDto()
-            await testSeeder.registerUser({login, pass, email})
-            const result = await registerUserUseCase(login, email, pass)
+            const {login, password, email} = testSeeder.createUserDto()
+            await testSeeder.registerUser({login, password, email})
+            const result = await registerUserUseCase(login, email, password)
             expect(result).toEqual({
                 code: ResultCode.Forbidden
             })

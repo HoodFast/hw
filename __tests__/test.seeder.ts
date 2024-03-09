@@ -3,9 +3,9 @@ import {randomUUID} from "crypto";
 import {add} from "date-fns/add";
 import {usersCollection} from "../src/db/db";
 
-type RegisterUserType = {
+export type RegisterUserType = {
     login:string,
-    pass:string,
+    password:string,
     email:string,
     code?:string,
     expirationDate?:Date,
@@ -35,7 +35,7 @@ export const testSeeder = {
 
     async registerUser({
                            login,
-                           pass,
+                           password,
                            email,
                            code,
                            expirationDate,
@@ -45,7 +45,7 @@ export const testSeeder = {
             accountData:{
                 login,
                 email,
-                _passwordHash:pass,
+                _passwordHash:password,
                 createdAt:new Date()
             },
             emailConfirmation: {
