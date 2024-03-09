@@ -16,7 +16,7 @@ export const testSeeder = {
         return {
             login: "test",
             email: "test@mail.com",
-            pass: "1234567788"
+            password: "1234567788"
         }
     },
     
@@ -27,7 +27,7 @@ export const testSeeder = {
             users.push({
                 login: `test ${i}`,
                 email: `test${i}@mail.com`,
-                pass: "1234567788"
+                password: "1234567788"
             })
         }
         return users

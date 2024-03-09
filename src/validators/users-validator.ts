@@ -28,7 +28,7 @@ const emailValidator = body('email')
     .isString()
     .isLength({min: 1})
     .matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
-    .withMessage('Incorrect login')
+    .withMessage('Incorrect email')
     .custom(
         async (email:string)=>{
             const user = await UserQueryRepository.getByLoginOrEmail(email)
