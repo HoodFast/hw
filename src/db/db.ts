@@ -5,6 +5,8 @@ import {PostTypeDb} from "../models/common/common";
 import {UsersTypeDb} from "../models/users/db/usersDBModel";
 import {CommentDbType} from "../models/comments/db/comment.db.model";
 import {appConfig} from "../app/config";
+import {rateLimitDbType} from "../models/sessions/session.db.model";
+import {tokensMetaDbType} from "../models/tokens/token.db.model";
 
 dotenv.config()
 
@@ -65,3 +67,6 @@ export const blogsCollection = db.getDbName().collection<BlogDbType>('blogs')
 export const postsCollection = db.getDbName().collection<PostTypeDb>('posts')
 export const usersCollection = db.getDbName().collection<UsersTypeDb>('users')
 export const commentsCollection = db.getDbName().collection<CommentDbType>('comments')
+export const rateLimitsCollection = db.getDbName().collection<rateLimitDbType>('rateLimits')
+export const tokensMetaCollection = db.getDbName().collection<tokensMetaDbType>('tokensMeta')
+

@@ -7,12 +7,14 @@ import {userService} from "../../src/services/user.service";
 import {testSeeder} from "../test.seeder";
 import {ResultCode} from "../../src/models/common/common";
 import {emailAdapter} from "../../src/adapters/email.adapter";
+import {authService} from "../../src/services/auth.service";
+import {randomUUID} from "crypto";
+import {add} from "date-fns/add";
 
 describe('AUTH-INTEGRATION', () => {
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create()
         const url = mongoServer.getUri()
-        console.log(url)
         appConfig.MONGO_URL = url
     })
 
@@ -24,6 +26,7 @@ describe('AUTH-INTEGRATION', () => {
         await db.stop()
     })
     afterAll((done: DoneCallback) => done())
+
     describe('USER Registration', () => {
         const registerUserUseCase = userService.createUser
         // emailAdapter.sendEmail = emailServiceMock.sendEmail
@@ -48,6 +51,7 @@ describe('AUTH-INTEGRATION', () => {
             expect(emailAdapter.sendEmail).toBeCalled()
             expect(emailAdapter.sendEmail).toBeCalledTimes(1)
         })
+
         it('Should not register user twice', async () => {
             const {login, password, email} = testSeeder.createUserDto()
             await testSeeder.registerUser({login, password, email})
@@ -55,6 +59,45 @@ describe('AUTH-INTEGRATION', () => {
             expect(result).toEqual({
                 code: ResultCode.Forbidden
             })
+            expect(emailAdapter.sendEmail).toBeCalledTimes(1)
+        })
+    });
+    describe('Confirm email', () => {
+        const confirmedEmailUseCase = authService.confirmEmail
+        it('should not confirm if user does not exist', async () => {
+            const code = randomUUID()
+            const result = await confirmedEmailUseCase(code)
+
+            expect(result).toEqual({code: ResultCode.Forbidden})
+        })
+
+        it('should not confirm if user has already confirmed', async () => {
+            const user = await testSeeder.registerUser({
+                ...testSeeder.createUserDto(),
+                isConfirmed: true
+            })
+            const result = await confirmedEmailUseCase(user.emailConfirmation.confirmationCode)
+
+            expect(result).toEqual({code: ResultCode.Forbidden})
+        })
+
+        it('should not confirm if user has expired date', async () => {
+            const user = await testSeeder.registerUser({
+                ...testSeeder.createUserDto(),
+                expirationDate: add(new Date(), {minutes: -1})
+            })
+            const result = await confirmedEmailUseCase(user.emailConfirmation.confirmationCode)
+
+            expect(result.code).toEqual(ResultCode.Forbidden)
+            expect(result.errorMessage).toEqual({message: 'expired', field: 'expirationDate'})
+        })
+
+        it('should confirm ', async () => {
+            const user = await testSeeder.registerUser(testSeeder.createUserDto())
+            const result = await confirmedEmailUseCase(user.emailConfirmation.confirmationCode)
+
+            expect(result.code).toEqual(ResultCode.Success)
+
         })
     })
 })

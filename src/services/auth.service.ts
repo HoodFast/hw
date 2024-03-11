@@ -13,7 +13,7 @@ export class authService {
     static async me(userId: string) {
         const user = await UserQueryRepository.getById(userId)
         if (!user) return {code: ResultCode.NotFound}
-        return {code: ResultCode.Success,data: {email: user.email, login: user.login, userId: user.id}}
+        return {code: ResultCode.Success, data: {email: user.email, login: user.login, userId: user.id}}
     }
 
     static async deleteToken(token: string) {
@@ -67,6 +67,12 @@ export class authService {
 
     static async confirmEmail(code: string): Promise<Result> {
         const user = await UserQueryRepository.getByCode(code)
+        if (!user) return {code: ResultCode.Forbidden}
+        if (user.emailConfirmation.isConfirmed) return {code: ResultCode.Forbidden}
+        if (user.emailConfirmation.expirationDate < new Date()) return {
+            code: ResultCode.Forbidden,
+            errorMessage: {message: 'expired', field: 'expirationDate'}
+        }
         const updateConfirm = await UserRepository.updateConfirmation(user!._id)
         if (updateConfirm) return {code: ResultCode.Success}
         return {code: ResultCode.NotFound}

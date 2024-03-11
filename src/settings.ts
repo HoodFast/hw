@@ -129,7 +129,7 @@ const validate = (
     let errors: ErrorType = {
         errorsMessages: []
     }
-    console.log(publicationDate)
+
     if (publicationDate && typeof publicationDate !== 'string') {
         errors.errorsMessages.push({message: "invalid publicationDate!", field: 'publicationDate'})
     }
