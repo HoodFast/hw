@@ -24,39 +24,60 @@ export class authService {
         return {code: ResultCode.Success}
     }
 
-    static async refreshToken(token: string,ip:string,title:string) {
+    static async refreshToken(token: string, ip: string, title: string) {
         const userId = await jwtService.getUserIdByRefreshToken(token)
         if (!userId) return {code: ResultCode.Forbidden}
         const user = await UserQueryRepository.getDBUserById(userId)
         if (!user) return {code: ResultCode.NotFound}
         const accessToken = await jwtService.createJWT(user)
-        const refreshToken = await jwtService.createRefreshJWT(user,ip,title)
+        const refreshToken = await jwtService.createRefreshJWT(user, ip, title)
         await UserRepository.putTokenInBL(userId, token)
         return {code: ResultCode.Success, data: {accessToken, refreshToken}}
     }
 
-    static async getLoginTokensPair(user:WithId<UsersTypeDb>,ip:string,title:string) {
+    static async loginTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string) {
         const userId = user._id
-
-        const oldSession = await TokenMetaRepository.getSession(userId,title)
-        if(oldSession){
+        const oldSession = await TokenMetaRepository.getSessionForLogin(userId, title)
+        if (oldSession) {
             await TokenMetaRepository.deleteById(oldSession._id)
         }
-
         const accessToken = await jwtService.createJWT(user)
         if (!accessToken) return {code: ResultCode.Forbidden}
 
-        const refreshToken = await jwtService.createRefreshJWT(user,ip,title)
+        const refreshToken = await jwtService.createRefreshJWT(user, ip, title)
+        if (!refreshToken) return {code: ResultCode.Forbidden}
+
+        return {code: ResultCode.Success, data: {accessToken, refreshToken}}
+    }
+
+    static async refreshTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string, token: string) {
+        const metaData = await jwtService.getMetaDataByToken(token)
+        if (!metaData) return {code: ResultCode.Forbidden}
+        const oldSession = await TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId)
+
+        if (oldSession) {
+            await TokenMetaRepository.deleteById(oldSession._id)
+        } else {
+            return {code: ResultCode.Forbidden}
+        }
+        const accessToken = await jwtService.createJWT(user)
+        if (!accessToken) return {code: ResultCode.Forbidden}
+
+        const refreshToken = await jwtService.createRefreshJWT(user, ip, title)
         if (!refreshToken) return {code: ResultCode.Forbidden}
 
         return {code: ResultCode.Success, data: {accessToken, refreshToken}}
     }
 
 
-    static async resendConfirmationCode(email: string): Promise<Result> {
+    static async resendConfirmationCode(email: string):
+        Promise<Result> {
         const user = await UserQueryRepository.getByLoginOrEmail(email)
 
-        if (!user) return {code: ResultCode.NotFound}
+        if (!
+            user
+        )
+            return {code: ResultCode.NotFound}
         const newConfirmationCode = uuidv4()
         const updateConfirmCode = await UserRepository.updateNewConfirmCode(user._id, newConfirmationCode)
         if (!updateConfirmCode) return {code: ResultCode.NotFound}
@@ -83,9 +104,13 @@ export class authService {
         return true
     }
 
-    static async confirmEmail(code: string): Promise<Result> {
+    static async confirmEmail(code: string):
+        Promise<Result> {
         const user = await UserQueryRepository.getByCode(code)
-        if (!user) return {code: ResultCode.Forbidden}
+        if (!
+            user
+        )
+            return {code: ResultCode.Forbidden}
         if (user.emailConfirmation.isConfirmed) return {code: ResultCode.Forbidden}
         if (user.emailConfirmation.expirationDate < new Date()) return {
             code: ResultCode.Forbidden,
@@ -96,7 +121,8 @@ export class authService {
         return {code: ResultCode.NotFound}
     }
 
-    static async checkCredentials(loginOrEmail: string, password: string): Promise<WithId<UsersTypeDb> | null> {
+    static async checkCredentials(loginOrEmail: string, password: string):
+        Promise<WithId<UsersTypeDb> | null> {
         const user = await UserQueryRepository.getByLoginOrEmail(loginOrEmail)
         if (!user) return null
         if (!user.emailConfirmation.isConfirmed) return null

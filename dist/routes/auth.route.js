@@ -14,6 +14,7 @@ const express_1 = require("express");
 const auth_service_1 = require("../services/auth.service");
 const common_1 = require("../models/common/common");
 const auth_validators_1 = require("../validators/auth-validators");
+const jwt_service_1 = require("../application/jwt.service");
 const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
 const users_validator_1 = require("../validators/users-validator");
 const user_service_1 = require("../services/user.service");
@@ -43,7 +44,7 @@ exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, 
     const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
     if (!user)
         return res.sendStatus(401);
-    const tokens = yield auth_service_1.authService.getLoginTokensPair(user, ip, title);
+    const tokens = yield auth_service_1.authService.loginTokensPair(user, ip, title);
     switch (tokens.code) {
         case common_1.ResultCode.Success:
             const accessToken = tokens.data.accessToken;
@@ -97,7 +98,12 @@ exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.co
 exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const title = req.headers['user-agent'] || 'none title';
     const ip = req.ip || 'none ip';
-    const tokens = yield auth_service_1.authService.refreshToken(req.cookies.refreshToken, ip, title);
+    const token = req.cookies.refreshToken;
+    debugger;
+    const user = yield jwt_service_1.jwtService.checkRefreshToken(token);
+    if (!user)
+        return res.sendStatus(401);
+    const tokens = yield auth_service_1.authService.refreshTokensPair(user, ip, title, token);
     switch (tokens.code) {
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);

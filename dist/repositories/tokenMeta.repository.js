@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenMetaRepository = void 0;
 const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
-const blog_query_repository_1 = require("./blog.query.repository");
 class TokenMetaRepository {
     static setTokenMetaData(data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -32,47 +31,21 @@ class TokenMetaRepository {
             return meta;
         });
     }
-    static getSession(userId, title) {
+    static getSessionForLogin(userId, title) {
         return __awaiter(this, void 0, void 0, function* () {
             const meta = yield db_1.tokensMetaCollection.findOne({ userId, title });
-            if (!meta)
-                return null;
+            return meta;
+        });
+    }
+    static getSessionForRefresh(iat, deviceId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const meta = yield db_1.tokensMetaCollection.findOne({ iat, deviceId });
             return meta;
         });
     }
     static deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.tokensMetaCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
-            return !!res.deletedCount;
-        });
-    }
-    static updatePost(data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const blog = yield blog_query_repository_1.BlogQueryRepository.getById(data.blogId);
-                if (!blog) {
-                    return false;
-                }
-                const res = yield db_1.postsCollection.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
-                    $set: {
-                        title: data.title,
-                        shortDescription: data.shortDescription,
-                        content: data.content,
-                        blogId: data.blogId,
-                        blogName: blog.name
-                    }
-                });
-                return !!res.matchedCount;
-            }
-            catch (e) {
-                console.log(e);
-                return false;
-            }
-        });
-    }
-    static deletePost(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.postsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return !!res.deletedCount;
         });
     }

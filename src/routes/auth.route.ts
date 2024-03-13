@@ -42,7 +42,8 @@ authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInput
     const ip = req.ip || 'none ip'
     const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)
     if (!user) return res.sendStatus(401)
-    const tokens = await authService.getLoginTokensPair(user,ip,title)
+    const tokens = await authService.loginTokensPair(user,ip,title)
+
     switch (tokens.code) {
         case ResultCode.Success:
             const accessToken = tokens.data!.accessToken
@@ -111,7 +112,12 @@ authRoute.post('/registration-confirmation', codeValidation(), async (req: Reque
 authRoute.post('/refresh-token', async (req: Request, res: Response) => {
     const title = req.headers['user-agent'] || 'none title'
     const ip = req.ip || 'none ip'
-    const tokens = await authService.refreshToken(req.cookies.refreshToken,ip,title)
+    const token = req.cookies.refreshToken
+    debugger
+    const user =await jwtService.checkRefreshToken(token)
+    if(!user)return res.sendStatus(401)
+
+    const tokens = await authService.refreshTokensPair(user,ip,title,token)
 
     switch (tokens.code) {
         case ResultCode.NotFound:

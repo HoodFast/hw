@@ -24,6 +24,14 @@ class UserRepository {
             return user;
         });
     }
+    static getUserById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            if (!res)
+                return null;
+            return res;
+        });
+    }
     static putTokenInBL(userId, token) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.usersCollection.updateOne({ _id: new mongodb_1.ObjectId(userId) }, {

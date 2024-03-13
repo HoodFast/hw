@@ -53,12 +53,33 @@ class authService {
             return { code: common_1.ResultCode.Success, data: { accessToken, refreshToken } };
         });
     }
-    static getLoginTokensPair(user, ip, title) {
+    static loginTokensPair(user, ip, title) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = user._id;
-            const oldSession = yield tokenMeta_repository_1.TokenMetaRepository.getSession(userId, title);
+            const oldSession = yield tokenMeta_repository_1.TokenMetaRepository.getSessionForLogin(userId, title);
             if (oldSession) {
                 yield tokenMeta_repository_1.TokenMetaRepository.deleteById(oldSession._id);
+            }
+            const accessToken = yield jwt_service_1.jwtService.createJWT(user);
+            if (!accessToken)
+                return { code: common_1.ResultCode.Forbidden };
+            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user, ip, title);
+            if (!refreshToken)
+                return { code: common_1.ResultCode.Forbidden };
+            return { code: common_1.ResultCode.Success, data: { accessToken, refreshToken } };
+        });
+    }
+    static refreshTokensPair(user, ip, title, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const metaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
+            if (!metaData)
+                return { code: common_1.ResultCode.Forbidden };
+            const oldSession = yield tokenMeta_repository_1.TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId);
+            if (oldSession) {
+                yield tokenMeta_repository_1.TokenMetaRepository.deleteById(oldSession._id);
+            }
+            else {
+                return { code: common_1.ResultCode.Forbidden };
             }
             const accessToken = yield jwt_service_1.jwtService.createJWT(user);
             if (!accessToken)

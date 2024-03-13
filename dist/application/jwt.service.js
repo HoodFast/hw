@@ -22,6 +22,20 @@ class jwtService {
             return token;
         });
     }
+    static getMetaDataByToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = jwt.verify(token, config_1.appConfig.RT_SECRET);
+                const decoded = jwt.decode(token, { complete: true });
+                const iat = new Date(decoded.payload.iat * 1000);
+                const deviceId = result.deviceId;
+                return { iat, deviceId };
+            }
+            catch (e) {
+                return null;
+            }
+        });
+    }
     static createRefreshJWT(user, ip, title) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = user._id;
@@ -51,6 +65,21 @@ class jwtService {
                 if (blackList === null || blackList === void 0 ? void 0 : blackList.includes(token))
                     return null;
                 return result.userId;
+            }
+            catch (err) {
+                return null;
+            }
+        });
+    }
+    static checkRefreshToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = jwt.verify(token, config_1.appConfig.RT_SECRET);
+                const blackList = yield user_repository_1.UserRepository.getBlackList(result.userId);
+                if (blackList === null || blackList === void 0 ? void 0 : blackList.includes(token))
+                    return null;
+                const user = yield user_repository_1.UserRepository.getUserById(result.userId);
+                return user;
             }
             catch (err) {
                 return null;

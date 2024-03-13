@@ -12,6 +12,11 @@ export class UserRepository {
         }
         return user
     }
+    static async getUserById(id:string){
+        const res = await usersCollection.findOne({_id:new ObjectId(id)})
+        if(!res)return null
+        return res
+    }
 
     static async putTokenInBL(userId: string, token: string) {
         const res = await usersCollection.updateOne({_id: new ObjectId(userId)}, {
