@@ -1,8 +1,10 @@
+import {ObjectId} from "mongodb";
+
 export type tokensMetaDbType = {
-    issuedAt:Date
+    iat:Date
     expireDate:Date
-    userId:string
+    userId:ObjectId
     deviceId:string
     ip:string
-    deviceName:string
+    title:string
 }

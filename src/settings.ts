@@ -5,22 +5,27 @@ import {testingRoute} from "./routes/testing-route";
 import {userRoute} from "./routes/user-route";
 import {authRoute} from "./routes/auth.route";
 import {commentsRoute} from "./routes/comments-route";
+import {securityRoute} from "./routes/security.route";
 
 const cookieParser = require('cookie-parser');
 
 export const app = express()
 
+app.set('trust proxy', true)
 app.use(express.json())
 
 app.use(cookieParser('secret key'));
 
+const baseUrl:string = '/ht_02/api/'
 
-app.use('/ht_02/api/blogs', blogRoute)
-app.use('/ht_02/api/posts', postRoute)
-app.use('/ht_02/api/users', userRoute)
-app.use('/ht_02/api/comments', commentsRoute)
-app.use('/ht_02/api/auth', authRoute)
-app.use('/ht_02/api/testing', testingRoute)
+app.use(`${baseUrl}blogs`, blogRoute)
+app.use(`${baseUrl}posts`, postRoute)
+app.use(`${baseUrl}users`, userRoute)
+app.use(`${baseUrl}comments`, commentsRoute)
+app.use(`${baseUrl}auth`, authRoute)
+app.use(`${baseUrl}security`, securityRoute)
+app.use(`${baseUrl}testing`, testingRoute)
+
 
 
 const AvailableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"]

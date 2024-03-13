@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtService = void 0;
 const config_1 = require("../app/config");
 const user_repository_1 = require("../repositories/user.repository");
+const crypto_1 = require("crypto");
+const tokenMeta_repository_1 = require("../repositories/tokenMeta.repository");
 let jwt = require('jsonwebtoken');
 class jwtService {
     static createJWT(user) {
@@ -20,9 +22,24 @@ class jwtService {
             return token;
         });
     }
-    static createRefreshJWT(user) {
+    static createRefreshJWT(user, ip, title) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = jwt.sign({ userId: user._id }, config_1.appConfig.RT_SECRET, { expiresIn: config_1.appConfig.RT_TIME });
+            const userId = user._id;
+            const deviceId = (0, crypto_1.randomUUID)();
+            const token = jwt.sign({ userId, deviceId }, config_1.appConfig.RT_SECRET, { expiresIn: config_1.appConfig.RT_TIME });
+            const decoded = jwt.decode(token, { complete: true });
+            const iat = new Date(decoded.payload.iat * 1000);
+            const tokenMetaData = {
+                iat,
+                deviceId,
+                expireDate: decoded.payload.exp,
+                userId,
+                ip,
+                title,
+            };
+            const setTokenMetaData = yield tokenMeta_repository_1.TokenMetaRepository.setTokenMetaData(tokenMetaData);
+            if (!setTokenMetaData)
+                return null;
             return token;
         });
     }

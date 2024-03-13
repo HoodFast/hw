@@ -2,6 +2,11 @@ import {UsersTypeDb} from "../models/users/db/usersDBModel";
 import {WithId} from "mongodb";
 import {appConfig} from "../app/config";
 import {UserRepository} from "../repositories/user.repository";
+import {randomUUID} from "crypto";
+import {tokensMetaDbType} from "../models/tokens/token.db.model";
+
+
+import {TokenMetaRepository} from "../repositories/tokenMeta.repository";
 let jwt = require('jsonwebtoken');
 
 export class jwtService {
@@ -11,8 +16,22 @@ export class jwtService {
     }
 
 
-    static async createRefreshJWT(user: WithId<UsersTypeDb>):Promise<string> {
-        const token = jwt.sign({userId:user._id}, appConfig.RT_SECRET, {expiresIn:appConfig.RT_TIME})
+    static async createRefreshJWT(user: WithId<UsersTypeDb>,ip:string,title:string):Promise<string | null> {
+        const userId = user._id
+        const deviceId = randomUUID()
+        const token = jwt.sign({userId,deviceId}, appConfig.RT_SECRET, {expiresIn:appConfig.RT_TIME})
+        const decoded = jwt.decode(token, { complete: true })
+        const iat = new Date(decoded.payload.iat * 1000);
+        const tokenMetaData:tokensMetaDbType = {
+            iat,
+            deviceId,
+            expireDate:decoded.payload.exp,
+            userId,
+            ip,
+            title,
+        }
+        const setTokenMetaData = await TokenMetaRepository.setTokenMetaData(tokenMetaData)
+        if(!setTokenMetaData)return null
         return token
     }
     static async getUserIdByToken(token:string){

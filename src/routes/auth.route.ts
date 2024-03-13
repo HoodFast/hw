@@ -38,13 +38,25 @@ authRoute.get('/me', accessTokenGuard, async (req: Request, res: Response) => {
 )
 
 authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInputType>, res: Response) => {
-
+    const title = req.headers['user-agent'] || 'none title'
+    const ip = req.ip || 'none ip'
     const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)
     if (!user) return res.sendStatus(401)
-    const accessToken = await jwtService.createJWT(user)
-    const refreshToken = await jwtService.createRefreshJWT(user)
-    res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
-    return res.status(200).send({accessToken})
+    const tokens = await authService.getLoginTokensPair(user,ip,title)
+    switch (tokens.code) {
+        case ResultCode.Success:
+            const accessToken = tokens.data!.accessToken
+            const refreshToken = tokens.data!.refreshToken
+            res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
+            return res.status(200).send({accessToken})
+        case ResultCode.Forbidden:
+            return res.sendStatus(400)
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
+        default:
+            return res.sendStatus(404)
+    }
+
 
 })
 
@@ -97,8 +109,9 @@ authRoute.post('/registration-confirmation', codeValidation(), async (req: Reque
 })
 
 authRoute.post('/refresh-token', async (req: Request, res: Response) => {
-
-    const tokens = await authService.refreshToken(req.cookies.refreshToken)
+    const title = req.headers['user-agent'] || 'none title'
+    const ip = req.ip || 'none ip'
+    const tokens = await authService.refreshToken(req.cookies.refreshToken,ip,title)
 
     switch (tokens.code) {
         case ResultCode.NotFound:

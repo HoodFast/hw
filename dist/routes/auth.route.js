@@ -14,7 +14,6 @@ const express_1 = require("express");
 const auth_service_1 = require("../services/auth.service");
 const common_1 = require("../models/common/common");
 const auth_validators_1 = require("../validators/auth-validators");
-const jwt_service_1 = require("../application/jwt.service");
 const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
 const users_validator_1 = require("../validators/users-validator");
 const user_service_1 = require("../services/user.service");
@@ -39,13 +38,25 @@ exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, re
     }
 }));
 exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const title = req.headers['user-agent'] || 'none title';
+    const ip = req.ip || 'none ip';
     const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
     if (!user)
         return res.sendStatus(401);
-    const accessToken = yield jwt_service_1.jwtService.createJWT(user);
-    const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user);
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
-    return res.status(200).send({ accessToken });
+    const tokens = yield auth_service_1.authService.getLoginTokensPair(user, ip, title);
+    switch (tokens.code) {
+        case common_1.ResultCode.Success:
+            const accessToken = tokens.data.accessToken;
+            const refreshToken = tokens.data.refreshToken;
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+            return res.status(200).send({ accessToken });
+        case common_1.ResultCode.Forbidden:
+            return res.sendStatus(400);
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        default:
+            return res.sendStatus(404);
+    }
 }));
 exports.authRoute.post('/registration-email-resending', (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sendEmail = yield auth_service_1.authService.resendConfirmationCode(req.body.email);
@@ -84,7 +95,9 @@ exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.co
     }
 }));
 exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const tokens = yield auth_service_1.authService.refreshToken(req.cookies.refreshToken);
+    const title = req.headers['user-agent'] || 'none title';
+    const ip = req.ip || 'none ip';
+    const tokens = yield auth_service_1.authService.refreshToken(req.cookies.refreshToken, ip, title);
     switch (tokens.code) {
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);

@@ -11,16 +11,20 @@ const testing_route_1 = require("./routes/testing-route");
 const user_route_1 = require("./routes/user-route");
 const auth_route_1 = require("./routes/auth.route");
 const comments_route_1 = require("./routes/comments-route");
+const security_route_1 = require("./routes/security.route");
 const cookieParser = require('cookie-parser');
 exports.app = (0, express_1.default)();
+exports.app.set('trust proxy', true);
 exports.app.use(express_1.default.json());
 exports.app.use(cookieParser('secret key'));
-exports.app.use('/ht_02/api/blogs', blog_route_1.blogRoute);
-exports.app.use('/ht_02/api/posts', posts_route_1.postRoute);
-exports.app.use('/ht_02/api/users', user_route_1.userRoute);
-exports.app.use('/ht_02/api/comments', comments_route_1.commentsRoute);
-exports.app.use('/ht_02/api/auth', auth_route_1.authRoute);
-exports.app.use('/ht_02/api/testing', testing_route_1.testingRoute);
+const baseUrl = '/ht_02/api/';
+exports.app.use(`${baseUrl}blogs`, blog_route_1.blogRoute);
+exports.app.use(`${baseUrl}posts`, posts_route_1.postRoute);
+exports.app.use(`${baseUrl}users`, user_route_1.userRoute);
+exports.app.use(`${baseUrl}comments`, comments_route_1.commentsRoute);
+exports.app.use(`${baseUrl}auth`, auth_route_1.authRoute);
+exports.app.use(`${baseUrl}security`, security_route_1.securityRoute);
+exports.app.use(`${baseUrl}testing`, testing_route_1.testingRoute);
 const AvailableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"];
 const videos = [
     {
@@ -72,7 +76,6 @@ const validate = (title, author, availableResolutions, canBeDownloaded, minAgeRe
     let errors = {
         errorsMessages: []
     };
-    console.log(publicationDate);
     if (publicationDate && typeof publicationDate !== 'string') {
         errors.errorsMessages.push({ message: "invalid publicationDate!", field: 'publicationDate' });
     }

@@ -35,7 +35,7 @@ const emailValidator = (0, express_validator_1.body)('email')
     .isString()
     .isLength({ min: 1 })
     .matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
-    .withMessage('Incorrect login')
+    .withMessage('Incorrect email')
     .custom((email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
     if (user) {

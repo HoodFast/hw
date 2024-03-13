@@ -20,6 +20,7 @@ const user_repository_1 = require("../repositories/user.repository");
 const uuid_1 = require("uuid");
 const common_1 = require("../models/common/common");
 const jwt_service_1 = require("../application/jwt.service");
+const tokenMeta_repository_1 = require("../repositories/tokenMeta.repository");
 class authService {
     static me(userId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,7 +39,7 @@ class authService {
             return { code: common_1.ResultCode.Success };
         });
     }
-    static refreshToken(token) {
+    static refreshToken(token, ip, title) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = yield jwt_service_1.jwtService.getUserIdByRefreshToken(token);
             if (!userId)
@@ -47,8 +48,24 @@ class authService {
             if (!user)
                 return { code: common_1.ResultCode.NotFound };
             const accessToken = yield jwt_service_1.jwtService.createJWT(user);
-            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user);
+            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user, ip, title);
             yield user_repository_1.UserRepository.putTokenInBL(userId, token);
+            return { code: common_1.ResultCode.Success, data: { accessToken, refreshToken } };
+        });
+    }
+    static getLoginTokensPair(user, ip, title) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = user._id;
+            const oldSession = yield tokenMeta_repository_1.TokenMetaRepository.getSession(userId, title);
+            if (oldSession) {
+                yield tokenMeta_repository_1.TokenMetaRepository.deleteById(oldSession._id);
+            }
+            const accessToken = yield jwt_service_1.jwtService.createJWT(user);
+            if (!accessToken)
+                return { code: common_1.ResultCode.Forbidden };
+            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user, ip, title);
+            if (!refreshToken)
+                return { code: common_1.ResultCode.Forbidden };
             return { code: common_1.ResultCode.Success, data: { accessToken, refreshToken } };
         });
     }
@@ -91,6 +108,15 @@ class authService {
     static confirmEmail(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByCode(code);
+            if (!user)
+                return { code: common_1.ResultCode.Forbidden };
+            if (user.emailConfirmation.isConfirmed)
+                return { code: common_1.ResultCode.Forbidden };
+            if (user.emailConfirmation.expirationDate < new Date())
+                return {
+                    code: common_1.ResultCode.Forbidden,
+                    errorMessage: { message: 'expired', field: 'expirationDate' }
+                };
             const updateConfirm = yield user_repository_1.UserRepository.updateConfirmation(user._id);
             if (updateConfirm)
                 return { code: common_1.ResultCode.Success };

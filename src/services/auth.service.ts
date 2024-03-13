@@ -8,6 +8,7 @@ import {v4 as uuidv4} from "uuid";
 import {Result} from "../types/result.type";
 import {ResultCode} from "../models/common/common";
 import {jwtService} from "../application/jwt.service";
+import {TokenMetaRepository} from "../repositories/tokenMeta.repository";
 
 export class authService {
     static async me(userId: string) {
@@ -23,14 +24,31 @@ export class authService {
         return {code: ResultCode.Success}
     }
 
-    static async refreshToken(token: string) {
+    static async refreshToken(token: string,ip:string,title:string) {
         const userId = await jwtService.getUserIdByRefreshToken(token)
         if (!userId) return {code: ResultCode.Forbidden}
         const user = await UserQueryRepository.getDBUserById(userId)
         if (!user) return {code: ResultCode.NotFound}
         const accessToken = await jwtService.createJWT(user)
-        const refreshToken = await jwtService.createRefreshJWT(user)
+        const refreshToken = await jwtService.createRefreshJWT(user,ip,title)
         await UserRepository.putTokenInBL(userId, token)
+        return {code: ResultCode.Success, data: {accessToken, refreshToken}}
+    }
+
+    static async getLoginTokensPair(user:WithId<UsersTypeDb>,ip:string,title:string) {
+        const userId = user._id
+
+        const oldSession = await TokenMetaRepository.getSession(userId,title)
+        if(oldSession){
+            await TokenMetaRepository.deleteById(oldSession._id)
+        }
+
+        const accessToken = await jwtService.createJWT(user)
+        if (!accessToken) return {code: ResultCode.Forbidden}
+
+        const refreshToken = await jwtService.createRefreshJWT(user,ip,title)
+        if (!refreshToken) return {code: ResultCode.Forbidden}
+
         return {code: ResultCode.Success, data: {accessToken, refreshToken}}
     }
 

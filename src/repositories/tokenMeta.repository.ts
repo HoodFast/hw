@@ -1,22 +1,39 @@
-import {postsCollection} from "../db/db";
-import {PostType, PostTypeDb, UpdatePostType} from "../models/common/common";
+import {postsCollection, tokensMetaCollection} from "../db/db";
+import {UpdatePostType} from "../models/common/common";
 import {ObjectId} from "mongodb";
 import {BlogQueryRepository} from "./blog.query.repository";
-import {PostQueryRepository} from "./post.query.repository";
+
+import {tokensMetaDbType} from "../models/tokens/token.db.model";
 
 
-export class PostRepository {
+export class TokenMetaRepository {
 
-    static async createPost(data: PostTypeDb): Promise<PostType | null> {
+    static async setTokenMetaData(data: tokensMetaDbType): Promise<boolean | null> {
 
-        const res = await postsCollection.insertOne(data)
-        const post = await PostQueryRepository.getById(res.insertedId.toString())
-        if (!post) {
+        await tokensMetaCollection.insertOne(data)
+        const TokenMeta = await this.getByDeviceId(data.deviceId)
+        if (!TokenMeta) {
             return null
         }
-        return post
+        return !!TokenMeta
     }
 
+    static async getByDeviceId(deviceId:string){
+        const meta = await tokensMetaCollection.findOne({deviceId})
+        if(!meta) return null
+        return meta
+    }
+
+    static async getSession(userId:ObjectId,title:string){
+        const meta = await tokensMetaCollection.findOne({userId,title})
+        if(!meta) return null
+        return meta
+    }
+
+    static async deleteById(id:ObjectId){
+        const res = await tokensMetaCollection.deleteOne({_id:new ObjectId(id)})
+        return !!res.deletedCount
+    }
     static async updatePost(data: UpdatePostType): Promise<boolean> {
         try {
             const blog = await BlogQueryRepository.getById(data.blogId)
