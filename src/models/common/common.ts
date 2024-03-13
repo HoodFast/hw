@@ -9,6 +9,7 @@ export type RequestWithParamsAndBody<P, B> = Request<P, {}, B, {}>
 export type RequestWithBody<B> = Request<{}, {}, B, {}>
 
 export enum ResultCode  {
+    Unauthorized='Unauthorized',
     Error='Error',
     Success='Success',
     NotFound = 'NotFound',

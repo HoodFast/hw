@@ -49,5 +49,11 @@ class TokenMetaRepository {
             return !!res.deletedCount;
         });
     }
+    static deleteByDeviceId(deviceId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield db_1.tokensMetaCollection.deleteOne({ deviceId: deviceId });
+            return !!res.deletedCount;
+        });
+    }
 }
 exports.TokenMetaRepository = TokenMetaRepository;

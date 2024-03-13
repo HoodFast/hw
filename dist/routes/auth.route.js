@@ -99,7 +99,6 @@ exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0,
     const title = req.headers['user-agent'] || 'none title';
     const ip = req.ip || 'none ip';
     const token = req.cookies.refreshToken;
-    debugger;
     const user = yield jwt_service_1.jwtService.checkRefreshToken(token);
     if (!user)
         return res.sendStatus(401);

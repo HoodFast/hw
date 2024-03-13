@@ -113,7 +113,6 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
     const title = req.headers['user-agent'] || 'none title'
     const ip = req.ip || 'none ip'
     const token = req.cookies.refreshToken
-    debugger
     const user =await jwtService.checkRefreshToken(token)
     if(!user)return res.sendStatus(401)
 

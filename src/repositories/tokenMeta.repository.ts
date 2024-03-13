@@ -28,13 +28,20 @@ export class TokenMetaRepository {
         const meta = await tokensMetaCollection.findOne({userId, title})
         return meta
     }
+
     static async getSessionForRefresh(iat: Date, deviceId: string) {
         const meta = await tokensMetaCollection.findOne({iat, deviceId})
 
         return meta
     }
+
     static async deleteById(id: ObjectId) {
         const res = await tokensMetaCollection.deleteOne({_id: new ObjectId(id)})
+        return !!res.deletedCount
+    }
+
+    static async deleteByDeviceId(deviceId: string) {
+        const res = await tokensMetaCollection.deleteOne({deviceId: deviceId})
         return !!res.deletedCount
     }
 }
