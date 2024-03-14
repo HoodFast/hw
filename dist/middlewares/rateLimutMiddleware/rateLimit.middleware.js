@@ -19,10 +19,6 @@ const rateLimitMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0
     const URL = req.baseUrl;
     const date = new Date();
     const filterDate = (0, add_1.add)(new Date(), { seconds: -10 });
-    const blackList = yield db_1.blCollection.find({ ip, URL }).toArray();
-    if (blackList.length > 0) {
-        return res.sendStatus(429);
-    }
     const limitList = yield db_1.rateLimitsCollection.find({
         ip,
         URL,
@@ -35,8 +31,6 @@ const rateLimitMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0
         return next();
     }
     else {
-        yield db_1.blCollection.insertOne({ ip, URL });
-        yield db_1.rateLimitsCollection.deleteMany({ ip, URL });
         return res.sendStatus(429);
     }
 });
