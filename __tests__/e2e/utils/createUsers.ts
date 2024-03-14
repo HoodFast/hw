@@ -4,8 +4,7 @@ import {ADMIN_LOGIN, ADMIN_PASS} from "../../../src/auth/guards/base.auth.guard"
 const request = require('supertest');
 
 
-
-export const createUser = async (app:any)=>{
+export const createUser = async (app: any) => {
     const resp = await request(app)
         .post(routerPaths.users)
         .auth(ADMIN_LOGIN, ADMIN_PASS)
@@ -17,9 +16,9 @@ export const createUser = async (app:any)=>{
     return resp.body
 }
 
-export const createUsers=async (app:any,count:any)=>{
+export const createUsers = async (app: any, count: any) => {
     const users = []
-    for (let i = 0; i <= count ; i++) {
+    for (let i = 0; i <= count; i++) {
         const resp = await request(app)
             .post(routerPaths.users)
             .auth(ADMIN_LOGIN, ADMIN_PASS)
@@ -34,10 +33,12 @@ export const createUsers=async (app:any,count:any)=>{
 }
 
 
-export const createUserJwtToken=async (app:any)=>{
+export const createUserJwtToken = async (app: any) => {
     const newUser = await createUser(app)
 
     const resp = await request(app)
-        .post(routerPaths.login).auth('admin', 'qwerty').send({loginOrEmail:newUser.login,password:'123456'})
+        .post(routerPaths.login)
+        .auth('admin', 'qwerty')
+        .send({loginOrEmail: newUser.login, password: '123456'})
     return resp.body.accessToken
 }

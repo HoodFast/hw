@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tokensMetaCollection = exports.rateLimitsCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = exports.db = void 0;
+exports.blCollection = exports.tokensMetaCollection = exports.rateLimitsCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = exports.db = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const mongodb_1 = require("mongodb");
 const config_1 = require("../app/config");
@@ -74,3 +74,4 @@ exports.usersCollection = exports.db.getDbName().collection('users');
 exports.commentsCollection = exports.db.getDbName().collection('comments');
 exports.rateLimitsCollection = exports.db.getDbName().collection('rateLimits');
 exports.tokensMetaCollection = exports.db.getDbName().collection('tokensMeta');
+exports.blCollection = exports.db.getDbName().collection('blackList');

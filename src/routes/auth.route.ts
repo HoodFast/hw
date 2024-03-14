@@ -12,6 +12,7 @@ import {OutputUsersType} from "../models/users/output/output.users.models";
 import {Result} from "../types/result.type";
 import {codeValidation} from "../validators/confirm-validators";
 import {emailValidation} from "../validators/email-validators";
+import {rateLimitMiddleware} from "../middlewares/rateLimutMiddleware/rateLimit.middleware";
 
 
 export const authRoute = Router({})
@@ -37,7 +38,8 @@ authRoute.get('/me', accessTokenGuard, async (req: Request, res: Response) => {
     }
 )
 
-authRoute.post('/login', authValidation(), async (req: RequestWithBody<AuthInputType>, res: Response) => {
+
+authRoute.post('/login',rateLimitMiddleware, authValidation(), async (req: RequestWithBody<AuthInputType>, res: Response) => {
     const title = req.headers['user-agent'] || 'none title'
     const ip = req.ip || 'none ip'
     const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)

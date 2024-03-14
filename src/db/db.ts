@@ -70,3 +70,5 @@ export const commentsCollection = db.getDbName().collection<CommentDbType>('comm
 export const rateLimitsCollection = db.getDbName().collection<rateLimitDbType>('rateLimits')
 export const tokensMetaCollection = db.getDbName().collection<tokensMetaDbType>('tokensMeta')
 
+export const blCollection = db.getDbName().collection<{ip:string,URL:string}>('blackList')
+

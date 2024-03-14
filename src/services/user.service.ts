@@ -40,9 +40,10 @@ export class userService {
             return {code: ResultCode.NotFound}
         }
         try {
-            await authService.sendConfirmCode(createdUser.email)
+            if(!isConfirmed){
+                await authService.sendConfirmCode(createdUser.email)
+            }
         } catch (e) {
-            console.log(e)
             return {code: ResultCode.NotFound}
         }
 

@@ -44,10 +44,11 @@ class userService {
                 return { code: common_1.ResultCode.NotFound };
             }
             try {
-                yield auth_service_1.authService.sendConfirmCode(createdUser.email);
+                if (!isConfirmed) {
+                    yield auth_service_1.authService.sendConfirmCode(createdUser.email);
+                }
             }
             catch (e) {
-                console.log(e);
                 return { code: common_1.ResultCode.NotFound };
             }
             return { code: common_1.ResultCode.Success, data: createdUser };

@@ -9,7 +9,7 @@ import {createUserJwtToken} from "./utils/createUsers";
 const request = require('supertest');
 
 
-describe('ht_02/api/blogs', () => {
+describe('ht_02/api/posts', () => {
     let newBlog: { name: string, description: string, websiteUrl: string } = {
         name: "string",
         description: "string",

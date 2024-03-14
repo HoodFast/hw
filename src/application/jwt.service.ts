@@ -17,14 +17,14 @@ export class jwtService {
     }
 
     static async getMetaDataByToken(token: string) {
-        try{
+        try {
             const result = jwt.verify(token, appConfig.RT_SECRET)
             const decoded = jwt.decode(token, {complete: true})
             const userId = decoded.payload.userId
             const iat = new Date(decoded.payload.iat * 1000);
             const deviceId = result.deviceId
-            return {iat,deviceId,userId}
-        }catch (e) {
+            return {iat, deviceId, userId}
+        } catch (e) {
             return null
         }
 
@@ -60,7 +60,7 @@ export class jwtService {
         }
     }
 
-    static async checkRefreshToken(token:string){
+    static async checkRefreshToken(token: string) {
         try {
             const result = jwt.verify(token, appConfig.RT_SECRET)
             const blackList = await UserRepository.getBlackList(result.userId)

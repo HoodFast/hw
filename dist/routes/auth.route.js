@@ -20,6 +20,7 @@ const users_validator_1 = require("../validators/users-validator");
 const user_service_1 = require("../services/user.service");
 const confirm_validators_1 = require("../validators/confirm-validators");
 const email_validators_1 = require("../validators/email-validators");
+const rateLimit_middleware_1 = require("../middlewares/rateLimutMiddleware/rateLimit.middleware");
 exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -38,7 +39,7 @@ exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, re
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/login', (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/login', rateLimit_middleware_1.rateLimitMiddleware, (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const title = req.headers['user-agent'] || 'none title';
     const ip = req.ip || 'none ip';
     const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
