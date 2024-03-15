@@ -59,7 +59,7 @@ export class authService {
 
     static async refreshTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string, token: string) {
         const metaData = await jwtService.getMetaDataByToken(token)
-        if (!metaData) return {code: ResultCode.NotFound}
+        if (!metaData) return {code: ResultCode.Unauthorized}
         const oldSession = await TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId)
         const deviceId = oldSession?.deviceId
         if (oldSession) {

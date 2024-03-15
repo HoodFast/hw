@@ -37,9 +37,9 @@ class securityService {
             if (!tokenMetaData)
                 return { code: common_1.ResultCode.Unauthorized };
             if (deviceId !== tokenMetaData.deviceId)
-                return { code: common_1.ResultCode.Unauthorized };
+                return { code: common_1.ResultCode.Forbidden };
             const res = yield tokenMeta_repository_1.TokenMetaRepository.deleteByDeviceId(deviceId);
-            if (!tokenMetaData)
+            if (!res)
                 return { code: common_1.ResultCode.NotFound };
             return { code: common_1.ResultCode.Success };
         });

@@ -76,7 +76,7 @@ class authService {
         return __awaiter(this, void 0, void 0, function* () {
             const metaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
             if (!metaData)
-                return { code: common_1.ResultCode.NotFound };
+                return { code: common_1.ResultCode.Unauthorized };
             const oldSession = yield tokenMeta_repository_1.TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId);
             const deviceId = oldSession === null || oldSession === void 0 ? void 0 : oldSession.deviceId;
             if (oldSession) {

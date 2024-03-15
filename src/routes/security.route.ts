@@ -22,18 +22,19 @@ securityRoute.delete('/devices', async (req, res) => {
     return res.sendStatus(204)
 })
 
-securityRoute.delete('/devices/:deviceId', async (req:RequestWithParams<{ deviceId: string }>, res) => {
+securityRoute.delete('/devices/:deviceId', async (req: RequestWithParams<{ deviceId: string }>, res) => {
 
     const token = req.cookies.refreshToken
     if (!token) return res.sendStatus(401)
     const deviceId = req.params.deviceId.trim()
     if (!deviceId) return res.sendStatus(404)
-    const result = await securityService.deleteSessionById(token,deviceId)
-    if (!result) return res.sendStatus(404)
+    const result = await securityService.deleteSessionById(token, deviceId)
 
     switch (result.code) {
         case ResultCode.Success:
             return res.sendStatus(204)
+        case ResultCode.Unauthorized:
+            return res.sendStatus(401)
         case ResultCode.Forbidden:
             return res.sendStatus(403)
         case ResultCode.NotFound:

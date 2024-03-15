@@ -41,11 +41,11 @@ exports.securityRoute.delete('/devices/:deviceId', (req, res) => __awaiter(void 
     if (!deviceId)
         return res.sendStatus(404);
     const result = yield security_service_1.securityService.deleteSessionById(token, deviceId);
-    if (!result)
-        return res.sendStatus(404);
     switch (result.code) {
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
+        case common_1.ResultCode.Unauthorized:
+            return res.sendStatus(401);
         case common_1.ResultCode.Forbidden:
             return res.sendStatus(403);
         case common_1.ResultCode.NotFound:
