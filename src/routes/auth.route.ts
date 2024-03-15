@@ -48,8 +48,7 @@ authRoute.post('/login', rateLimitMiddleware, authValidation(), async (req: Requ
 
     switch (tokens.code) {
         case ResultCode.Success:
-            const accessToken = tokens.data!.accessToken
-            const refreshToken = tokens.data!.refreshToken
+            const {accessToken,refreshToken}=tokens.data!
             res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
             return res.status(200).send({accessToken})
         case ResultCode.Forbidden:

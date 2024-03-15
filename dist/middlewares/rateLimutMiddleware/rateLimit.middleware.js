@@ -20,10 +20,13 @@ const rateLimitMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0
     const date = new Date();
     const filterDate = (0, add_1.add)(new Date(), { seconds: -10 });
     const limitList = yield db_1.rateLimitsCollection.find({
-        ip,
-        URL,
-        date: { $gt: filterDate }
-    }).toArray();
+        $and: [
+            { ip: ip },
+            { URL: URL },
+            { date: { $gt: filterDate } }
+        ]
+    })
+        .toArray();
     if (limitList.length < 5) {
         yield db_1.rateLimitsCollection.insertOne({
             ip, URL, date

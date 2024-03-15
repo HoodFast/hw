@@ -48,8 +48,7 @@ exports.authRoute.post('/login', rateLimit_middleware_1.rateLimitMiddleware, (0,
     const tokens = yield auth_service_1.authService.loginTokensPair(user, ip, title);
     switch (tokens.code) {
         case common_1.ResultCode.Success:
-            const accessToken = tokens.data.accessToken;
-            const refreshToken = tokens.data.refreshToken;
+            const { accessToken, refreshToken } = tokens.data;
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
             return res.status(200).send({ accessToken });
         case common_1.ResultCode.Forbidden:

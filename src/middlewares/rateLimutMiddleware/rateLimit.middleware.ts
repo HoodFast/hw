@@ -12,11 +12,15 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
     const filterDate = add(new Date(), {seconds: -10})
 
 
-    const limitList = await rateLimitsCollection.find({
-        ip,
-        URL,
-        date: {$gt: filterDate}
-    }).toArray()
+    const limitList = await rateLimitsCollection.find(
+        {
+            $and: [
+                {ip: ip},
+                {URL: URL},
+                {date: {$gt: filterDate}}
+            ]
+        })
+        .toArray()
 
 
     if (limitList.length < 5) {
