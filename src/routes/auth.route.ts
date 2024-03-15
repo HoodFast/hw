@@ -93,6 +93,7 @@ authRoute.post('/registration', rateLimitMiddleware,userValidators(), async (req
     }
 })
 
+
 authRoute.post('/registration-confirmation',rateLimitMiddleware, codeValidation(), async (req: RequestWithBody<{
     code: string
 }>, res: Response) => {
