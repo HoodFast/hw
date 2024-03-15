@@ -33,6 +33,9 @@ class securityService {
     }
     static deleteSessionById(token, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
+            const deviceIdCheck = yield tokenMeta_repository_1.TokenMetaRepository.getByDeviceId(deviceId);
+            if (!deviceIdCheck)
+                return { code: common_1.ResultCode.Forbidden };
             const tokenMetaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
             if (!tokenMetaData)
                 return { code: common_1.ResultCode.Unauthorized };
