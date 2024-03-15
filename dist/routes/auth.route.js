@@ -104,15 +104,15 @@ exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0,
         return res.sendStatus(401);
     const tokens = yield auth_service_1.authService.refreshTokensPair(user, ip, title, token);
     switch (tokens.code) {
-        case common_1.ResultCode.NotFound:
-            return res.sendStatus(404);
         case common_1.ResultCode.Success:
             res.cookie('refreshToken', tokens.data.refreshToken, { httpOnly: true, secure: true });
             return res.status(200).send({ accessToken: tokens.data.accessToken });
-        case common_1.ResultCode.Forbidden:
-            return res.sendStatus(403);
         case common_1.ResultCode.Unauthorized:
             return res.sendStatus(401);
+        case common_1.ResultCode.Forbidden:
+            return res.sendStatus(403);
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
         default:
             return res.sendStatus(404);
     }
@@ -120,12 +120,12 @@ exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0,
 exports.authRoute.post('/logout', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const deleteToken = yield auth_service_1.authService.deleteSession(req.cookies.refreshToken);
     switch (deleteToken.code) {
-        case common_1.ResultCode.NotFound:
-            return res.sendStatus(404);
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
         case common_1.ResultCode.Forbidden:
             return res.sendStatus(403);
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
         default:
             return res.sendStatus(404);
     }

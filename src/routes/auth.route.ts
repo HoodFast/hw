@@ -121,15 +121,16 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
     const tokens = await authService.refreshTokensPair(user, ip, title, token)
 
     switch (tokens.code) {
-        case ResultCode.NotFound:
-            return res.sendStatus(404)
+
         case ResultCode.Success:
             res.cookie('refreshToken', tokens.data!.refreshToken, {httpOnly: true, secure: true})
             return res.status(200).send({accessToken: tokens.data!.accessToken})
-        case ResultCode.Forbidden:
-            return res.sendStatus(403)
         case ResultCode.Unauthorized:
             return res.sendStatus(401)
+        case ResultCode.Forbidden:
+            return res.sendStatus(403)
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
         default:
             return res.sendStatus(404)
     }
@@ -140,12 +141,12 @@ authRoute.post('/logout', async (req: Request, res: Response) => {
     const deleteToken = await authService.deleteSession(req.cookies.refreshToken)
 
     switch (deleteToken.code) {
-        case ResultCode.NotFound:
-            return res.sendStatus(404)
         case ResultCode.Success:
             return res.sendStatus(204)
         case ResultCode.Forbidden:
             return res.sendStatus(403)
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
         default:
             return res.sendStatus(404)
     }

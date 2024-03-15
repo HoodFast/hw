@@ -24,7 +24,7 @@ export class authService {
         if (oldSession) {
             await TokenMetaRepository.deleteById(oldSession._id)
         } else {
-            return {code: ResultCode.NotFound}
+            return {code: ResultCode.Unauthorized}
         }
         return {code: ResultCode.Success}
     }

@@ -40,7 +40,7 @@ class authService {
                 yield tokenMeta_repository_1.TokenMetaRepository.deleteById(oldSession._id);
             }
             else {
-                return { code: common_1.ResultCode.NotFound };
+                return { code: common_1.ResultCode.Unauthorized };
             }
             return { code: common_1.ResultCode.Success };
         });
