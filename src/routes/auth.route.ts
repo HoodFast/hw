@@ -143,6 +143,8 @@ authRoute.post('/logout', async (req: Request, res: Response) => {
     switch (deleteToken.code) {
         case ResultCode.Success:
             return res.sendStatus(204)
+        case ResultCode.Unauthorized:
+            return res.sendStatus(401)
         case ResultCode.Forbidden:
             return res.sendStatus(403)
         case ResultCode.NotFound:

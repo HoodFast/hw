@@ -122,6 +122,8 @@ exports.authRoute.post('/logout', (req, res) => __awaiter(void 0, void 0, void 0
     switch (deleteToken.code) {
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
+        case common_1.ResultCode.Unauthorized:
+            return res.sendStatus(401);
         case common_1.ResultCode.Forbidden:
             return res.sendStatus(403);
         case common_1.ResultCode.NotFound:
