@@ -25,6 +25,7 @@ export class jwtService {
             const deviceId = result.deviceId
             return {iat, deviceId, userId}
         } catch (e) {
+            console.log(e)
             return null
         }
 

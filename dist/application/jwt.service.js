@@ -33,6 +33,7 @@ class jwtService {
                 return { iat, deviceId, userId };
             }
             catch (e) {
+                console.log(e);
                 return null;
             }
         });
