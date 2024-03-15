@@ -41,6 +41,7 @@ exports.securityRoute.delete('/devices/:deviceId', (req, res) => __awaiter(void 
     if (!deviceId)
         return res.sendStatus(404);
     const result = yield security_service_1.securityService.deleteSessionById(token, deviceId);
+    console.log(result);
     switch (result.code) {
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
