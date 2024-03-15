@@ -13,6 +13,7 @@ exports.securityRoute = void 0;
 const express_1 = require("express");
 const session_query_repository_1 = require("../repositories/session.query.repository");
 const security_service_1 = require("../services/security.service");
+const common_1 = require("../models/common/common");
 exports.securityRoute = (0, express_1.Router)({});
 exports.securityRoute.get('/devices', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.cookies.refreshToken;
@@ -36,11 +37,20 @@ exports.securityRoute.delete('/devices/:deviceId', (req, res) => __awaiter(void 
     const token = req.cookies.refreshToken;
     if (!token)
         return res.sendStatus(401);
-    const deviceId = req.params.deviceId;
+    const deviceId = req.params.deviceId.trim();
     if (!deviceId)
-        return res.sendStatus(400);
+        return res.sendStatus(404);
     const result = yield security_service_1.securityService.deleteSessionById(token, deviceId);
     if (!result)
         return res.sendStatus(404);
-    return res.sendStatus(204);
+    switch (result.code) {
+        case common_1.ResultCode.Success:
+            return res.sendStatus(204);
+        case common_1.ResultCode.Forbidden:
+            return res.sendStatus(403);
+        case common_1.ResultCode.NotFound:
+            return res.sendStatus(404);
+        default:
+            return res.sendStatus(404);
+    }
 }));

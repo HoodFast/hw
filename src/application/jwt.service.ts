@@ -30,9 +30,8 @@ export class jwtService {
 
     }
 
-    static async createRefreshJWT(user: WithId<UsersTypeDb>, ip: string, title: string): Promise<string | null> {
+    static async createRefreshJWT(user: WithId<UsersTypeDb>, deviceId: string = randomUUID(), ip: string, title: string): Promise<string | null> {
         const userId = user._id
-        const deviceId = randomUUID()
         const token = jwt.sign({userId, deviceId}, appConfig.RT_SECRET, {expiresIn: appConfig.RT_TIME})
         const decoded = jwt.decode(token, {complete: true})
         const iat = new Date(decoded.payload.iat * 1000);

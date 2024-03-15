@@ -17,34 +17,41 @@ export class authService {
         return {code: ResultCode.Success, data: {email: user.email, login: user.login, userId: user.id}}
     }
 
-    static async deleteToken(token: string) {
-        const userId = await jwtService.getUserIdByRefreshToken(token)
-        if (!userId) return {code: ResultCode.Forbidden}
-        await UserRepository.putTokenInBL(userId, token)
+    static async deleteSession(token: string) {
+        const metaData = await jwtService.getMetaDataByToken(token)
+        if (!metaData) return {code: ResultCode.Unauthorized}
+        const oldSession = await TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId)
+        if (oldSession) {
+            await TokenMetaRepository.deleteById(oldSession._id)
+        } else {
+            return {code: ResultCode.NotFound}
+        }
         return {code: ResultCode.Success}
     }
 
-    static async refreshToken(token: string, ip: string, title: string) {
-        const userId = await jwtService.getUserIdByRefreshToken(token)
-        if (!userId) return {code: ResultCode.Forbidden}
-        const user = await UserQueryRepository.getDBUserById(userId)
-        if (!user) return {code: ResultCode.NotFound}
-        const accessToken = await jwtService.createJWT(user)
-        const refreshToken = await jwtService.createRefreshJWT(user, ip, title)
-        await UserRepository.putTokenInBL(userId, token)
-        return {code: ResultCode.Success, data: {accessToken, refreshToken}}
-    }
+    // static async refreshToken(token: string, ip: string, title: string) {
+    //     const userId = await jwtService.getUserIdByRefreshToken(token)
+    //     if (!userId) return {code: ResultCode.Forbidden}
+    //     const user = await UserQueryRepository.getDBUserById(userId)
+    //     if (!user) return {code: ResultCode.NotFound}
+    //     const accessToken = await jwtService.createJWT(user)
+    //     const refreshToken = await jwtService.createRefreshJWT(user, ip, title)
+    //     await UserRepository.putTokenInBL(userId, token)
+    //     return {code: ResultCode.Success, data: {accessToken, refreshToken}}
+    // }
 
     static async loginTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string) {
         const userId = user._id
         const oldSession = await TokenMetaRepository.getSessionForLogin(userId, title)
+        const deviceId = oldSession?.deviceId
         if (oldSession) {
             await TokenMetaRepository.deleteById(oldSession._id)
         }
+
         const accessToken = await jwtService.createJWT(user)
         if (!accessToken) return {code: ResultCode.Forbidden}
 
-        const refreshToken = await jwtService.createRefreshJWT(user, ip, title)
+        const refreshToken = await jwtService.createRefreshJWT(user, deviceId, ip, title)
         if (!refreshToken) return {code: ResultCode.Forbidden}
 
         return {code: ResultCode.Success, data: {accessToken, refreshToken}}
@@ -52,9 +59,9 @@ export class authService {
 
     static async refreshTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string, token: string) {
         const metaData = await jwtService.getMetaDataByToken(token)
-        if (!metaData) return {code: ResultCode.Forbidden}
+        if (!metaData) return {code: ResultCode.NotFound}
         const oldSession = await TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId)
-
+        const deviceId = oldSession?.deviceId
         if (oldSession) {
             await TokenMetaRepository.deleteById(oldSession._id)
         } else {
@@ -63,7 +70,7 @@ export class authService {
         const accessToken = await jwtService.createJWT(user)
         if (!accessToken) return {code: ResultCode.Forbidden}
 
-        const refreshToken = await jwtService.createRefreshJWT(user, ip, title)
+        const refreshToken = await jwtService.createRefreshJWT(user,deviceId, ip, title)
         if (!refreshToken) return {code: ResultCode.Forbidden}
 
         return {code: ResultCode.Success, data: {accessToken, refreshToken}}

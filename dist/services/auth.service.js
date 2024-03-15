@@ -30,40 +30,43 @@ class authService {
             return { code: common_1.ResultCode.Success, data: { email: user.email, login: user.login, userId: user.id } };
         });
     }
-    static deleteToken(token) {
+    static deleteSession(token) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userId = yield jwt_service_1.jwtService.getUserIdByRefreshToken(token);
-            if (!userId)
-                return { code: common_1.ResultCode.Forbidden };
-            yield user_repository_1.UserRepository.putTokenInBL(userId, token);
+            const metaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
+            if (!metaData)
+                return { code: common_1.ResultCode.Unauthorized };
+            const oldSession = yield tokenMeta_repository_1.TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId);
+            if (oldSession) {
+                yield tokenMeta_repository_1.TokenMetaRepository.deleteById(oldSession._id);
+            }
+            else {
+                return { code: common_1.ResultCode.NotFound };
+            }
             return { code: common_1.ResultCode.Success };
         });
     }
-    static refreshToken(token, ip, title) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const userId = yield jwt_service_1.jwtService.getUserIdByRefreshToken(token);
-            if (!userId)
-                return { code: common_1.ResultCode.Forbidden };
-            const user = yield users_query_repository_1.UserQueryRepository.getDBUserById(userId);
-            if (!user)
-                return { code: common_1.ResultCode.NotFound };
-            const accessToken = yield jwt_service_1.jwtService.createJWT(user);
-            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user, ip, title);
-            yield user_repository_1.UserRepository.putTokenInBL(userId, token);
-            return { code: common_1.ResultCode.Success, data: { accessToken, refreshToken } };
-        });
-    }
+    // static async refreshToken(token: string, ip: string, title: string) {
+    //     const userId = await jwtService.getUserIdByRefreshToken(token)
+    //     if (!userId) return {code: ResultCode.Forbidden}
+    //     const user = await UserQueryRepository.getDBUserById(userId)
+    //     if (!user) return {code: ResultCode.NotFound}
+    //     const accessToken = await jwtService.createJWT(user)
+    //     const refreshToken = await jwtService.createRefreshJWT(user, ip, title)
+    //     await UserRepository.putTokenInBL(userId, token)
+    //     return {code: ResultCode.Success, data: {accessToken, refreshToken}}
+    // }
     static loginTokensPair(user, ip, title) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = user._id;
             const oldSession = yield tokenMeta_repository_1.TokenMetaRepository.getSessionForLogin(userId, title);
+            const deviceId = oldSession === null || oldSession === void 0 ? void 0 : oldSession.deviceId;
             if (oldSession) {
                 yield tokenMeta_repository_1.TokenMetaRepository.deleteById(oldSession._id);
             }
             const accessToken = yield jwt_service_1.jwtService.createJWT(user);
             if (!accessToken)
                 return { code: common_1.ResultCode.Forbidden };
-            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user, ip, title);
+            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user, deviceId, ip, title);
             if (!refreshToken)
                 return { code: common_1.ResultCode.Forbidden };
             return { code: common_1.ResultCode.Success, data: { accessToken, refreshToken } };
@@ -73,8 +76,9 @@ class authService {
         return __awaiter(this, void 0, void 0, function* () {
             const metaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
             if (!metaData)
-                return { code: common_1.ResultCode.Forbidden };
+                return { code: common_1.ResultCode.NotFound };
             const oldSession = yield tokenMeta_repository_1.TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId);
+            const deviceId = oldSession === null || oldSession === void 0 ? void 0 : oldSession.deviceId;
             if (oldSession) {
                 yield tokenMeta_repository_1.TokenMetaRepository.deleteById(oldSession._id);
             }
@@ -84,7 +88,7 @@ class authService {
             const accessToken = yield jwt_service_1.jwtService.createJWT(user);
             if (!accessToken)
                 return { code: common_1.ResultCode.Forbidden };
-            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user, ip, title);
+            const refreshToken = yield jwt_service_1.jwtService.createRefreshJWT(user, deviceId, ip, title);
             if (!refreshToken)
                 return { code: common_1.ResultCode.Forbidden };
             return { code: common_1.ResultCode.Success, data: { accessToken, refreshToken } };

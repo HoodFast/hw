@@ -63,7 +63,7 @@ authRoute.post('/login',rateLimitMiddleware, authValidation(), async (req: Reque
 
 })
 
-authRoute.post('/registration-email-resending', emailValidation(), async (req: RequestWithBody<{
+authRoute.post('/registration-email-resending',rateLimitMiddleware, emailValidation(), async (req: RequestWithBody<{
     email: string
 }>, res: Response) => {
 
@@ -79,7 +79,7 @@ authRoute.post('/registration-email-resending', emailValidation(), async (req: R
 
 })
 
-authRoute.post('/registration', userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
+authRoute.post('/registration', rateLimitMiddleware,userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
 
     const createdUser: Result<OutputUsersType | null> = await userService.createUser(req.body.login, req.body.email, req.body.password)
 
@@ -93,7 +93,7 @@ authRoute.post('/registration', userValidators(), async (req: RequestWithBody<Us
     }
 })
 
-authRoute.post('/registration-confirmation', codeValidation(), async (req: RequestWithBody<{
+authRoute.post('/registration-confirmation',rateLimitMiddleware, codeValidation(), async (req: RequestWithBody<{
     code: string
 }>, res: Response) => {
     const code = req.body.code
@@ -127,7 +127,7 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
             res.cookie('refreshToken', tokens.data!.refreshToken, {httpOnly: true, secure: true})
             return res.status(200).send({accessToken: tokens.data!.accessToken})
         case ResultCode.Forbidden:
-            return res.sendStatus(401)
+            return res.sendStatus(403)
         default:
             return res.sendStatus(404)
     }
@@ -135,7 +135,7 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
 
 authRoute.post('/logout', async (req: Request, res: Response) => {
 
-    const deleteToken = await authService.deleteToken(req.cookies.refreshToken)
+    const deleteToken = await authService.deleteSession(req.cookies.refreshToken)
 
     switch (deleteToken.code) {
         case ResultCode.NotFound:
@@ -143,7 +143,7 @@ authRoute.post('/logout', async (req: Request, res: Response) => {
         case ResultCode.Success:
             return res.sendStatus(204)
         case ResultCode.Forbidden:
-            return res.sendStatus(401)
+            return res.sendStatus(403)
         default:
             return res.sendStatus(404)
     }

@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {sessionQueryRepository} from "../repositories/session.query.repository";
 import {securityService} from "../services/security.service";
-import {RequestWithParams} from "../models/common/common";
+import {RequestWithParams, ResultCode} from "../models/common/common";
 
 export const securityRoute = Router({})
 
@@ -23,11 +23,22 @@ securityRoute.delete('/devices', async (req, res) => {
 })
 
 securityRoute.delete('/devices/:deviceId', async (req:RequestWithParams<{ deviceId: string }>, res) => {
+
     const token = req.cookies.refreshToken
     if (!token) return res.sendStatus(401)
-    const deviceId = req.params.deviceId
-    if (!deviceId) return res.sendStatus(400)
+    const deviceId = req.params.deviceId.trim()
+    if (!deviceId) return res.sendStatus(404)
     const result = await securityService.deleteSessionById(token,deviceId)
     if (!result) return res.sendStatus(404)
-    return res.sendStatus(204)
+
+    switch (result.code) {
+        case ResultCode.Success:
+            return res.sendStatus(204)
+        case ResultCode.Forbidden:
+            return res.sendStatus(403)
+        case ResultCode.NotFound:
+            return res.sendStatus(404)
+        default:
+            return res.sendStatus(404)
+    }
 })

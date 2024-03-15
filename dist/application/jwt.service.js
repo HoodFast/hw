@@ -37,10 +37,9 @@ class jwtService {
             }
         });
     }
-    static createRefreshJWT(user, ip, title) {
+    static createRefreshJWT(user, deviceId = (0, crypto_1.randomUUID)(), ip, title) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = user._id;
-            const deviceId = (0, crypto_1.randomUUID)();
             const token = jwt.sign({ userId, deviceId }, config_1.appConfig.RT_SECRET, { expiresIn: config_1.appConfig.RT_TIME });
             const decoded = jwt.decode(token, { complete: true });
             const iat = new Date(decoded.payload.iat * 1000);

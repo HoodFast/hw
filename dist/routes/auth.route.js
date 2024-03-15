@@ -60,7 +60,7 @@ exports.authRoute.post('/login', rateLimit_middleware_1.rateLimitMiddleware, (0,
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/registration-email-resending', (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/registration-email-resending', rateLimit_middleware_1.rateLimitMiddleware, (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sendEmail = yield auth_service_1.authService.resendConfirmationCode(req.body.email);
     switch (sendEmail.code) {
         case common_1.ResultCode.Success:
@@ -71,7 +71,7 @@ exports.authRoute.post('/registration-email-resending', (0, email_validators_1.e
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/registration', (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/registration', rateLimit_middleware_1.rateLimitMiddleware, (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
     switch (createdUser.code) {
         case common_1.ResultCode.NotFound:
@@ -82,7 +82,7 @@ exports.authRoute.post('/registration', (0, users_validator_1.userValidators)(),
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/registration-confirmation', (0, confirm_validators_1.codeValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/registration-confirmation', rateLimit_middleware_1.rateLimitMiddleware, (0, confirm_validators_1.codeValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const code = req.body.code;
     if (!code)
         return res.sendStatus(404);
@@ -111,20 +111,20 @@ exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0,
             res.cookie('refreshToken', tokens.data.refreshToken, { httpOnly: true, secure: true });
             return res.status(200).send({ accessToken: tokens.data.accessToken });
         case common_1.ResultCode.Forbidden:
-            return res.sendStatus(401);
+            return res.sendStatus(403);
         default:
             return res.sendStatus(404);
     }
 }));
 exports.authRoute.post('/logout', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const deleteToken = yield auth_service_1.authService.deleteToken(req.cookies.refreshToken);
+    const deleteToken = yield auth_service_1.authService.deleteSession(req.cookies.refreshToken);
     switch (deleteToken.code) {
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
         case common_1.ResultCode.Success:
             return res.sendStatus(204);
         case common_1.ResultCode.Forbidden:
-            return res.sendStatus(401);
+            return res.sendStatus(403);
         default:
             return res.sendStatus(404);
     }
