@@ -83,7 +83,7 @@ class authService {
                 yield tokenMeta_repository_1.TokenMetaRepository.deleteById(oldSession._id);
             }
             else {
-                return { code: common_1.ResultCode.Forbidden };
+                return { code: common_1.ResultCode.Unauthorized };
             }
             const accessToken = yield jwt_service_1.jwtService.createJWT(user);
             if (!accessToken)

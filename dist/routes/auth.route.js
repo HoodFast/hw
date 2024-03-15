@@ -112,6 +112,8 @@ exports.authRoute.post('/refresh-token', (req, res) => __awaiter(void 0, void 0,
             return res.status(200).send({ accessToken: tokens.data.accessToken });
         case common_1.ResultCode.Forbidden:
             return res.sendStatus(403);
+        case common_1.ResultCode.Unauthorized:
+            return res.sendStatus(401);
         default:
             return res.sendStatus(404);
     }

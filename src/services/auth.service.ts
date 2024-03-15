@@ -65,7 +65,7 @@ export class authService {
         if (oldSession) {
             await TokenMetaRepository.deleteById(oldSession._id)
         } else {
-            return {code: ResultCode.Forbidden}
+            return {code: ResultCode.Unauthorized}
         }
         const accessToken = await jwtService.createJWT(user)
         if (!accessToken) return {code: ResultCode.Forbidden}

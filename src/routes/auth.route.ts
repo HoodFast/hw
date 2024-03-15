@@ -39,12 +39,12 @@ authRoute.get('/me', accessTokenGuard, async (req: Request, res: Response) => {
 )
 
 
-authRoute.post('/login',rateLimitMiddleware, authValidation(), async (req: RequestWithBody<AuthInputType>, res: Response) => {
+authRoute.post('/login', rateLimitMiddleware, authValidation(), async (req: RequestWithBody<AuthInputType>, res: Response) => {
     const title = req.headers['user-agent'] || 'none title'
     const ip = req.ip || 'none ip'
     const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)
     if (!user) return res.sendStatus(401)
-    const tokens = await authService.loginTokensPair(user,ip,title)
+    const tokens = await authService.loginTokensPair(user, ip, title)
 
     switch (tokens.code) {
         case ResultCode.Success:
@@ -63,7 +63,7 @@ authRoute.post('/login',rateLimitMiddleware, authValidation(), async (req: Reque
 
 })
 
-authRoute.post('/registration-email-resending',rateLimitMiddleware, emailValidation(), async (req: RequestWithBody<{
+authRoute.post('/registration-email-resending', rateLimitMiddleware, emailValidation(), async (req: RequestWithBody<{
     email: string
 }>, res: Response) => {
 
@@ -79,7 +79,7 @@ authRoute.post('/registration-email-resending',rateLimitMiddleware, emailValidat
 
 })
 
-authRoute.post('/registration', rateLimitMiddleware,userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
+authRoute.post('/registration', rateLimitMiddleware, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
 
     const createdUser: Result<OutputUsersType | null> = await userService.createUser(req.body.login, req.body.email, req.body.password)
 
@@ -94,7 +94,7 @@ authRoute.post('/registration', rateLimitMiddleware,userValidators(), async (req
 })
 
 
-authRoute.post('/registration-confirmation',rateLimitMiddleware, codeValidation(), async (req: RequestWithBody<{
+authRoute.post('/registration-confirmation', rateLimitMiddleware, codeValidation(), async (req: RequestWithBody<{
     code: string
 }>, res: Response) => {
     const code = req.body.code
@@ -116,10 +116,10 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
     const title = req.headers['user-agent'] || 'none title'
     const ip = req.ip || 'none ip'
     const token = req.cookies.refreshToken
-    const user =await jwtService.checkRefreshToken(token)
-    if(!user)return res.sendStatus(401)
+    const user = await jwtService.checkRefreshToken(token)
+    if (!user) return res.sendStatus(401)
 
-    const tokens = await authService.refreshTokensPair(user,ip,title,token)
+    const tokens = await authService.refreshTokensPair(user, ip, title, token)
 
     switch (tokens.code) {
         case ResultCode.NotFound:
@@ -129,6 +129,8 @@ authRoute.post('/refresh-token', async (req: Request, res: Response) => {
             return res.status(200).send({accessToken: tokens.data!.accessToken})
         case ResultCode.Forbidden:
             return res.sendStatus(403)
+        case ResultCode.Unauthorized:
+            return res.sendStatus(401)
         default:
             return res.sendStatus(404)
     }
