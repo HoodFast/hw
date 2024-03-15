@@ -37,9 +37,9 @@ class securityService {
             if (!deviceIdCheck)
                 return { code: common_1.ResultCode.NotFound };
             const tokenMetaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
+            console.log(tokenMetaData);
             if (!tokenMetaData)
                 return { code: common_1.ResultCode.Unauthorized };
-            debugger;
             if (deviceId !== tokenMetaData.deviceId)
                 return { code: common_1.ResultCode.Forbidden };
             const res = yield tokenMeta_repository_1.TokenMetaRepository.deleteByDeviceId(deviceId);

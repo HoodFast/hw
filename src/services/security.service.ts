@@ -22,8 +22,9 @@ export class securityService {
         const deviceIdCheck = await TokenMetaRepository.getByDeviceId(deviceId)
         if(!deviceIdCheck) return {code: ResultCode.NotFound}
         const tokenMetaData = await jwtService.getMetaDataByToken(token)
+        console.log(tokenMetaData)
         if (!tokenMetaData) return {code: ResultCode.Unauthorized}
-        debugger
+
         if (deviceId !== tokenMetaData.deviceId) return {code: ResultCode.Forbidden}
         const res = await TokenMetaRepository.deleteByDeviceId(deviceId)
         if (!res) return {code: ResultCode.NotFound}

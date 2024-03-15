@@ -29,7 +29,7 @@ securityRoute.delete('/devices/:deviceId', async (req: RequestWithParams<{ devic
     const deviceId = req.params.deviceId.trim()
     if (!deviceId) return res.sendStatus(404)
     const result = await securityService.deleteSessionById(token, deviceId)
-    console.log(result)
+
     switch (result.code) {
         case ResultCode.Success:
             return res.sendStatus(204)
