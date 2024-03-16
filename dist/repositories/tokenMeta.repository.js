@@ -18,7 +18,7 @@ class TokenMetaRepository {
             yield db_1.tokensMetaCollection.insertOne(data);
             const TokenMeta = yield this.getByDeviceId(data.deviceId);
             if (!TokenMeta) {
-                return null;
+                return false;
             }
             return !!TokenMeta;
         });

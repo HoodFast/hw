@@ -8,12 +8,12 @@ import {tokensMetaDbType} from "../models/tokens/token.db.model";
 
 export class TokenMetaRepository {
 
-    static async setTokenMetaData(data: tokensMetaDbType): Promise<boolean | null> {
+    static async setTokenMetaData(data: tokensMetaDbType): Promise<boolean> {
 
         await tokensMetaCollection.insertOne(data)
         const TokenMeta = await this.getByDeviceId(data.deviceId)
         if (!TokenMeta) {
-            return null
+            return false
         }
         return !!TokenMeta
     }
