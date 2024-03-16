@@ -20,12 +20,8 @@ const users_validator_1 = require("../validators/users-validator");
 const user_service_1 = require("../services/user.service");
 const confirm_validators_1 = require("../validators/confirm-validators");
 const email_validators_1 = require("../validators/email-validators");
-const express_rate_limit_1 = require("express-rate-limit");
+const rateLimit_middleware_1 = require("../middlewares/rateLimutMiddleware/rateLimit.middleware");
 exports.authRoute = (0, express_1.Router)({});
-const limiterLogin = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 4 });
-const limiterRegistrationEmailResending = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 4 });
-const limiterRegistration = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 4 });
-const limiterRegistrationConfirmation = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 4 });
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
@@ -43,7 +39,7 @@ exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, re
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/login', limiterLogin, (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/login', rateLimit_middleware_1.rateLimitMiddleware, (0, auth_validators_1.authValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const title = req.headers['user-agent'] || 'none title';
     const ip = req.ip || 'none ip';
     const user = yield auth_service_1.authService.checkCredentials(req.body.loginOrEmail, req.body.password);
@@ -63,7 +59,7 @@ exports.authRoute.post('/login', limiterLogin, (0, auth_validators_1.authValidat
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/registration-email-resending', limiterRegistrationEmailResending, (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/registration-email-resending', rateLimit_middleware_1.rateLimitMiddleware, (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sendEmail = yield auth_service_1.authService.resendConfirmationCode(req.body.email);
     switch (sendEmail.code) {
         case common_1.ResultCode.Success:
@@ -74,7 +70,7 @@ exports.authRoute.post('/registration-email-resending', limiterRegistrationEmail
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/registration', limiterRegistration, (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/registration', rateLimit_middleware_1.rateLimitMiddleware, (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password);
     switch (createdUser.code) {
         case common_1.ResultCode.NotFound:
@@ -85,7 +81,7 @@ exports.authRoute.post('/registration', limiterRegistration, (0, users_validator
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/registration-confirmation', limiterRegistrationConfirmation, (0, confirm_validators_1.codeValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/registration-confirmation', rateLimit_middleware_1.rateLimitMiddleware, (0, confirm_validators_1.codeValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const code = req.body.code;
     if (!code)
         return res.sendStatus(404);

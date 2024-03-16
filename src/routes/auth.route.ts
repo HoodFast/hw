@@ -13,14 +13,10 @@ import {Result} from "../types/result.type";
 import {codeValidation} from "../validators/confirm-validators";
 import {emailValidation} from "../validators/email-validators";
 import {rateLimitMiddleware} from "../middlewares/rateLimutMiddleware/rateLimit.middleware";
-import { rateLimit } from 'express-rate-limit'
 
 export const authRoute = Router({})
 
-const limiterLogin = rateLimit({windowMs:10000,max:4})
-const limiterRegistrationEmailResending = rateLimit({windowMs:10000,max:4})
-const limiterRegistration = rateLimit({windowMs:10000,max:4})
-const limiterRegistrationConfirmation = rateLimit({windowMs:10000,max:4})
+
 authRoute.get('/me', accessTokenGuard, async (req: Request, res: Response) => {
 
         const userId = req.user?.id
@@ -42,7 +38,7 @@ authRoute.get('/me', accessTokenGuard, async (req: Request, res: Response) => {
 )
 
 
-authRoute.post('/login', limiterLogin, authValidation(), async (req: RequestWithBody<AuthInputType>, res: Response) => {
+authRoute.post('/login', rateLimitMiddleware, authValidation(), async (req: RequestWithBody<AuthInputType>, res: Response) => {
     const title = req.headers['user-agent'] || 'none title'
     const ip = req.ip || 'none ip'
     const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)
@@ -65,7 +61,7 @@ authRoute.post('/login', limiterLogin, authValidation(), async (req: RequestWith
 
 })
 
-authRoute.post('/registration-email-resending', limiterRegistrationEmailResending, emailValidation(), async (req: RequestWithBody<{
+authRoute.post('/registration-email-resending', rateLimitMiddleware, emailValidation(), async (req: RequestWithBody<{
     email: string
 }>, res: Response) => {
 
@@ -81,7 +77,7 @@ authRoute.post('/registration-email-resending', limiterRegistrationEmailResendin
 
 })
 
-authRoute.post('/registration', limiterRegistration, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
+authRoute.post('/registration', rateLimitMiddleware, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: Response) => {
 
     const createdUser: Result<OutputUsersType | null> = await userService.createUser(req.body.login, req.body.email, req.body.password)
 
@@ -96,7 +92,7 @@ authRoute.post('/registration', limiterRegistration, userValidators(), async (re
 })
 
 
-authRoute.post('/registration-confirmation', limiterRegistrationConfirmation, codeValidation(), async (req: RequestWithBody<{
+authRoute.post('/registration-confirmation', rateLimitMiddleware, codeValidation(), async (req: RequestWithBody<{
     code: string
 }>, res: Response) => {
     const code = req.body.code

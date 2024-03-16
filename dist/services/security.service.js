@@ -33,14 +33,13 @@ class securityService {
     }
     static deleteSessionById(token, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const deviceIdCheck = yield tokenMeta_repository_1.TokenMetaRepository.getByDeviceId(deviceId);
-            if (!deviceIdCheck)
+            const sessionMetaData = yield tokenMeta_repository_1.TokenMetaRepository.getByDeviceId(deviceId);
+            if (!sessionMetaData)
                 return { code: common_1.ResultCode.NotFound };
             const tokenMetaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
-            console.log(`${tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.deviceId} === ${deviceId}`);
             if (!tokenMetaData)
                 return { code: common_1.ResultCode.Unauthorized };
-            if (deviceId !== tokenMetaData.deviceId)
+            if (`${tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId} === ${sessionMetaData.userId}`)
                 return { code: common_1.ResultCode.Forbidden };
             const res = yield tokenMeta_repository_1.TokenMetaRepository.deleteByDeviceId(deviceId);
             if (!res)

@@ -21,9 +21,9 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
             ]
         })
         .toArray()
+    console.log(`${limitList} = ${limitList.length}`)
 
-
-    if (limitList.length < 5) {
+    if (limitList.length < 4) {
         await rateLimitsCollection.insertOne({
             ip, URL, date
         })
