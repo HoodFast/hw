@@ -11,9 +11,10 @@ const cookieParser = require('cookie-parser');
 
 export const app = express()
 
-app.set('trust proxy', true)
+// app.set('trust proxy', true)
 app.use(express.json())
-app.set('trust proxy', 1)
+
+
 app.use(cookieParser('secret key'));
 
 const baseUrl:string = '/ht_02/api/'
@@ -25,6 +26,7 @@ app.use(`${baseUrl}comments`, commentsRoute)
 app.use(`${baseUrl}auth`, authRoute)
 app.use(`${baseUrl}security`, securityRoute)
 app.use(`${baseUrl}testing`, testingRoute)
+
 
 
 
