@@ -22,10 +22,10 @@ const confirm_validators_1 = require("../validators/confirm-validators");
 const email_validators_1 = require("../validators/email-validators");
 const express_rate_limit_1 = require("express-rate-limit");
 exports.authRoute = (0, express_1.Router)({});
-const limiterLogin = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 5 });
-const limiterRegistrationEmailResending = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 5 });
-const limiterRegistration = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 5 });
-const limiterRegistrationConfirmation = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 5 });
+const limiterLogin = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 4 });
+const limiterRegistrationEmailResending = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 4 });
+const limiterRegistration = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 4 });
+const limiterRegistrationConfirmation = (0, express_rate_limit_1.rateLimit)({ windowMs: 10000, max: 4 });
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;

@@ -17,10 +17,10 @@ import { rateLimit } from 'express-rate-limit'
 
 export const authRoute = Router({})
 
-const limiterLogin = rateLimit({windowMs:10000,max:5})
-const limiterRegistrationEmailResending = rateLimit({windowMs:10000,max:5})
-const limiterRegistration = rateLimit({windowMs:10000,max:5})
-const limiterRegistrationConfirmation = rateLimit({windowMs:10000,max:5})
+const limiterLogin = rateLimit({windowMs:10000,max:4})
+const limiterRegistrationEmailResending = rateLimit({windowMs:10000,max:4})
+const limiterRegistration = rateLimit({windowMs:10000,max:4})
+const limiterRegistrationConfirmation = rateLimit({windowMs:10000,max:4})
 authRoute.get('/me', accessTokenGuard, async (req: Request, res: Response) => {
 
         const userId = req.user?.id
