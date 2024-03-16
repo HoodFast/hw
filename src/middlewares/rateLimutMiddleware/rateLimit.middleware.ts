@@ -29,6 +29,7 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
         })
         return next()
     } else {
+        await rateLimitsCollection.deleteMany({ip:ip,URL:URL})
         return res.sendStatus(429)
     }
 

@@ -34,6 +34,7 @@ const rateLimitMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0
         return next();
     }
     else {
+        yield db_1.rateLimitsCollection.deleteMany({ ip: ip, URL: URL });
         return res.sendStatus(429);
     }
 });
