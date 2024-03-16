@@ -22,10 +22,15 @@ export class securityService {
         const sessionMetaData = await TokenMetaRepository.getByDeviceId(deviceId)
         if (!sessionMetaData) return {code: ResultCode.NotFound}
         const tokenMetaData = await jwtService.getMetaDataByToken(token)
-        console.log(`${tokenMetaData?.userId} !== ${sessionMetaData.userId}`)
+
         if (!tokenMetaData) return {code: ResultCode.Unauthorized}
 
-        if (tokenMetaData?.userId !== sessionMetaData.userId) return {code: ResultCode.Forbidden}
+        if (tokenMetaData?.userId !== sessionMetaData.userId) {
+            console.log('запретили')
+            console.log(`${tokenMetaData?.userId} !== ${sessionMetaData.userId}`)
+            return {code: ResultCode.Forbidden}
+        }
+        console.log('разрешили')
         const res = await TokenMetaRepository.deleteByDeviceId(deviceId)
         if (!res) return {code: ResultCode.NotFound}
         return {code: ResultCode.Success}
