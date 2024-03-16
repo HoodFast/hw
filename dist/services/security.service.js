@@ -40,13 +40,8 @@ class securityService {
             if (!tokenMetaData)
                 return { code: common_1.ResultCode.Unauthorized };
             if ((tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId) != sessionMetaData.userId) {
-                console.log(`${tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId} !== ${sessionMetaData.userId}`);
-                console.log(`${(tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId) !== sessionMetaData.userId}`);
-                console.log(`${(tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId) != sessionMetaData.userId}`);
-                console.log('запретили');
                 return { code: common_1.ResultCode.Forbidden };
             }
-            console.log('разрешили');
             const res = yield tokenMeta_repository_1.TokenMetaRepository.deleteByDeviceId(deviceId);
             if (!res)
                 return { code: common_1.ResultCode.NotFound };

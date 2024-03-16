@@ -27,13 +27,8 @@ export class securityService {
 
         if (tokenMetaData?.userId != sessionMetaData.userId) {
 
-            console.log(`${tokenMetaData?.userId} !== ${sessionMetaData.userId}`)
-            console.log(`${tokenMetaData?.userId !== sessionMetaData.userId}`)
-            console.log(`${tokenMetaData?.userId != sessionMetaData.userId}`)
-            console.log('запретили')
             return {code: ResultCode.Forbidden}
         }
-        console.log('разрешили')
         const res = await TokenMetaRepository.deleteByDeviceId(deviceId)
         if (!res) return {code: ResultCode.NotFound}
         return {code: ResultCode.Success}
