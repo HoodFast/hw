@@ -37,6 +37,7 @@ class securityService {
             if (!sessionMetaData)
                 return { code: common_1.ResultCode.NotFound };
             const tokenMetaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
+            console.log(`${tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId} !== ${sessionMetaData.userId}`);
             if (!tokenMetaData)
                 return { code: common_1.ResultCode.Unauthorized };
             if ((tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId) !== sessionMetaData.userId)

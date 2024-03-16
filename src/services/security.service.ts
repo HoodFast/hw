@@ -20,9 +20,9 @@ export class securityService {
 
     static async deleteSessionById(token: string, deviceId: string): Promise<Result> {
         const sessionMetaData = await TokenMetaRepository.getByDeviceId(deviceId)
-        if(!sessionMetaData) return {code: ResultCode.NotFound}
+        if (!sessionMetaData) return {code: ResultCode.NotFound}
         const tokenMetaData = await jwtService.getMetaDataByToken(token)
-
+        console.log(`${tokenMetaData?.userId} !== ${sessionMetaData.userId}`)
         if (!tokenMetaData) return {code: ResultCode.Unauthorized}
 
         if (tokenMetaData?.userId !== sessionMetaData.userId) return {code: ResultCode.Forbidden}
