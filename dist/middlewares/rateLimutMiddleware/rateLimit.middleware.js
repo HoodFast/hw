@@ -28,7 +28,7 @@ const rateLimitMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0
     })
         .toArray();
     console.log(`${limitList} = ${limitList.length}`);
-    if (limitList.length < 4) {
+    if (limitList.length < 5) {
         yield db_1.rateLimitsCollection.insertOne({
             ip, URL, date
         });

@@ -39,7 +39,7 @@ class securityService {
             const tokenMetaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
             if (!tokenMetaData)
                 return { code: common_1.ResultCode.Unauthorized };
-            if (`${tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId} === ${sessionMetaData.userId}`)
+            if ((tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId) !== sessionMetaData.userId)
                 return { code: common_1.ResultCode.Forbidden };
             const res = yield tokenMeta_repository_1.TokenMetaRepository.deleteByDeviceId(deviceId);
             if (!res)

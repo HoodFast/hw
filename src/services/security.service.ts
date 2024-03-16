@@ -25,7 +25,7 @@ export class securityService {
 
         if (!tokenMetaData) return {code: ResultCode.Unauthorized}
 
-        if (`${tokenMetaData?.userId} === ${sessionMetaData.userId}`) return {code: ResultCode.Forbidden}
+        if (tokenMetaData?.userId !== sessionMetaData.userId) return {code: ResultCode.Forbidden}
         const res = await TokenMetaRepository.deleteByDeviceId(deviceId)
         if (!res) return {code: ResultCode.NotFound}
         return {code: ResultCode.Success}
