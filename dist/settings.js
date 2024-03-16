@@ -16,6 +16,7 @@ const cookieParser = require('cookie-parser');
 exports.app = (0, express_1.default)();
 exports.app.set('trust proxy', true);
 exports.app.use(express_1.default.json());
+exports.app.set('trust proxy', 1);
 exports.app.use(cookieParser('secret key'));
 const baseUrl = '/ht_02/api/';
 exports.app.use(`${baseUrl}blogs`, blog_route_1.blogRoute);

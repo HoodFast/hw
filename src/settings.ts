@@ -13,7 +13,7 @@ export const app = express()
 
 app.set('trust proxy', true)
 app.use(express.json())
-
+app.set('trust proxy', 1)
 app.use(cookieParser('secret key'));
 
 const baseUrl:string = '/ht_02/api/'
