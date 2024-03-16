@@ -32,7 +32,6 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
         //     ip, URL, date
         // })
         limitListDB.push({ip, URL, date})
-        console.log(limitListDB)
         return next()
     } else {
         // await rateLimitsCollection.deleteMany({ip: ip, URL: URL})

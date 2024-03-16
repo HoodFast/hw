@@ -36,7 +36,6 @@ const rateLimitMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0
         //     ip, URL, date
         // })
         limitListDB.push({ ip, URL, date });
-        console.log(limitListDB);
         return next();
     }
     else {
