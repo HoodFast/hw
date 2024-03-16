@@ -25,7 +25,7 @@ export class securityService {
 
         if (!tokenMetaData) return {code: ResultCode.Unauthorized}
 
-        if (tokenMetaData?.userId !== sessionMetaData.userId) {
+        if (tokenMetaData?.userId != sessionMetaData.userId) {
             console.log('запретили')
             console.log(`${tokenMetaData?.userId} !== ${sessionMetaData.userId}`)
             return {code: ResultCode.Forbidden}
