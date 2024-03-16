@@ -40,8 +40,10 @@ class securityService {
             if (!tokenMetaData)
                 return { code: common_1.ResultCode.Unauthorized };
             if ((tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId) != sessionMetaData.userId) {
-                console.log('запретили');
                 console.log(`${tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId} !== ${sessionMetaData.userId}`);
+                console.log(`${(tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId) !== sessionMetaData.userId}`);
+                console.log(`${(tokenMetaData === null || tokenMetaData === void 0 ? void 0 : tokenMetaData.userId) != sessionMetaData.userId}`);
+                console.log('запретили');
                 return { code: common_1.ResultCode.Forbidden };
             }
             console.log('разрешили');
