@@ -1,12 +1,9 @@
-import {tokensMetaCollection} from "../db/db";
 
-import {ObjectId, WithId} from "mongodb";
-
-
-import {tokensMetaDbType} from "../models/tokens/token.db.model";
+import {ObjectId,} from "mongodb";
 import {jwtService} from "../application/jwt.service";
 import {sessionMapper} from "../models/sessions/mappers/session-mappers";
 import {SessionsOutputType} from "../models/sessions/output/session.output.type";
+import {tokenMetaModel} from "../db/db";
 
 
 export class sessionQueryRepository {
@@ -15,7 +12,7 @@ export class sessionQueryRepository {
         const metaData = await jwtService.getMetaDataByToken(token)
         if (!metaData) return null
         const userId = metaData.userId
-        const result = await tokensMetaCollection.find({userId:new ObjectId(userId)}).toArray()
+        const result = await tokenMetaModel.find({userId:new ObjectId(userId)}).lean()
         if (!result) return null
         return sessionMapper(result)
     }

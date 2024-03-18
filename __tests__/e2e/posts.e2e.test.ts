@@ -4,6 +4,8 @@ import {CreatePostType, UpdateBlogType} from "../../src/models/common/common";
 import {routerPaths} from "../../src/models/common/paths/paths";
 import {CreateCommentInputType} from "../../src/models/comments/input/create.comment.input.model";
 import {createUserJwtToken} from "./utils/createUsers";
+import mongoose from "mongoose";
+import {appConfig} from "../../src/app/config";
 
 
 const request = require('supertest');
@@ -17,12 +19,12 @@ describe('ht_02/api/posts', () => {
     }
 
     let postId: string
-    let commentatorUserId:string
-    let commentatorUserLogin:string='test'
+    let commentatorUserId: string
+    let commentatorUserLogin: string = 'test'
     beforeAll(async () => {
+        await mongoose.connect(appConfig.MONGO_URL + "/" + appConfig.DB_NAME)
 
-
-        await request(app).delete(routerPaths.deleteAll)
+        await request(app).delete(routerPaths.deleteAll).expect(204)
 
         await request(app).post(routerPaths.blogs).auth('admin', 'qwerty').send(newBlog)
         const blogs = await request(app).get(routerPaths.blogs)
@@ -43,7 +45,7 @@ describe('ht_02/api/posts', () => {
     })
 
     afterAll(async () => {
-
+        await mongoose.connection.close()
     })
 
     it('+get post, should be 10 posts', async () => {
@@ -119,8 +121,8 @@ describe('ht_02/api/posts', () => {
             id: '1111',
             content: 'string',
             commentatorInfo: {
-                userId:'string',
-                userLogin:'string'
+                userId: 'string',
+                userLogin: 'string'
             },
             createdAt: 'string'
         }

@@ -38,7 +38,7 @@ exports.postRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, funct
     res.send(blogs);
 }));
 exports.postRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const foundPost = yield post_query_repository_1.PostQueryRepository.getById(req.params.id);
+    const foundPost = yield post_query_repository_1.PostQueryRepository.getById(new mongodb_1.ObjectId(req.params.id));
     if (!foundPost) {
         res.sendStatus(404);
         return;
@@ -109,7 +109,7 @@ exports.postRoute.get('/:id/comments', (req, res) => __awaiter(void 0, void 0, v
         res.sendStatus(404);
         return;
     }
-    const post = yield db_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+    const post = yield db_1.postModel.findOne({ _id: new mongodb_1.ObjectId(id) });
     if (!post)
         return res.sendStatus(404);
     const sortData = {

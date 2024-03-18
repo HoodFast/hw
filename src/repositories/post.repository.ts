@@ -1,4 +1,4 @@
-import {postsCollection} from "../db/db";
+import {postModel} from "../db/db";
 import {PostType, PostTypeDb, UpdatePostType} from "../models/common/common";
 import {ObjectId} from "mongodb";
 import {BlogQueryRepository} from "./blog.query.repository";
@@ -9,8 +9,9 @@ export class PostRepository {
 
     static async createPost(data: PostTypeDb): Promise<PostType | null> {
 
-        const res = await postsCollection.insertOne(data)
-        const post = await PostQueryRepository.getById(res.insertedId.toString())
+        const res = await postModel.insertMany(data)
+
+        const post = await PostQueryRepository.getById(res[0]._id)
         if (!post) {
             return null
         }
@@ -19,11 +20,11 @@ export class PostRepository {
 
     static async updatePost(data: UpdatePostType): Promise<boolean> {
         try {
-            const blog = await BlogQueryRepository.getById(data.blogId)
+            const blog = await BlogQueryRepository.getById(new ObjectId(data.blogId))
             if (!blog) {
                 return false
             }
-            const res = await postsCollection.updateOne({_id: new ObjectId(data.id)}, {
+            const res = await postModel.updateOne({_id: new ObjectId(data.id)}, {
                 $set: {
                     title: data.title,
                     shortDescription: data.shortDescription,
@@ -41,7 +42,7 @@ export class PostRepository {
     }
 
     static async deletePost(id: string) {
-        const res = await postsCollection.deleteOne({_id: new ObjectId(id)})
+        const res = await postModel.deleteOne({_id: new ObjectId(id)})
         return !!res.deletedCount
     }
 }

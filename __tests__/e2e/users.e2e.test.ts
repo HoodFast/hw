@@ -5,15 +5,14 @@ import {app} from "../../src/settings";
 import {routerPaths} from "../../src/models/common/paths/paths";
 import {ADMIN_LOGIN, ADMIN_PASS} from "../../src/auth/guards/base.auth.guard";
 import {RegisterUserType, testSeeder} from "../test.seeder";
+import mongoose from "mongoose";
 
 const request = require('supertest');
 
 describe("USER TESTS", () => {
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create()
-        appConfig.MONGO_URL = mongoServer.getUri()
-        await db.run()
-
+        await mongoose.connect( mongoServer.getUri())
     })
 
     beforeEach(async () => {
@@ -21,6 +20,7 @@ describe("USER TESTS", () => {
     })
 
     afterAll(async () => {
+        await mongoose.connection.close()
         await db.stop()
     })
 

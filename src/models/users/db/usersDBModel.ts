@@ -1,14 +1,18 @@
 export type UsersTypeDb = {
-    accountData: {
-        _passwordHash: string
-        login: string,
-        email: string,
-        createdAt: Date
-    }
-    emailConfirmation: {
-        confirmationCode: string
-        expirationDate: Date
-        isConfirmed: boolean
-    }
+    accountData: accountDataType
+    emailConfirmation: emailConfirmationType
     tokensBlackList: string[]
+}
+
+
+export type accountDataType = {
+    _passwordHash: string
+    login: string,
+    email: string,
+    createdAt: Date
+}
+export type emailConfirmationType = {
+    confirmationCode: string
+    expirationDate: Date
+    isConfirmed: boolean
 }

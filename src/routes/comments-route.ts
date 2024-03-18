@@ -21,7 +21,7 @@ commentsRoute.get('/:id', async (req: RequestWithParams<ParamsType>, res: Respon
     const id = req.params.id
     if (!ObjectId.isValid(id)) return res.sendStatus(404)
 
-    const comment = await CommentsQueryRepository.getById(id)
+    const comment = await CommentsQueryRepository.getById(new ObjectId(id))
 
     if (!comment) return res.sendStatus(404)
 

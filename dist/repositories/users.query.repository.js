@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserQueryRepository = void 0;
-const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
 const user_mappers_1 = require("../models/users/mappers/user-mappers");
+const db_1 = require("../db/db");
 class UserQueryRepository {
     static getAll(sortData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -36,13 +36,13 @@ class UserQueryRepository {
             else {
                 filter = { $and: [loginFilter, emailFilter] };
             }
-            const users = yield db_1.usersCollection
+            const users = yield db_1.userModel
                 .find(filter)
-                .sort(sortBy, sortDirection)
+                .sort({ sortBy: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray();
-            const totalCount = yield db_1.usersCollection.countDocuments(filter);
+                .lean();
+            const totalCount = yield db_1.userModel.countDocuments(filter);
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {
                 pagesCount,
@@ -55,7 +55,7 @@ class UserQueryRepository {
     }
     static getById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const user = yield db_1.userModel.findOne({ _id: new mongodb_1.ObjectId(id) });
             if (!user) {
                 return null;
             }
@@ -64,7 +64,7 @@ class UserQueryRepository {
     }
     static getDBUserById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const user = yield db_1.userModel.findOne({ _id: new mongodb_1.ObjectId(id) });
             if (!user)
                 return null;
             return user;
@@ -72,7 +72,7 @@ class UserQueryRepository {
     }
     static getByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.email': loginOrEmail }, { 'accountData.login': loginOrEmail }] });
+            const user = yield db_1.userModel.findOne({ $or: [{ 'accountData.email': loginOrEmail }, { 'accountData.login': loginOrEmail }] });
             if (!user)
                 return null;
             return user;
@@ -80,7 +80,7 @@ class UserQueryRepository {
     }
     static getByCode(code) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({ "emailConfirmation.confirmationCode": code });
+            const user = yield db_1.userModel.findOne({ "emailConfirmation.confirmationCode": code });
             if (!user)
                 return null;
             return user;
@@ -88,7 +88,7 @@ class UserQueryRepository {
     }
     static deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.usersCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+            const res = yield db_1.userModel.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return !!res.deletedCount;
         });
     }

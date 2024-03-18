@@ -27,13 +27,13 @@ class BlogQueryRepository {
                     }
                 };
             }
-            const blogs = yield db_1.blogsCollection
+            const blogs = yield db_1.blogModel
                 .find(filter)
-                .sort(sortBy, sortDirection)
+                .sort({ sortBy: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray();
-            const totalCount = yield db_1.blogsCollection.countDocuments(filter);
+                .lean();
+            const totalCount = yield db_1.blogModel.countDocuments(filter);
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {
                 pagesCount,
@@ -47,13 +47,13 @@ class BlogQueryRepository {
     static getAllPostsToBlog(blogId, sortData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
-            const posts = yield db_1.postsCollection
+            const posts = yield db_1.postModel
                 .find({ blogId })
-                .sort(sortBy, sortDirection)
+                .sort({ sortBy: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray();
-            const totalCount = yield db_1.postsCollection.countDocuments({ blogId });
+                .lean();
+            const totalCount = yield db_1.postModel.countDocuments({ blogId });
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {
                 pagesCount,
@@ -66,7 +66,7 @@ class BlogQueryRepository {
     }
     static getById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield db_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const blog = yield db_1.blogModel.findOne({ _id: new mongodb_1.ObjectId(id) });
             if (!blog) {
                 return null;
             }

@@ -1,7 +1,7 @@
 import {UsersTypeDb} from "../src/models/users/db/usersDBModel";
 import {randomUUID} from "crypto";
 import {add} from "date-fns/add";
-import {usersCollection} from "../src/db/db";
+import {userModel} from "../src/db/db";
 
 export type RegisterUserType = {
     login:string,
@@ -55,9 +55,9 @@ export const testSeeder = {
             },
             tokensBlackList: []
         }
-        const res = await usersCollection.insertOne({...newUser})
+        const res = await userModel.insertMany({...newUser})
         return {
-            id:res.insertedId.toString(),
+            id:res[0]._id.toString(),
             ...newUser
         }
     }

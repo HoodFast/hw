@@ -54,7 +54,7 @@ exports.blogRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
         res.sendStatus(404);
         return;
     }
-    const blog = yield blog_query_repository_1.BlogQueryRepository.getById(req.params.id);
+    const blog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(req.params.id));
     if (!blog) {
         res.sendStatus(404);
         return;

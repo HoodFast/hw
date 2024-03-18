@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sessionQueryRepository = void 0;
-const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
 const jwt_service_1 = require("../application/jwt.service");
 const session_mappers_1 = require("../models/sessions/mappers/session-mappers");
+const db_1 = require("../db/db");
 class sessionQueryRepository {
     static getAllSessions(token) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -21,7 +21,7 @@ class sessionQueryRepository {
             if (!metaData)
                 return null;
             const userId = metaData.userId;
-            const result = yield db_1.tokensMetaCollection.find({ userId: new mongodb_1.ObjectId(userId) }).toArray();
+            const result = yield db_1.tokenMetaModel.find({ userId: new mongodb_1.ObjectId(userId) }).lean();
             if (!result)
                 return null;
             return (0, session_mappers_1.sessionMapper)(result);

@@ -60,7 +60,7 @@ blogRoute.get('/:id', async (req: RequestWithParams<{ id: string }>, res: Respon
         res.sendStatus(404)
         return
     }
-    const blog = await BlogQueryRepository.getById(req.params.id)
+    const blog = await BlogQueryRepository.getById(new ObjectId(req.params.id))
     if (!blog) {
         res.sendStatus(404)
         return

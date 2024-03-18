@@ -19,8 +19,9 @@ import {CommentsService, CreateCommentDataType} from "../services/comments.servi
 import {QueryParamsInputCommentType} from "../models/comments/input/qwery.comment.input.model";
 import {accessTokenGuard} from "../middlewares/auth/accesstoken-middleware";
 import {CommentsQueryRepository} from "../repositories/comment.query.repository";
-import {postsCollection} from "../db/db";
+
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
+import {postModel} from "../db/db";
 
 
 export const postRoute = Router({})
@@ -42,7 +43,7 @@ postRoute.get('/', async (req: RequestWithQuery<QueryPostInputModel>, res: Respo
 })
 
 postRoute.get('/:id', async (req: RequestWithParams<ParamsType>, res: ResponseType<PostType>) => {
-    const foundPost = await PostQueryRepository.getById(req.params.id)
+    const foundPost = await PostQueryRepository.getById(new ObjectId(req.params.id))
     if (!foundPost) {
         res.sendStatus(404)
         return
@@ -129,7 +130,7 @@ postRoute.get('/:id/comments', async (req: RequestWithQueryAndParams<ParamsType,
         res.sendStatus(404)
         return
     }
-    const post = await postsCollection.findOne({_id:new ObjectId(id)})
+    const post = await postModel.findOne({_id:new ObjectId(id)})
 
     if(!post) return res.sendStatus(404)
 

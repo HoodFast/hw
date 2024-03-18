@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import {UserQueryRepository} from "../repositories/users.query.repository";
-import {WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {UsersTypeDb} from "../models/users/db/usersDBModel";
 import {emailAdapter} from "../adapters/email.adapter";
 import {UserRepository} from "../repositories/user.repository";
@@ -12,7 +12,7 @@ import {TokenMetaRepository} from "../repositories/tokenMeta.repository";
 
 export class authService {
     static async me(userId: string) {
-        const user = await UserQueryRepository.getById(userId)
+        const user = await UserQueryRepository.getById(new ObjectId(userId))
         if (!user) return {code: ResultCode.NotFound}
         return {code: ResultCode.Success, data: {email: user.email, login: user.login, userId: user.id}}
     }

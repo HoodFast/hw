@@ -1,18 +1,18 @@
-import {commentsCollection} from "../db/db";
-import {ObjectId, WithId} from "mongodb";
-import {BlogType} from "../models/common/common";
+
+import {ObjectId} from "mongodb";
 import {CommentDbType} from "../models/comments/db/comment.db.model";
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 import {CommentsQueryRepository} from "./comment.query.repository";
-import {commentMapper} from "../models/comments/mappers/comment-mappers";
+import {commentModel} from "../db/db";
+
 
 
 
 export class CommentRepository {
 
     static async createComment(createData: CommentDbType):Promise<CommentsOutputType | null> {
-        const res = await commentsCollection.insertOne(createData)
-        const comment = await CommentsQueryRepository.getById(res.insertedId.toString())
+        const res = await commentModel.insertMany(createData)
+        const comment = await CommentsQueryRepository.getById(res[0]._id)
         if (!comment) {
             return null
         }
@@ -21,7 +21,7 @@ export class CommentRepository {
 
     static async updateComment(id:string,content:string):Promise<boolean> {
 
-        const res = await commentsCollection.updateOne({_id:new ObjectId(id)}, {
+        const res = await commentModel.updateOne({_id:new ObjectId(id)}, {
             $set : {
                 content,
             }
@@ -30,7 +30,7 @@ export class CommentRepository {
     }
 
     static async deleteById(id: string):Promise<boolean> {
-        const res = await commentsCollection.deleteOne({_id:new ObjectId(id)})
+        const res = await commentModel.deleteOne({_id:new ObjectId(id)})
         return !!res.deletedCount
     }
 }

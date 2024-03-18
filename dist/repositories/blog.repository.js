@@ -16,8 +16,8 @@ const blog_query_repository_1 = require("./blog.query.repository");
 class BlogRepository {
     static createBlog(createData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.blogsCollection.insertOne(createData);
-            const blog = yield blog_query_repository_1.BlogQueryRepository.getById(res.insertedId.toString());
+            const res = yield db_1.blogModel.insertMany(createData);
+            const blog = yield blog_query_repository_1.BlogQueryRepository.getById(res[0]._id);
             if (!blog) {
                 return null;
             }
@@ -26,7 +26,7 @@ class BlogRepository {
     }
     static updateBlog(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.blogsCollection.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
+            const res = yield db_1.blogModel.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
                 $set: {
                     name: data.name,
                     description: data.description,
@@ -38,7 +38,7 @@ class BlogRepository {
     }
     static getById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield db_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const blog = yield db_1.blogModel.findOne({ _id: new mongodb_1.ObjectId(id) });
             if (!blog) {
                 return null;
             }
@@ -47,7 +47,7 @@ class BlogRepository {
     }
     static deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.blogsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+            const res = yield db_1.blogModel.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return !!res.deletedCount;
         });
     }

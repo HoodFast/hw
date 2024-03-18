@@ -15,15 +15,16 @@ const post_query_repository_1 = require("../repositories/post.query.repository")
 const users_query_repository_1 = require("../repositories/users.query.repository");
 const comment_repository_1 = require("../repositories/comment.repository");
 const comment_query_repository_1 = require("../repositories/comment.query.repository");
+const mongodb_1 = require("mongodb");
 class CommentsService {
     static createComment(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const { userId, postId, content, createdAt } = data;
-            const post = yield post_query_repository_1.PostQueryRepository.getById(postId);
+            const post = yield post_query_repository_1.PostQueryRepository.getById(new mongodb_1.ObjectId(postId));
             if (!post) {
                 return null;
             }
-            const user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+            const user = yield users_query_repository_1.UserQueryRepository.getById(new mongodb_1.ObjectId(userId));
             if (!user) {
                 return null;
             }
@@ -45,10 +46,10 @@ class CommentsService {
     }
     static updateComment(id, content, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(id);
+            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
             if (!comment)
                 return { code: common_1.ResultCode.NotFound };
-            const user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+            const user = yield users_query_repository_1.UserQueryRepository.getById(new mongodb_1.ObjectId(userId));
             if (!user)
                 return { code: common_1.ResultCode.NotFound };
             if (comment.commentatorInfo.userId !== user.id)
@@ -61,10 +62,10 @@ class CommentsService {
     }
     static deleteCommentById(id, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(id);
+            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
             if (!comment)
                 return { code: common_1.ResultCode.NotFound };
-            const user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+            const user = yield users_query_repository_1.UserQueryRepository.getById(new mongodb_1.ObjectId(userId));
             if (!user)
                 return { code: common_1.ResultCode.NotFound };
             if (comment.commentatorInfo.userId !== user.id)

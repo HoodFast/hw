@@ -17,8 +17,8 @@ const post_query_repository_1 = require("./post.query.repository");
 class PostRepository {
     static createPost(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.postsCollection.insertOne(data);
-            const post = yield post_query_repository_1.PostQueryRepository.getById(res.insertedId.toString());
+            const res = yield db_1.postModel.insertMany(data);
+            const post = yield post_query_repository_1.PostQueryRepository.getById(res[0]._id);
             if (!post) {
                 return null;
             }
@@ -28,11 +28,11 @@ class PostRepository {
     static updatePost(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const blog = yield blog_query_repository_1.BlogQueryRepository.getById(data.blogId);
+                const blog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(data.blogId));
                 if (!blog) {
                     return false;
                 }
-                const res = yield db_1.postsCollection.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
+                const res = yield db_1.postModel.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
                     $set: {
                         title: data.title,
                         shortDescription: data.shortDescription,
@@ -51,7 +51,7 @@ class PostRepository {
     }
     static deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.postsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+            const res = yield db_1.postModel.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return !!res.deletedCount;
         });
     }

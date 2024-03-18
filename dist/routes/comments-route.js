@@ -22,7 +22,7 @@ exports.commentsRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0
     const id = req.params.id;
     if (!mongodb_1.ObjectId.isValid(id))
         return res.sendStatus(404);
-    const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(id);
+    const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
     if (!comment)
         return res.sendStatus(404);
     return res.send(comment);

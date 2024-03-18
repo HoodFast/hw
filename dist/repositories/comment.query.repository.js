@@ -10,13 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentsQueryRepository = void 0;
-const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
 const comment_mappers_1 = require("../models/comments/mappers/comment-mappers");
+const db_1 = require("../db/db");
 class CommentsQueryRepository {
     static getById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comment = yield db_1.commentsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const comment = yield db_1.commentModel.findOne({ _id: new mongodb_1.ObjectId(id) });
             if (!comment) {
                 return null;
             }
@@ -26,13 +26,13 @@ class CommentsQueryRepository {
     static getAllByPostId(id, sortData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
-            const comments = yield db_1.commentsCollection
+            const comments = yield db_1.commentModel
                 .find({ postId: id })
-                .sort(sortBy, sortDirection)
+                .sort({ sortBy: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray();
-            const totalCount = yield db_1.commentsCollection.countDocuments({ postId: id });
+                .lean();
+            const totalCount = yield db_1.commentModel.countDocuments({ postId: id });
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {
                 pagesCount,

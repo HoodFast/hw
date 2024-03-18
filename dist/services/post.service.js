@@ -13,6 +13,7 @@ exports.PostService = void 0;
 const blog_repository_1 = require("../repositories/blog.repository");
 const post_repository_1 = require("../repositories/post.repository");
 const post_query_repository_1 = require("../repositories/post.query.repository");
+const mongodb_1 = require("mongodb");
 class PostService {
     static createPost(data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +34,7 @@ class PostService {
             if (!createPost) {
                 return null;
             }
-            const post = yield post_query_repository_1.PostQueryRepository.getById(createPost.id);
+            const post = yield post_query_repository_1.PostQueryRepository.getById(new mongodb_1.ObjectId(createPost.id));
             if (!post) {
                 return null;
             }

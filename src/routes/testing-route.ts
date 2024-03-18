@@ -1,24 +1,21 @@
 import {Router} from "express";
 import {
-    blCollection,
-    blogsCollection,
-    commentsCollection,
-    postsCollection,
-    rateLimitsCollection,
-    tokensMetaCollection,
-    usersCollection
+    blogModel,
+    commentModel,
+    postModel,
+    tokenMetaModel,
+    userModel,
 } from "../db/db";
 
 export const testingRoute = Router({})
 
 
 testingRoute.delete('/all-data',async (req,res)=>{
-    await blogsCollection.deleteMany({})
-    await postsCollection.deleteMany({})
-    await usersCollection.deleteMany({})
-    await commentsCollection.deleteMany({})
-    await tokensMetaCollection.deleteMany({})
-    await rateLimitsCollection.deleteMany({})
-    await blCollection.deleteMany({})
+    await blogModel.deleteMany({})
+    await postModel.deleteMany({})
+    await userModel.deleteMany({})
+    await commentModel.deleteMany({})
+    await tokenMetaModel.deleteMany({})
+
     res.sendStatus(204)
 })

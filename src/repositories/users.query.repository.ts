@@ -1,4 +1,4 @@
-import {usersCollection} from "../db/db";
+
 import {Pagination, PostType} from "../models/common/common";
 import {ObjectId, WithId} from "mongodb";
 
@@ -6,6 +6,7 @@ import {OutputUsersType} from "../models/users/output/output.users.models";
 import {userMapper} from "../models/users/mappers/user-mappers";
 
 import {UsersTypeDb} from "../models/users/db/usersDBModel";
+import {userModel} from "../db/db";
 
 
 export type UserSortDataSearchType = {
@@ -41,14 +42,14 @@ export class UserQueryRepository {
         }
 
 
-        const users = await usersCollection
+        const users = await userModel
             .find(filter)
-            .sort(sortBy, sortDirection)
+            .sort({sortBy: sortDirection})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
 
-        const totalCount = await usersCollection.countDocuments(filter)
+        const totalCount = await userModel.countDocuments(filter)
         const pagesCount = Math.ceil(totalCount / pageSize)
 
         return {
@@ -60,9 +61,9 @@ export class UserQueryRepository {
         }
     }
 
-    static async getById(id: string):
+    static async getById(id: ObjectId):
         Promise<OutputUsersType | null> {
-        const user = await usersCollection.findOne({_id: new ObjectId(id)})
+        const user = await userModel.findOne({_id: new ObjectId(id)})
         if (!
             user
         ) {
@@ -72,26 +73,26 @@ export class UserQueryRepository {
     }
 
     static async getDBUserById(id: string): Promise<WithId<UsersTypeDb> | null> {
-        const user = await usersCollection.findOne({_id: new ObjectId(id)})
+        const user = await userModel.findOne({_id: new ObjectId(id)})
         if (!user) return null
         return user
     }
 
     static async getByLoginOrEmail(loginOrEmail: string): Promise<WithId<UsersTypeDb> | null> {
 
-        const user = await usersCollection.findOne({$or: [{'accountData.email': loginOrEmail}, {'accountData.login': loginOrEmail}]})
+        const user = await userModel.findOne({$or: [{'accountData.email': loginOrEmail}, {'accountData.login': loginOrEmail}]})
         if (!user) return null
         return user
     }
 
     static async getByCode(code: string): Promise<WithId<UsersTypeDb> | null> {
-        const user = await usersCollection.findOne({"emailConfirmation.confirmationCode": code})
+        const user = await userModel.findOne({"emailConfirmation.confirmationCode": code})
         if (!user) return null
         return user
     }
 
     static async deleteById(id: string): Promise<boolean> {
-        const res = await usersCollection.deleteOne({_id: new ObjectId(id)})
+        const res = await userModel.deleteOne({_id: new ObjectId(id)})
         return !!res.deletedCount
     }
 

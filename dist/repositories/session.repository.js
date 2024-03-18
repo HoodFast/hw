@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sessionRepository = void 0;
-const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
 const jwt_service_1 = require("../application/jwt.service");
+const db_1 = require("../db/db");
 class sessionRepository {
     static getAllSessions(token) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -20,7 +20,7 @@ class sessionRepository {
             if (!metaData)
                 return null;
             const userId = metaData.userId;
-            const result = yield db_1.tokensMetaCollection.find({ userId: new mongodb_1.ObjectId(userId) }).toArray();
+            const result = yield db_1.tokenMetaModel.find({ userId: new mongodb_1.ObjectId(userId) }).lean();
             if (!result)
                 return null;
             return result;

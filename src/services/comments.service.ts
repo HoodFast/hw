@@ -7,6 +7,7 @@ import {CommentRepository} from "../repositories/comment.repository";
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 import {CommentsQueryRepository} from "../repositories/comment.query.repository";
 import {Result} from "../types/result.type";
+import {ObjectId} from "mongodb";
 
 export type CreateCommentDataType = {
     userId: string,
@@ -18,13 +19,13 @@ export type CreateCommentDataType = {
 export class CommentsService {
     static async createComment(data: CreateCommentDataType): Promise<CommentsOutputType | null> {
         const {userId, postId, content, createdAt} = data
-        const post = await PostQueryRepository.getById(postId)
+        const post = await PostQueryRepository.getById(new ObjectId(postId))
 
         if (!post) {
             return null
         }
 
-        const user = await UserQueryRepository.getById(userId)
+        const user = await UserQueryRepository.getById(new ObjectId(userId))
 
         if (!user) {
             return null
@@ -48,11 +49,11 @@ export class CommentsService {
     }
 
     static async updateComment(id:string,content:string,userId:string): Promise<Result> {
-        const comment = await CommentsQueryRepository.getById(id)
+        const comment = await CommentsQueryRepository.getById(new ObjectId(id))
 
         if (!comment) return {code: ResultCode.NotFound}
 
-        const user = await UserQueryRepository.getById(userId)
+        const user = await UserQueryRepository.getById(new ObjectId(userId))
 
         if (!user) return {code: ResultCode.NotFound}
 
@@ -67,11 +68,11 @@ export class CommentsService {
 
     static async deleteCommentById(id: string,userId:string): Promise<Result> {
 
-        const comment = await CommentsQueryRepository.getById(id)
+        const comment = await CommentsQueryRepository.getById(new ObjectId(id))
 
         if (!comment) return {code: ResultCode.NotFound}
 
-        const user = await UserQueryRepository.getById(userId)
+        const user = await UserQueryRepository.getById(new ObjectId(userId))
 
         if (!user) return {code: ResultCode.NotFound}
 

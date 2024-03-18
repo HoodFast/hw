@@ -8,6 +8,7 @@ import {authService} from "./auth.service";
 import {Result} from "../types/result.type";
 import {ResultCode} from "../models/common/common";
 import {OutputUsersType} from "../models/users/output/output.users.models";
+import {ObjectId} from "mongodb";
 
 
 const bcrypt = require('bcrypt');
@@ -52,7 +53,7 @@ export class userService {
 
 
     static async deleteUser(id: string): Promise<boolean | null> {
-        const findUser = await UserQueryRepository.getById(id)
+        const findUser = await UserQueryRepository.getById(new ObjectId(id))
         if (!findUser) {
             return null
         }

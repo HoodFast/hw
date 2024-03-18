@@ -1,17 +1,16 @@
-import {commentsCollection, postsCollection} from "../db/db";
 import {ObjectId} from "mongodb";
-import {Pagination, PostType} from "../models/common/common";
-import {postMapper} from "../models/blog/mappers/post-mappers";
+import {Pagination} from "../models/common/common";
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 import {commentMapper} from "../models/comments/mappers/comment-mappers";
 import {SortDataType} from "./blog.query.repository";
+import {commentModel} from "../db/db";
 
 
 export class CommentsQueryRepository {
 
 
-    static async getById(id: string): Promise<CommentsOutputType | null> {
-        const comment = await commentsCollection.findOne({_id: new ObjectId(id)})
+    static async getById(id: ObjectId): Promise<CommentsOutputType | null> {
+        const comment = await commentModel.findOne({_id: new ObjectId(id)})
         if (!comment) {
             return null
         }
@@ -21,14 +20,14 @@ export class CommentsQueryRepository {
     static async getAllByPostId(id: string, sortData: SortDataType):Promise<Pagination<CommentsOutputType> | null> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
-        const comments = await commentsCollection
+        const comments = await commentModel
             .find({postId: id})
-            .sort(sortBy, sortDirection)
+            .sort({sortBy: sortDirection})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
 
-        const totalCount = await commentsCollection.countDocuments({postId: id})
+        const totalCount = await commentModel.countDocuments({postId: id})
         const pagesCount = Math.ceil(totalCount / pageSize)
 
         return {

@@ -12,18 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostQueryRepository = void 0;
 const db_1 = require("../db/db");
 const post_mappers_1 = require("../models/blog/mappers/post-mappers");
-const mongodb_1 = require("mongodb");
 class PostQueryRepository {
     static getAll(sortData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
-            const posts = yield db_1.postsCollection
+            const posts = yield db_1.postModel
                 .find({})
-                .sort(sortBy, sortDirection)
+                .sort({ sortBy: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray();
-            const totalCount = yield db_1.postsCollection.countDocuments({});
+                .lean();
+            const totalCount = yield db_1.postModel.countDocuments({});
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {
                 pagesCount,
@@ -36,7 +35,7 @@ class PostQueryRepository {
     }
     static getById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const post = yield db_1.postsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const post = yield db_1.postModel.findOne({ _id: id });
             if (!post) {
                 return null;
             }

@@ -6,6 +6,7 @@ import {
 } from "../models/common/common";
 import {PostRepository} from "../repositories/post.repository";
 import {PostQueryRepository} from "../repositories/post.query.repository";
+import {ObjectId} from "mongodb";
 
 
 export class PostService {
@@ -29,7 +30,7 @@ export class PostService {
             return null
         }
 
-        const post = await PostQueryRepository.getById(createPost.id)
+        const post = await PostQueryRepository.getById(new ObjectId(createPost.id))
 
         if (!post) {
             return null

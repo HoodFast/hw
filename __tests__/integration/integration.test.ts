@@ -5,12 +5,14 @@ import {userService} from "../../src/services/user.service";
 import {testSeeder} from "../test.seeder";
 import {emailAdapter} from "../../src/adapters/email.adapter";
 import {ResultCode} from "../../src/models/common/common";
+import mongoose from "mongoose";
 
 describe('AUTH-INTEGRATION', () => {
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create()
         const url = mongoServer.getUri()
         appConfig.MONGO_URL = url
+        await mongoose.connect(url)
     })
 
     beforeEach(async () => {
@@ -18,6 +20,7 @@ describe('AUTH-INTEGRATION', () => {
     })
 
     afterAll(async () => {
+        await mongoose.connection.close()
         await db.drop()
         await db.stop()
     })

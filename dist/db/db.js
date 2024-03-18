@@ -12,22 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blCollection = exports.tokensMetaCollection = exports.rateLimitsCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = exports.db = void 0;
+exports.tokenMetaModel = exports.commentModel = exports.userModel = exports.postModel = exports.blogModel = exports.db = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const mongodb_1 = require("mongodb");
 const config_1 = require("../app/config");
+const mongoose_1 = __importDefault(require("mongoose"));
 dotenv_1.default.config();
-// mongodb+srv://holistic:vjueBUHFNM1234@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
-// const uri = process.env.MONGO_URL || "mongodb"
-//
-// const client = new MongoClient(uri)
-//
-// const dataBase = client.db('blogs-db')
-//
-// export const blogsCollection = dataBase.collection<BlogDbType>('blogs')
-// export const postsCollection = dataBase.collection<PostTypeDb>('posts')
-// export const usersCollection = dataBase.collection<UsersTypeDb>('users')
-// export const commentsCollection = dataBase.collection<CommentDbType>('comments')
 exports.db = {
     client: new mongodb_1.MongoClient(config_1.appConfig.MONGO_URL),
     getDbName() {
@@ -36,6 +26,7 @@ exports.db = {
     run() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                yield mongoose_1.default.connect(config_1.appConfig.MONGO_URL + "/" + config_1.appConfig.DB_NAME);
                 yield this.client.connect();
                 yield this.getDbName().command({ ping: 1 });
                 console.log('db connected');
@@ -62,16 +53,63 @@ exports.db = {
                 }
             }
             catch (e) {
+                yield mongoose_1.default.disconnect();
                 console.log('Error drop db');
                 yield this.stop();
             }
         });
     }
 };
-exports.blogsCollection = exports.db.getDbName().collection('blogs');
-exports.postsCollection = exports.db.getDbName().collection('posts');
-exports.usersCollection = exports.db.getDbName().collection('users');
-exports.commentsCollection = exports.db.getDbName().collection('comments');
-exports.rateLimitsCollection = exports.db.getDbName().collection('rateLimits');
-exports.tokensMetaCollection = exports.db.getDbName().collection('tokensMeta');
-exports.blCollection = exports.db.getDbName().collection('blackList');
+const blogSchema = new mongoose_1.default.Schema({
+    name: { type: String, require },
+    description: { type: String, require },
+    websiteUrl: { type: String, require },
+    createdAt: String,
+    isMembership: { type: Boolean },
+});
+const postSchema = new mongoose_1.default.Schema({
+    title: { type: String, require },
+    shortDescription: { type: String, require },
+    content: { type: String, require },
+    blogId: { type: String, require },
+    blogName: { type: String, require },
+    createdAt: { type: String, require },
+});
+const accountSchema = new mongoose_1.default.Schema({
+    _passwordHash: { type: String, require },
+    login: { type: String, require },
+    email: { type: String, require },
+    createdAt: Date
+});
+const emailSchema = new mongoose_1.default.Schema({
+    confirmationCode: String,
+    expirationDate: Date,
+    isConfirmed: Boolean
+});
+const userSchema = new mongoose_1.default.Schema({
+    accountData: accountSchema,
+    emailConfirmation: emailSchema,
+    tokensBlackList: [String]
+});
+const commentSchema = new mongoose_1.default.Schema({
+    content: String,
+    postId: { type: String, require },
+    commentatorInfo: {
+        userId: { type: String, require },
+        userLogin: { type: String, require },
+    },
+    createdAt: String
+});
+const tokenMetaSchema = new mongoose_1.default.Schema({
+    iat: Date,
+    expireDate: Date,
+    userId: mongodb_1.ObjectId,
+    deviceId: { type: String, require },
+    ip: { type: String, require },
+    title: String
+});
+exports.blogModel = mongoose_1.default.model('blogs', blogSchema);
+exports.postModel = mongoose_1.default.model('posts', postSchema);
+exports.userModel = mongoose_1.default.model('users', userSchema);
+exports.commentModel = mongoose_1.default.model('comments', commentSchema);
+exports.tokenMetaModel = mongoose_1.default.model('tokensMeta', tokenMetaSchema);

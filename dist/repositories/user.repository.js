@@ -10,14 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserRepository = void 0;
-const db_1 = require("../db/db");
 const users_query_repository_1 = require("./users.query.repository");
 const mongodb_1 = require("mongodb");
+const db_1 = require("../db/db");
 class UserRepository {
     static createUser(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.usersCollection.insertOne(data);
-            const user = users_query_repository_1.UserQueryRepository.getById(res.insertedId.toString());
+            const res = yield db_1.userModel.insertMany(data);
+            const user = users_query_repository_1.UserQueryRepository.getById(res[0]._id);
             if (!user) {
                 return null;
             }
@@ -26,7 +26,7 @@ class UserRepository {
     }
     static getUserById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const res = yield db_1.userModel.findOne({ _id: new mongodb_1.ObjectId(id) });
             if (!res)
                 return null;
             return res;
@@ -34,7 +34,7 @@ class UserRepository {
     }
     static putTokenInBL(userId, token) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.usersCollection.updateOne({ _id: new mongodb_1.ObjectId(userId) }, {
+            const res = yield db_1.userModel.updateOne({ _id: new mongodb_1.ObjectId(userId) }, {
                 $push: { tokensBlackList: token }
             });
             return res.modifiedCount === 1;
@@ -42,7 +42,7 @@ class UserRepository {
     }
     static getBlackList(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(userId) });
+            const res = yield db_1.userModel.findOne({ _id: new mongodb_1.ObjectId(userId) });
             if (!res)
                 return null;
             return res.tokensBlackList;
@@ -50,7 +50,7 @@ class UserRepository {
     }
     static updateConfirmation(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.usersCollection.updateOne({ _id: userId }, {
+            const res = yield db_1.userModel.updateOne({ _id: userId }, {
                 $set: {
                     "emailConfirmation.isConfirmed": true
                 }
@@ -60,7 +60,7 @@ class UserRepository {
     }
     static updateNewConfirmCode(userId, code) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.usersCollection.updateOne({ _id: userId }, {
+            const res = yield db_1.userModel.updateOne({ _id: userId }, {
                 $set: {
                     "emailConfirmation.confirmationCode": code
                 }
@@ -70,13 +70,13 @@ class UserRepository {
     }
     static doesExistById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const res = yield db_1.userModel.findOne({ _id: new mongodb_1.ObjectId(id) });
             return !!res;
         });
     }
     static doesExistByLoginOrEmail(login, email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.email': email }, { 'accountData.login': login }] });
+            const user = yield db_1.userModel.findOne({ $or: [{ 'accountData.email': email }, { 'accountData.login': login }] });
             return !!user;
         });
     }

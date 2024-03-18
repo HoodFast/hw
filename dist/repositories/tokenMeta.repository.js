@@ -10,12 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenMetaRepository = void 0;
-const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
+const db_1 = require("../db/db");
 class TokenMetaRepository {
     static setTokenMetaData(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.tokensMetaCollection.insertOne(data);
+            yield db_1.tokenMetaModel.insertMany(data);
             const TokenMeta = yield this.getByDeviceId(data.deviceId);
             if (!TokenMeta) {
                 return false;
@@ -25,7 +25,7 @@ class TokenMetaRepository {
     }
     static getByDeviceId(deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const meta = yield db_1.tokensMetaCollection.findOne({ deviceId });
+            const meta = yield db_1.tokenMetaModel.findOne({ deviceId });
             if (!meta)
                 return null;
             return meta;
@@ -33,25 +33,25 @@ class TokenMetaRepository {
     }
     static getSessionForLogin(userId, title) {
         return __awaiter(this, void 0, void 0, function* () {
-            const meta = yield db_1.tokensMetaCollection.findOne({ userId, title });
+            const meta = yield db_1.tokenMetaModel.findOne({ userId, title });
             return meta;
         });
     }
     static getSessionForRefresh(iat, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const meta = yield db_1.tokensMetaCollection.findOne({ iat, deviceId });
+            const meta = yield db_1.tokenMetaModel.findOne({ iat, deviceId });
             return meta;
         });
     }
     static deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.tokensMetaCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+            const res = yield db_1.tokenMetaModel.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return !!res.deletedCount;
         });
     }
     static deleteByDeviceId(deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.tokensMetaCollection.deleteOne({ deviceId: deviceId });
+            const res = yield db_1.tokenMetaModel.deleteOne({ deviceId: deviceId });
             return !!res.deletedCount;
         });
     }

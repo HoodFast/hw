@@ -2,6 +2,9 @@ import {app} from '../../src/settings'
 
 import {UpdateBlogType} from "../../src/models/common/common";
 import {createUserJwtToken} from "./utils/createUsers";
+import {routerPaths} from "../../src/models/common/paths/paths";
+import mongoose from "mongoose";
+import {appConfig} from "../../src/app/config";
 
 
 const request = require('supertest');
@@ -25,7 +28,8 @@ describe('ht_02/api/blogs', () => {
     }
     let token:string
     beforeAll(async () => {
-        await request(app).delete('/ht_02/api/testing/all-data')
+        await mongoose.connect(appConfig.MONGO_URL + "/" + appConfig.DB_NAME)
+        await request(app).delete(routerPaths.deleteAll).expect(204)
         token = await createUserJwtToken(app)
 
 
@@ -37,7 +41,7 @@ describe('ht_02/api/blogs', () => {
 
     })
     afterAll(async () => {
-
+        await mongoose.connection.close()
     })
 
     it('+get blogs', async () => {

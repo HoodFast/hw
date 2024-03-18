@@ -1,27 +1,15 @@
 import dotenv from 'dotenv'
-import {MongoClient} from "mongodb";
+import {MongoClient, ObjectId} from "mongodb";
 import {BlogDbType} from "../models/blog/db/blog-db";
 import {PostTypeDb} from "../models/common/common";
-import {UsersTypeDb} from "../models/users/db/usersDBModel";
+import {accountDataType, emailConfirmationType, UsersTypeDb} from "../models/users/db/usersDBModel";
 import {CommentDbType} from "../models/comments/db/comment.db.model";
 import {appConfig} from "../app/config";
-import {rateLimitDbType} from "../models/sessions/session.db.model";
 import {tokensMetaDbType} from "../models/tokens/token.db.model";
+import mongoose from "mongoose";
 
 dotenv.config()
 
-// mongodb+srv://holistic:vjueBUHFNM1234@cluster0.9rbemxf.mongodb.net/blog-dev?retryWrites=true&w=majority
-
-// const uri = process.env.MONGO_URL || "mongodb"
-//
-// const client = new MongoClient(uri)
-//
-// const dataBase = client.db('blogs-db')
-//
-// export const blogsCollection = dataBase.collection<BlogDbType>('blogs')
-// export const postsCollection = dataBase.collection<PostTypeDb>('posts')
-// export const usersCollection = dataBase.collection<UsersTypeDb>('users')
-// export const commentsCollection = dataBase.collection<CommentDbType>('comments')
 
 
 
@@ -36,6 +24,7 @@ export const db = {
 
     async run() {
         try {
+            await mongoose.connect(appConfig.MONGO_URL + "/" + appConfig.DB_NAME)
             await this.client.connect()
             await this.getDbName().command({ping: 1})
             console.log('db connected')
@@ -46,6 +35,7 @@ export const db = {
     },
     async stop() {
         await this.client.close()
+
         console.log('db closed')
     },
     async drop() {
@@ -57,18 +47,78 @@ export const db = {
                 await this.getDbName().collection(collectionName).deleteMany({})
             }
         } catch (e: unknown) {
+            await mongoose.disconnect()
             console.log('Error drop db')
             await this.stop()
         }
     }
 }
+const blogSchema = new mongoose.Schema<BlogDbType>(
+    {
+        name: {type:String,require},
+        description: {type:String,require},
+        websiteUrl: {type:String,require},
+        createdAt: String,
+        isMembership: {type:Boolean},
+    }
+)
+const postSchema =new mongoose.Schema<PostTypeDb>({
+    title: {type:String,require},
+    shortDescription: {type:String,require},
+    content: {type:String,require},
+    blogId: {type:String,require},
+    blogName: {type:String,require},
+    createdAt: {type:String,require},
+})
 
-export const blogsCollection = db.getDbName().collection<BlogDbType>('blogs')
-export const postsCollection = db.getDbName().collection<PostTypeDb>('posts')
-export const usersCollection = db.getDbName().collection<UsersTypeDb>('users')
-export const commentsCollection = db.getDbName().collection<CommentDbType>('comments')
-export const rateLimitsCollection = db.getDbName().collection<rateLimitDbType>('rateLimits')
-export const tokensMetaCollection = db.getDbName().collection<tokensMetaDbType>('tokensMeta')
 
-export const blCollection = db.getDbName().collection<{ip:string,URL:string}>('blackList')
+
+const accountSchema = new mongoose.Schema<accountDataType>({
+        _passwordHash: {type:String,require},
+        login: {type:String,require},
+        email: {type:String,require},
+        createdAt: Date
+    }
+)
+
+const emailSchema = new mongoose.Schema<emailConfirmationType>({
+    confirmationCode: String,
+    expirationDate: Date,
+    isConfirmed: Boolean
+    }
+)
+
+const userSchema = new mongoose.Schema<UsersTypeDb>({
+    accountData:accountSchema,
+    emailConfirmation:emailSchema,
+    tokensBlackList:[String]
+    }
+)
+
+const commentSchema = new mongoose.Schema<CommentDbType>({
+    content: String,
+    postId:{type:String,require},
+    commentatorInfo: {
+        userId: {type:String,require},
+        userLogin: {type:String,require},
+    },
+    createdAt: String
+})
+
+const tokenMetaSchema = new mongoose.Schema<tokensMetaDbType>(
+    {
+        iat: Date,
+        expireDate: Date,
+        userId: ObjectId,
+        deviceId: {type:String,require},
+        ip: {type:String,require},
+        title: String
+    }
+)
+
+export const blogModel = mongoose.model('blogs', blogSchema)
+export const postModel = mongoose.model('posts', postSchema)
+export const userModel = mongoose.model('users', userSchema)
+export const commentModel = mongoose.model('comments', commentSchema)
+export const tokenMetaModel = mongoose.model('tokensMeta', tokenMetaSchema)
 

@@ -1,4 +1,4 @@
-import {postsCollection} from "../db/db";
+import {postModel} from "../db/db";
 
 import {Pagination, PostType} from "../models/common/common";
 import {postMapper} from "../models/blog/mappers/post-mappers";
@@ -10,14 +10,14 @@ export class PostQueryRepository {
     static async getAll(sortData:SortDataType): Promise<Pagination<PostType>> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
-        const posts = await postsCollection
+        const posts = await postModel
             .find({})
-            .sort(sortBy, sortDirection)
+            .sort({sortBy: sortDirection})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
 
-        const totalCount = await postsCollection.countDocuments({})
+        const totalCount = await postModel.countDocuments({})
         const pagesCount = Math.ceil(totalCount / pageSize)
 
         return {
@@ -29,8 +29,8 @@ export class PostQueryRepository {
         }
     }
 
-    static async getById(id: string): Promise<PostType | null> {
-        const post = await postsCollection.findOne({_id: new ObjectId(id)})
+    static async getById(id: ObjectId): Promise<PostType | null> {
+        const post = await postModel.findOne({_id: id})
         if (!post) {
             return null
         }

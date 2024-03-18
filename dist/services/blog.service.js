@@ -14,6 +14,7 @@ const blog_repository_1 = require("../repositories/blog.repository");
 const post_repository_1 = require("../repositories/post.repository");
 const post_query_repository_1 = require("../repositories/post.query.repository");
 const blog_query_repository_1 = require("../repositories/blog.query.repository");
+const mongodb_1 = require("mongodb");
 class BlogService {
     static createPostToBlog(blogId, CreatePostData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34,7 +35,7 @@ class BlogService {
             if (!createPost) {
                 return null;
             }
-            const post = yield post_query_repository_1.PostQueryRepository.getById(createPost.id);
+            const post = yield post_query_repository_1.PostQueryRepository.getById(new mongodb_1.ObjectId(createPost.id));
             if (!post) {
                 return null;
             }
@@ -44,7 +45,7 @@ class BlogService {
     static updateBlog(blogId, updateData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, description, websiteUrl } = updateData;
-            const findUpdateBlog = yield blog_query_repository_1.BlogQueryRepository.getById(blogId);
+            const findUpdateBlog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(blogId));
             if (!findUpdateBlog) {
                 return null;
             }
@@ -57,7 +58,7 @@ class BlogService {
             if (!createBlog) {
                 return null;
             }
-            const blog = yield blog_query_repository_1.BlogQueryRepository.getById(createBlog.id);
+            const blog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(createBlog.id));
             if (!blog) {
                 return null;
             }
@@ -66,7 +67,7 @@ class BlogService {
     }
     static deleteBlog(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const findBlog = yield blog_query_repository_1.BlogQueryRepository.getById(blogId);
+            const findBlog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(blogId));
             if (!findBlog) {
                 return null;
             }

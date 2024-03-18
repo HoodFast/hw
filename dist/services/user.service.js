@@ -16,6 +16,7 @@ const users_query_repository_1 = require("../repositories/users.query.repository
 const add_1 = require("date-fns/add");
 const auth_service_1 = require("./auth.service");
 const common_1 = require("../models/common/common");
+const mongodb_1 = require("mongodb");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 class userService {
@@ -56,7 +57,7 @@ class userService {
     }
     static deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const findUser = yield users_query_repository_1.UserQueryRepository.getById(id);
+            const findUser = yield users_query_repository_1.UserQueryRepository.getById(new mongodb_1.ObjectId(id));
             if (!findUser) {
                 return null;
             }

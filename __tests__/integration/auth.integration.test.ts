@@ -2,7 +2,6 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {appConfig} from "../../src/app/config";
 import {db} from "../../src/db/db";
 import DoneCallback = jest.DoneCallback;
-
 import {userService} from "../../src/services/user.service";
 import {testSeeder} from "../test.seeder";
 import {ResultCode} from "../../src/models/common/common";
@@ -10,9 +9,11 @@ import {emailAdapter} from "../../src/adapters/email.adapter";
 import {authService} from "../../src/services/auth.service";
 import {randomUUID} from "crypto";
 import {add} from "date-fns/add";
+import mongoose from "mongoose";
 
 describe('AUTH-INTEGRATION', () => {
     beforeAll(async () => {
+        await mongoose.connect(appConfig.MONGO_URL + "/" + appConfig.DB_NAME)
         const mongoServer = await MongoMemoryServer.create()
         const url = mongoServer.getUri()
         appConfig.MONGO_URL = url
@@ -22,6 +23,7 @@ describe('AUTH-INTEGRATION', () => {
         await db.drop()
     })
     afterAll(async () => {
+        await mongoose.connection.close()
         await db.drop()
         await db.stop()
     })

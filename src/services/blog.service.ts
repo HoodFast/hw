@@ -9,6 +9,7 @@ import {
 import {PostRepository} from "../repositories/post.repository";
 import {PostQueryRepository} from "../repositories/post.query.repository";
 import {BlogQueryRepository} from "../repositories/blog.query.repository";
+import {ObjectId} from "mongodb";
 
 export class BlogService {
     static async createPostToBlog(blogId: string, CreatePostData: createPostFromBlog): Promise<PostType | null> {
@@ -31,7 +32,7 @@ export class BlogService {
 
             return null
         }
-        const post = await PostQueryRepository.getById(createPost.id)
+        const post = await PostQueryRepository.getById(new ObjectId(createPost.id))
         if (!post) {
 
             return null
@@ -41,7 +42,7 @@ export class BlogService {
 
     static async updateBlog(blogId: string, updateData: UpdateBlogType): Promise<boolean | null> {
         const {name, description, websiteUrl} = updateData
-        const findUpdateBlog = await BlogQueryRepository.getById(blogId)
+        const findUpdateBlog = await BlogQueryRepository.getById(new ObjectId(blogId))
         if (!findUpdateBlog) {
             return null
         }
@@ -55,7 +56,7 @@ export class BlogService {
             return null
         }
 
-        const blog = await BlogQueryRepository.getById(createBlog.id)
+        const blog = await BlogQueryRepository.getById(new ObjectId(createBlog.id))
         if (!blog) {
             return null
         }
@@ -63,7 +64,7 @@ export class BlogService {
     }
 
     static async deleteBlog(blogId: string): Promise<boolean | null> {
-        const findBlog = await BlogQueryRepository.getById(blogId)
+        const findBlog = await BlogQueryRepository.getById(new ObjectId(blogId))
         if (!findBlog) {
             return null
         }

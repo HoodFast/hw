@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_query_repository_1 = require("../repositories/users.query.repository");
+const mongodb_1 = require("mongodb");
 const email_adapter_1 = require("../adapters/email.adapter");
 const user_repository_1 = require("../repositories/user.repository");
 const uuid_1 = require("uuid");
@@ -24,7 +25,7 @@ const tokenMeta_repository_1 = require("../repositories/tokenMeta.repository");
 class authService {
     static me(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+            const user = yield users_query_repository_1.UserQueryRepository.getById(new mongodb_1.ObjectId(userId));
             if (!user)
                 return { code: common_1.ResultCode.NotFound };
             return { code: common_1.ResultCode.Success, data: { email: user.email, login: user.login, userId: user.id } };
