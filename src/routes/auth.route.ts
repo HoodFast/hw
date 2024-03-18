@@ -157,9 +157,10 @@ authRoute.post('/logout', async (req: Request, res: Response) => {
 })
 
 
-authRoute.post('/password-recovery', rateLimitMiddleware, emailValidation, async (req: RequestWithBody<{
+authRoute.post('/password-recovery', rateLimitMiddleware, emailValidation(), async (req: RequestWithBody<{
     email: string
 }>, res: Response) => {
+
     const email = req.body.email
     const recoverySend = await authService.sendRecoveryPass(email)
 
@@ -171,7 +172,7 @@ authRoute.post('/password-recovery', rateLimitMiddleware, emailValidation, async
     }
 })
 
-authRoute.post('/new-password', rateLimitMiddleware, recoveryValidation, recoverTokenGuard, async (req: RequestWithBody<recoveryPassInputType>, res: Response) => {
+authRoute.post('/new-password', rateLimitMiddleware, recoveryValidation(), recoverTokenGuard, async (req: RequestWithBody<recoveryPassInputType>, res: Response) => {
     const newPass = req.body.newPassword
     const recoverPass = await userService.recoveryPass(req.userId!, newPass)
 

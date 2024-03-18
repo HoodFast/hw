@@ -133,7 +133,7 @@ exports.authRoute.post('/logout', (req, res) => __awaiter(void 0, void 0, void 0
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/password-recovery', rateLimit_middleware_1.rateLimitMiddleware, email_validators_1.emailValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/password-recovery', rateLimit_middleware_1.rateLimitMiddleware, (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const email = req.body.email;
     const recoverySend = yield auth_service_1.authService.sendRecoveryPass(email);
     switch (recoverySend.code) {
@@ -143,7 +143,7 @@ exports.authRoute.post('/password-recovery', rateLimit_middleware_1.rateLimitMid
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/new-password', rateLimit_middleware_1.rateLimitMiddleware, recovery_validators_1.recoveryValidation, recover_token_middleware_1.recoverTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/new-password', rateLimit_middleware_1.rateLimitMiddleware, (0, recovery_validators_1.recoveryValidation)(), recover_token_middleware_1.recoverTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const newPass = req.body.newPassword;
     const recoverPass = yield user_service_1.userService.recoveryPass(req.userId, newPass);
     switch (recoverPass.code) {

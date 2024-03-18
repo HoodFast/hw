@@ -121,7 +121,12 @@ export class authService {
         <p>To finish password recovery please follow the link below:
           <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
       </p>`
-        await emailAdapter.sendEmail(email, subject, message)
+        try{
+            await emailAdapter.sendEmail(email, subject, message)
+        }catch (e){
+
+        }
+
         return {code: ResultCode.Success}
     }
 

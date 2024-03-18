@@ -26,16 +26,21 @@ class jwtService {
     }
     static createRecoveryCode(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
-            let userId;
-            if (!user) {
-                userId = new mongodb_1.ObjectId((0, crypto_1.randomUUID)());
+            try {
+                const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
+                let userId;
+                if (!(user === null || user === void 0 ? void 0 : user._id)) {
+                    userId = new mongodb_1.ObjectId((0, crypto_1.randomUUID)());
+                }
+                else {
+                    userId = user._id;
+                }
+                const token = jwt.sign({ userId: userId }, config_1.appConfig.RECOVERY_SECRET, { expiresIn: config_1.appConfig.RECOVERY_TIME });
+                return token;
             }
-            else {
-                userId = user._id;
+            catch (e) {
+                console.log('CreateRecoveryError');
             }
-            const token = jwt.sign({ userId: userId }, config_1.appConfig.RECOVERY_SECRET, { expiresIn: config_1.appConfig.RECOVERY_TIME });
-            return token;
         });
     }
     static getMetaDataByToken(token) {

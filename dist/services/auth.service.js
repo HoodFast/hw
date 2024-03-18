@@ -138,7 +138,11 @@ class authService {
         <p>To finish password recovery please follow the link below:
           <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
       </p>`;
-            yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
+            try {
+                yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
+            }
+            catch (e) {
+            }
             return { code: common_1.ResultCode.Success };
         });
     }

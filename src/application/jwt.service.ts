@@ -21,16 +21,21 @@ export class jwtService {
     }
 
     static async createRecoveryCode(email: string) {
-        const user =await UserQueryRepository.getByLoginOrEmail(email)
-        let userId
-        if(!user)  {
-            userId=new ObjectId(randomUUID())
-        }else{
-            userId = user._id
+        try {
+            const user = await UserQueryRepository.getByLoginOrEmail(email)
+            let userId:ObjectId
+            if (!user?._id) {
+                userId = new ObjectId(randomUUID())
+            } else {
+                userId = user._id
+            }
+            const token = jwt.sign({userId: userId}, appConfig.RECOVERY_SECRET, {expiresIn: appConfig.RECOVERY_TIME})
+            return token
+        } catch (e) {
+            console.log('CreateRecoveryError')
         }
 
-        const token = jwt.sign({userId:userId}, appConfig.RECOVERY_SECRET, {expiresIn: appConfig.RECOVERY_TIME})
-        return token
+
     }
 
     static async getMetaDataByToken(token: string) {
@@ -77,7 +82,7 @@ export class jwtService {
         }
     }
 
-    static async getUserByRecoverToken(token:string){
+    static async getUserByRecoverToken(token: string) {
         try {
             const result = jwt.verify(token, appConfig.RECOVERY_SECRET)
             return result.userId
