@@ -22,8 +22,14 @@ export class jwtService {
 
     static async createRecoveryCode(email: string) {
         const user =await UserQueryRepository.getByLoginOrEmail(email)
-        if(!user) return null
-        const token = jwt.sign({userId: user._id}, appConfig.RECOVERY_SECRET, {expiresIn: appConfig.RECOVERY_TIME})
+        let userId
+        if(!user)  {
+            userId=new ObjectId(randomUUID())
+        }else{
+            userId = user._id
+        }
+
+        const token = jwt.sign({userId:userId}, appConfig.RECOVERY_SECRET, {expiresIn: appConfig.RECOVERY_TIME})
         return token
     }
 

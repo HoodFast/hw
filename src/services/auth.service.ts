@@ -114,19 +114,14 @@ export class authService {
     }
 
     static async sendRecoveryPass(email: string):Promise<Result> {
-        const user = await UserQueryRepository.getByLoginOrEmail(email)
-        if (!user) return {code: ResultCode.NotFound}
 
         const subject = "Password recovery"
         const recoveryCode = await jwtService.createRecoveryCode(email)
-        if (!recoveryCode) return {code: ResultCode.NotFound}
-
         const message = `<h1>Password recovery</h1>
         <p>To finish password recovery please follow the link below:
           <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
       </p>`
-        const sending = await emailAdapter.sendEmail(email, subject, message)
-        if(!sending)return {code: ResultCode.Forbidden}
+        await emailAdapter.sendEmail(email, subject, message)
         return {code: ResultCode.Success}
     }
 

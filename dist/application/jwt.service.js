@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtService = void 0;
+const mongodb_1 = require("mongodb");
 const config_1 = require("../app/config");
 const user_repository_1 = require("../repositories/user.repository");
 const crypto_1 = require("crypto");
@@ -26,9 +27,14 @@ class jwtService {
     static createRecoveryCode(email) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
-            if (!user)
-                return null;
-            const token = jwt.sign({ userId: user._id }, config_1.appConfig.RECOVERY_SECRET, { expiresIn: config_1.appConfig.RECOVERY_TIME });
+            let userId;
+            if (!user) {
+                userId = new mongodb_1.ObjectId((0, crypto_1.randomUUID)());
+            }
+            else {
+                userId = user._id;
+            }
+            const token = jwt.sign({ userId: userId }, config_1.appConfig.RECOVERY_SECRET, { expiresIn: config_1.appConfig.RECOVERY_TIME });
             return token;
         });
     }

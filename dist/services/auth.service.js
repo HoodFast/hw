@@ -132,20 +132,13 @@ class authService {
     }
     static sendRecoveryPass(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
-            if (!user)
-                return { code: common_1.ResultCode.NotFound };
             const subject = "Password recovery";
             const recoveryCode = yield jwt_service_1.jwtService.createRecoveryCode(email);
-            if (!recoveryCode)
-                return { code: common_1.ResultCode.NotFound };
             const message = `<h1>Password recovery</h1>
         <p>To finish password recovery please follow the link below:
           <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
       </p>`;
-            const sending = yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
-            if (!sending)
-                return { code: common_1.ResultCode.Forbidden };
+            yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
             return { code: common_1.ResultCode.Success };
         });
     }
