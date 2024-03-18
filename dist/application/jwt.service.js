@@ -14,11 +14,21 @@ const config_1 = require("../app/config");
 const user_repository_1 = require("../repositories/user.repository");
 const crypto_1 = require("crypto");
 const tokenMeta_repository_1 = require("../repositories/tokenMeta.repository");
+const users_query_repository_1 = require("../repositories/users.query.repository");
 let jwt = require('jsonwebtoken');
 class jwtService {
     static createJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
             const token = jwt.sign({ userId: user._id }, config_1.appConfig.AC_SECRET, { expiresIn: config_1.appConfig.AC_TIME });
+            return token;
+        });
+    }
+    static createRecoveryCode(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
+            if (!user)
+                return null;
+            const token = jwt.sign({ userId: user._id }, config_1.appConfig.RECOVERY_SECRET, { expiresIn: config_1.appConfig.RECOVERY_TIME });
             return token;
         });
     }
@@ -65,6 +75,17 @@ class jwtService {
                 const blackList = yield user_repository_1.UserRepository.getBlackList(result.userId);
                 if (blackList === null || blackList === void 0 ? void 0 : blackList.includes(token))
                     return null;
+                return result.userId;
+            }
+            catch (err) {
+                return null;
+            }
+        });
+    }
+    static getUserByRecoverToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = jwt.verify(token, config_1.appConfig.RECOVERY_SECRET);
                 return result.userId;
             }
             catch (err) {

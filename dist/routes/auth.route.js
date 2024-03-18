@@ -21,10 +21,11 @@ const user_service_1 = require("../services/user.service");
 const confirm_validators_1 = require("../validators/confirm-validators");
 const email_validators_1 = require("../validators/email-validators");
 const rateLimit_middleware_1 = require("../middlewares/rateLimutMiddleware/rateLimit.middleware");
+const recover_token_middleware_1 = require("../middlewares/auth/recover-token-middleware");
+const recovery_validators_1 = require("../validators/recovery-validators");
 exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    const userId = req.userId;
     if (!userId)
         return res.sendStatus(401);
     const me = yield auth_service_1.authService.me(userId);
@@ -128,6 +129,26 @@ exports.authRoute.post('/logout', (req, res) => __awaiter(void 0, void 0, void 0
             return res.sendStatus(403);
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
+        default:
+            return res.sendStatus(404);
+    }
+}));
+exports.authRoute.post('/password-recovery', rateLimit_middleware_1.rateLimitMiddleware, email_validators_1.emailValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const email = req.body.email;
+    const recoverySend = yield auth_service_1.authService.sendRecoveryPass(email);
+    switch (recoverySend.code) {
+        case common_1.ResultCode.Success:
+            return res.sendStatus(204);
+        default:
+            return res.sendStatus(404);
+    }
+}));
+exports.authRoute.post('/new-password', rateLimit_middleware_1.rateLimitMiddleware, recovery_validators_1.recoveryValidation, recover_token_middleware_1.recoverTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const newPass = req.body.newPassword;
+    const recoverPass = yield user_service_1.userService.recoveryPass(req.userId, newPass);
+    switch (recoverPass.code) {
+        case common_1.ResultCode.Success:
+            return res.sendStatus(204);
         default:
             return res.sendStatus(404);
     }

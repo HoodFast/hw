@@ -29,7 +29,7 @@ exports.commentsRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0
 }));
 exports.commentsRoute.delete('/:id', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const userId = req.user.id;
+    const userId = req.userId.toString();
     if (!mongodb_1.ObjectId.isValid(id))
         return res.sendStatus(404);
     const deleted = yield comments_service_1.CommentsService.deleteCommentById(id, userId);
@@ -46,7 +46,7 @@ exports.commentsRoute.delete('/:id', accesstoken_middleware_1.accessTokenGuard, 
 }));
 exports.commentsRoute.put('/:id', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const userId = req.user.id;
+    const userId = req.userId.toString();
     if (!mongodb_1.ObjectId.isValid(id))
         return res.sendStatus(404);
     const updateComment = yield comments_service_1.CommentsService.updateComment(id, req.body.content, userId);

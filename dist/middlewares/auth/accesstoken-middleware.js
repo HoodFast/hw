@@ -13,6 +13,7 @@ exports.accessTokenGuard = void 0;
 const jwt_service_1 = require("../../application/jwt.service");
 const users_query_repository_1 = require("../../repositories/users.query.repository");
 const user_repository_1 = require("../../repositories/user.repository");
+const mongodb_1 = require("mongodb");
 const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     debugger;
     if (!req.headers.authorization) {
@@ -26,7 +27,8 @@ const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         if (!user) {
             return res.sendStatus(401);
         }
-        req.user = yield users_query_repository_1.UserQueryRepository.getById(userId);
+        const userData = yield users_query_repository_1.UserQueryRepository.getById(userId);
+        req.userId = new mongodb_1.ObjectId(userData.id);
         return next();
     }
     res.sendStatus(401);

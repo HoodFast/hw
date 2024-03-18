@@ -32,10 +32,10 @@ class UserRepository {
             return res;
         });
     }
-    static putTokenInBL(userId, token) {
+    static recoveryPass(userId, hash) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.userModel.updateOne({ _id: new mongodb_1.ObjectId(userId) }, {
-                $push: { tokensBlackList: token }
+                $set: { 'accountData._passwordHash': hash }
             });
             return res.modifiedCount === 1;
         });

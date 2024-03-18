@@ -64,5 +64,15 @@ class userService {
             return yield users_query_repository_1.UserQueryRepository.deleteById(id);
         });
     }
+    static recoveryPass(id, newPass) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const salt = bcrypt.genSaltSync(saltRounds);
+            const hash = bcrypt.hashSync(newPass, salt);
+            const recover = yield user_repository_1.UserRepository.recoveryPass(id, hash);
+            if (!recover)
+                return { code: common_1.ResultCode.NotFound };
+            return { code: common_1.ResultCode.Success };
+        });
+    }
 }
 exports.userService = userService;

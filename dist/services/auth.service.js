@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_query_repository_1 = require("../repositories/users.query.repository");
-const mongodb_1 = require("mongodb");
 const email_adapter_1 = require("../adapters/email.adapter");
 const user_repository_1 = require("../repositories/user.repository");
 const uuid_1 = require("uuid");
@@ -25,7 +24,7 @@ const tokenMeta_repository_1 = require("../repositories/tokenMeta.repository");
 class authService {
     static me(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_query_repository_1.UserQueryRepository.getById(new mongodb_1.ObjectId(userId));
+            const user = yield users_query_repository_1.UserQueryRepository.getById(userId);
             if (!user)
                 return { code: common_1.ResultCode.NotFound };
             return { code: common_1.ResultCode.Success, data: { email: user.email, login: user.login, userId: user.id } };
@@ -125,10 +124,29 @@ class authService {
         <p>To finish registration please follow the link below:
             <a href='https://somesite.com/confirm-email?code=${user.emailConfirmation.confirmationCode}'>complete registration</a>
         </p>`;
-            const sendCode = yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
-            if (!sendCode)
+            const sending = yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
+            if (!sending)
                 return false;
             return true;
+        });
+    }
+    static sendRecoveryPass(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
+            if (!user)
+                return { code: common_1.ResultCode.NotFound };
+            const subject = "Password recovery";
+            const recoveryCode = yield jwt_service_1.jwtService.createRecoveryCode(email);
+            if (!recoveryCode)
+                return { code: common_1.ResultCode.NotFound };
+            const message = `<h1>Password recovery</h1>
+        <p>To finish password recovery please follow the link below:
+          <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
+      </p>`;
+            const sending = yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
+            if (!sending)
+                return { code: common_1.ResultCode.Forbidden };
+            return { code: common_1.ResultCode.Success };
         });
     }
     static confirmEmail(code) {

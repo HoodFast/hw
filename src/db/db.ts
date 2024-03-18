@@ -1,4 +1,3 @@
-import dotenv from 'dotenv'
 import {MongoClient, ObjectId} from "mongodb";
 import {BlogDbType} from "../models/blog/db/blog-db";
 import {PostTypeDb} from "../models/common/common";
@@ -7,12 +6,6 @@ import {CommentDbType} from "../models/comments/db/comment.db.model";
 import {appConfig} from "../app/config";
 import {tokensMetaDbType} from "../models/tokens/token.db.model";
 import mongoose from "mongoose";
-
-dotenv.config()
-
-
-
-
 
 
 export const db = {
@@ -55,52 +48,52 @@ export const db = {
 }
 const blogSchema = new mongoose.Schema<BlogDbType>(
     {
-        name: {type:String,require},
-        description: {type:String,require},
-        websiteUrl: {type:String,require},
+        name: {type: String, require},
+        description: {type: String, require},
+        websiteUrl: {type: String, require},
         createdAt: String,
-        isMembership: {type:Boolean},
+        isMembership: {type: Boolean},
     }
 )
-const postSchema =new mongoose.Schema<PostTypeDb>({
-    title: {type:String,require},
-    shortDescription: {type:String,require},
-    content: {type:String,require},
-    blogId: {type:String,require},
-    blogName: {type:String,require},
-    createdAt: {type:String,require},
+const postSchema = new mongoose.Schema<PostTypeDb>({
+    title: {type: String, require},
+    shortDescription: {type: String, require},
+    content: {type: String, require},
+    blogId: {type: String, require},
+    blogName: {type: String, require},
+    createdAt: {type: String, require},
 })
 
 
-
 const accountSchema = new mongoose.Schema<accountDataType>({
-        _passwordHash: {type:String,require},
-        login: {type:String,require},
-        email: {type:String,require},
+        _passwordHash: {type: String, require},
+        recoveryCode: String,
+        login: {type: String, require},
+        email: {type: String, require},
         createdAt: Date
     }
 )
 
 const emailSchema = new mongoose.Schema<emailConfirmationType>({
-    confirmationCode: String,
-    expirationDate: Date,
-    isConfirmed: Boolean
+        confirmationCode: String,
+        expirationDate: Date,
+        isConfirmed: Boolean
     }
 )
 
 const userSchema = new mongoose.Schema<UsersTypeDb>({
-    accountData:accountSchema,
-    emailConfirmation:emailSchema,
-    tokensBlackList:[String]
+        accountData: accountSchema,
+        emailConfirmation: emailSchema,
+        tokensBlackList: [String]
     }
 )
 
 const commentSchema = new mongoose.Schema<CommentDbType>({
     content: String,
-    postId:{type:String,require},
+    postId: {type: String, require},
     commentatorInfo: {
-        userId: {type:String,require},
-        userLogin: {type:String,require},
+        userId: {type: String, require},
+        userLogin: {type: String, require},
     },
     createdAt: String
 })
@@ -110,8 +103,8 @@ const tokenMetaSchema = new mongoose.Schema<tokensMetaDbType>(
         iat: Date,
         expireDate: Date,
         userId: ObjectId,
-        deviceId: {type:String,require},
-        ip: {type:String,require},
+        deviceId: {type: String, require},
+        ip: {type: String, require},
         title: String
     }
 )

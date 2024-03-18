@@ -9,6 +9,7 @@ import {Result} from "../types/result.type";
 import {ResultCode} from "../models/common/common";
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {ObjectId} from "mongodb";
+import {randomUUID} from "crypto";
 
 
 const bcrypt = require('bcrypt');
@@ -19,7 +20,7 @@ export class userService {
     static async createUser(login: string, email: string, password: string, isConfirmed?: boolean): Promise<Result<OutputUsersType>> {
         const user = await UserRepository.doesExistByLoginOrEmail(login, email)
 
-        if(user) return {code: ResultCode.Forbidden}
+        if (user) return {code: ResultCode.Forbidden}
         const createdAt = new Date()
         const salt = bcrypt.genSaltSync(saltRounds)
         const hash = bcrypt.hashSync(password, salt)
@@ -41,7 +42,7 @@ export class userService {
             return {code: ResultCode.NotFound}
         }
         try {
-            if(!isConfirmed){
+            if (!isConfirmed) {
                 await authService.sendConfirmCode(createdUser.email)
             }
         } catch (e) {
@@ -58,5 +59,13 @@ export class userService {
             return null
         }
         return await UserQueryRepository.deleteById(id)
+    }
+
+    static async recoveryPass(id:ObjectId,newPass:string){
+        const salt = bcrypt.genSaltSync(saltRounds)
+        const hash = bcrypt.hashSync(newPass, salt)
+        const recover = await UserRepository.recoveryPass(id,hash)
+        if(!recover) return {code: ResultCode.NotFound}
+        return {code: ResultCode.Success}
     }
 }

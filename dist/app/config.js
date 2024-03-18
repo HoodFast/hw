@@ -13,5 +13,7 @@ exports.appConfig = {
     RT_TIME: process.env.AC_TIME,
     RT_SECRET: process.env.RT_SECRET,
     EMAIL: process.env.EMAIL,
-    EMAIL_PASS: process.env.EMAIL_PASS
+    EMAIL_PASS: process.env.EMAIL_PASS,
+    RECOVERY_SECRET: process.env.RECOVERY_SECRET,
+    RECOVERY_TIME: process.env.RECOVERY_TIME,
 };

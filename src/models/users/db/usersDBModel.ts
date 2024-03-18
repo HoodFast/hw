@@ -7,6 +7,7 @@ export type UsersTypeDb = {
 
 export type accountDataType = {
     _passwordHash: string
+    recoveryCode?:string
     login: string,
     email: string,
     createdAt: Date

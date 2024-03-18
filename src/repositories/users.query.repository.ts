@@ -64,9 +64,7 @@ export class UserQueryRepository {
     static async getById(id: ObjectId):
         Promise<OutputUsersType | null> {
         const user = await userModel.findOne({_id: new ObjectId(id)})
-        if (!
-            user
-        ) {
+        if (!user) {
             return null
         }
         return userMapper(user)

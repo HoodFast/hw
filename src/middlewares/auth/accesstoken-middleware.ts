@@ -2,10 +2,11 @@ import {NextFunction, Request, Response} from "express";
 import {jwtService} from "../../application/jwt.service";
 import {UserQueryRepository} from "../../repositories/users.query.repository";
 import {UserRepository} from "../../repositories/user.repository";
+import {ObjectId} from "mongodb";
 
 
 export const accessTokenGuard = async (req: Request, res: Response, next: NextFunction) => {
-debugger
+    debugger
     if (!req.headers.authorization) {
         return res.sendStatus(401)
     }
@@ -21,8 +22,8 @@ debugger
         if (!user) {
             return res.sendStatus(401)
         }
-
-        req.user = await UserQueryRepository.getById(userId)
+        const userData = await UserQueryRepository.getById(userId)
+        req.userId = new ObjectId(userData!.id)
         return next()
     }
 

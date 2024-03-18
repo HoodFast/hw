@@ -13,11 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tokenMetaModel = exports.commentModel = exports.userModel = exports.postModel = exports.blogModel = exports.db = void 0;
-const dotenv_1 = __importDefault(require("dotenv"));
 const mongodb_1 = require("mongodb");
 const config_1 = require("../app/config");
 const mongoose_1 = __importDefault(require("mongoose"));
-dotenv_1.default.config();
 exports.db = {
     client: new mongodb_1.MongoClient(config_1.appConfig.MONGO_URL),
     getDbName() {
@@ -77,6 +75,7 @@ const postSchema = new mongoose_1.default.Schema({
 });
 const accountSchema = new mongoose_1.default.Schema({
     _passwordHash: { type: String, require },
+    recoveryCode: String,
     login: { type: String, require },
     email: { type: String, require },
     createdAt: Date

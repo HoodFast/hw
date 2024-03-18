@@ -1,7 +1,7 @@
 import {UsersTypeDb} from "../models/users/db/usersDBModel";
 
 import {UserQueryRepository} from "./users.query.repository";
-import {ObjectId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {userModel} from "../db/db";
 
 export class UserRepository {
@@ -13,15 +13,17 @@ export class UserRepository {
         }
         return user
     }
-    static async getUserById(id:string){
-        const res = await userModel.findOne({_id:new ObjectId(id)})
-        if(!res)return null
+
+    static async getUserById(id: string): Promise<WithId<UsersTypeDb> | null> {
+        const res = await userModel.findOne({_id: new ObjectId(id)})
+        if (!res) return null
         return res
     }
 
-    static async putTokenInBL(userId: string, token: string) {
-        const res = await userModel.updateOne({_id: new ObjectId(userId)}, {
-            $push: {tokensBlackList: token}
+
+    static async recoveryPass(userId: ObjectId, hash: string){
+        const res =await userModel.updateOne({_id: new ObjectId(userId)},{
+            $set: {'accountData._passwordHash': hash}
         })
         return res.modifiedCount === 1
     }

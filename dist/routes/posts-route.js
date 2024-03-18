@@ -90,7 +90,7 @@ exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) =>
 }));
 exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createCommentData = {
-        userId: req.user.id,
+        userId: req.userId.toString(),
         postId: req.params.id,
         content: req.body.content,
         createdAt: new Date().toISOString()

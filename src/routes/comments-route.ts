@@ -29,7 +29,7 @@ commentsRoute.get('/:id', async (req: RequestWithParams<ParamsType>, res: Respon
 })
 commentsRoute.delete('/:id', accessTokenGuard, async (req: RequestWithParams<ParamsType>, res) => {
     const id = req.params.id
-    const userId = req.user!.id
+    const userId = req.userId!.toString()
     if (!ObjectId.isValid(id)) return res.sendStatus(404)
     const deleted = await CommentsService.deleteCommentById(id, userId)
     switch (deleted.code) {
@@ -46,7 +46,7 @@ commentsRoute.delete('/:id', accessTokenGuard, async (req: RequestWithParams<Par
 
 commentsRoute.put('/:id', accessTokenGuard, commentsValidation(), async (req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: ResponseType<void>) => {
     const id = req.params.id
-    const userId = req.user!.id
+    const userId = req.userId!.toString()
     if (!ObjectId.isValid(id)) return res.sendStatus(404)
     const updateComment = await CommentsService.updateComment(id, req.body.content, userId)
     switch (updateComment.code) {

@@ -13,13 +13,16 @@ import {Result} from "../types/result.type";
 import {codeValidation} from "../validators/confirm-validators";
 import {emailValidation} from "../validators/email-validators";
 import {rateLimitMiddleware} from "../middlewares/rateLimutMiddleware/rateLimit.middleware";
+import {recoveryPassInputType} from "../models/recoveryPass/input/recover.input.model";
+import {recoverTokenGuard} from "../middlewares/auth/recover-token-middleware";
+import {recoveryValidation} from "../validators/recovery-validators";
 
 export const authRoute = Router({})
 
 
 authRoute.get('/me', accessTokenGuard, async (req: Request, res: Response) => {
 
-        const userId = req.user?.id
+        const userId = req.userId!
         if (!userId) return res.sendStatus(401)
         const me = await authService.me(userId)
         switch (me.code) {
@@ -47,7 +50,7 @@ authRoute.post('/login', rateLimitMiddleware, authValidation(), async (req: Requ
 
     switch (tokens.code) {
         case ResultCode.Success:
-            const {accessToken,refreshToken}=tokens.data!
+            const {accessToken, refreshToken} = tokens.data!
             res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
             return res.status(200).send({accessToken})
         case ResultCode.Forbidden:
@@ -148,6 +151,33 @@ authRoute.post('/logout', async (req: Request, res: Response) => {
             return res.sendStatus(403)
         case ResultCode.NotFound:
             return res.sendStatus(404)
+        default:
+            return res.sendStatus(404)
+    }
+})
+
+
+authRoute.post('/password-recovery', rateLimitMiddleware, emailValidation, async (req: RequestWithBody<{
+    email: string
+}>, res: Response) => {
+    const email = req.body.email
+    const recoverySend = await authService.sendRecoveryPass(email)
+
+    switch (recoverySend.code) {
+        case ResultCode.Success:
+            return res.sendStatus(204)
+        default:
+            return res.sendStatus(404)
+    }
+})
+
+authRoute.post('/new-password', rateLimitMiddleware, recoveryValidation, recoverTokenGuard, async (req: RequestWithBody<recoveryPassInputType>, res: Response) => {
+    const newPass = req.body.newPassword
+    const recoverPass = await userService.recoveryPass(req.userId!, newPass)
+
+    switch (recoverPass.code) {
+        case ResultCode.Success:
+            return res.sendStatus(204)
         default:
             return res.sendStatus(404)
     }

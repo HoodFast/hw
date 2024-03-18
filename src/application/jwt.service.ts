@@ -1,5 +1,5 @@
 import {UsersTypeDb} from "../models/users/db/usersDBModel";
-import {WithId} from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import {appConfig} from "../app/config";
 import {UserRepository} from "../repositories/user.repository";
 import {randomUUID} from "crypto";
@@ -7,12 +7,23 @@ import {tokensMetaDbType} from "../models/tokens/token.db.model";
 
 
 import {TokenMetaRepository} from "../repositories/tokenMeta.repository";
+import {UserQueryRepository} from "../repositories/users.query.repository";
+import bcrypt from "bcrypt";
+import {ResultCode} from "../models/common/common";
+import {Result} from "../types/result.type";
 
 let jwt = require('jsonwebtoken');
 
 export class jwtService {
     static async createJWT(user: WithId<UsersTypeDb>): Promise<string> {
         const token = jwt.sign({userId: user._id}, appConfig.AC_SECRET, {expiresIn: appConfig.AC_TIME})
+        return token
+    }
+
+    static async createRecoveryCode(email: string) {
+        const user =await UserQueryRepository.getByLoginOrEmail(email)
+        if(!user) return null
+        const token = jwt.sign({userId: user._id}, appConfig.RECOVERY_SECRET, {expiresIn: appConfig.RECOVERY_TIME})
         return token
     }
 
@@ -54,6 +65,15 @@ export class jwtService {
             const result = jwt.verify(token, appConfig.AC_SECRET)
             const blackList = await UserRepository.getBlackList(result.userId)
             if (blackList?.includes(token)) return null
+            return result.userId
+        } catch (err) {
+            return null
+        }
+    }
+
+    static async getUserByRecoverToken(token:string){
+        try {
+            const result = jwt.verify(token, appConfig.RECOVERY_SECRET)
             return result.userId
         } catch (err) {
             return null
