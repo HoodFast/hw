@@ -23,6 +23,7 @@ const email_validators_1 = require("../validators/email-validators");
 const rateLimit_middleware_1 = require("../middlewares/rateLimutMiddleware/rateLimit.middleware");
 const recover_token_middleware_1 = require("../middlewares/auth/recover-token-middleware");
 const recovery_validators_1 = require("../validators/recovery-validators");
+const email_pass_recover_validators_1 = require("../validators/email-pass-recover-validators");
 exports.authRoute = (0, express_1.Router)({});
 exports.authRoute.get('/me', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.userId;
@@ -133,7 +134,7 @@ exports.authRoute.post('/logout', (req, res) => __awaiter(void 0, void 0, void 0
             return res.sendStatus(404);
     }
 }));
-exports.authRoute.post('/password-recovery', rateLimit_middleware_1.rateLimitMiddleware, (0, email_validators_1.emailValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRoute.post('/password-recovery', rateLimit_middleware_1.rateLimitMiddleware, (0, email_pass_recover_validators_1.emailPassRecoverValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const email = req.body.email;
     const recoverySend = yield auth_service_1.authService.sendRecoveryPass(email);
     switch (recoverySend.code) {

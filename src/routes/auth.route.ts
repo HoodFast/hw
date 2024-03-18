@@ -16,6 +16,7 @@ import {rateLimitMiddleware} from "../middlewares/rateLimutMiddleware/rateLimit.
 import {recoveryPassInputType} from "../models/recoveryPass/input/recover.input.model";
 import {recoverTokenGuard} from "../middlewares/auth/recover-token-middleware";
 import {recoveryValidation} from "../validators/recovery-validators";
+import {emailPassRecoverValidation} from "../validators/email-pass-recover-validators";
 
 export const authRoute = Router({})
 
@@ -157,7 +158,7 @@ authRoute.post('/logout', async (req: Request, res: Response) => {
 })
 
 
-authRoute.post('/password-recovery', rateLimitMiddleware, emailValidation(), async (req: RequestWithBody<{
+authRoute.post('/password-recovery', rateLimitMiddleware, emailPassRecoverValidation(), async (req: RequestWithBody<{
     email: string
 }>, res: Response) => {
 
