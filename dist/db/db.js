@@ -24,7 +24,7 @@ exports.db = {
     run() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield mongoose_1.default.connect(config_1.appConfig.MONGO_URL + "/" + config_1.appConfig.DB_NAME);
+                yield mongoose_1.default.connect(config_1.appConfig.MONGO_URL);
                 yield this.client.connect();
                 yield this.getDbName().command({ ping: 1 });
                 console.log('db connected');

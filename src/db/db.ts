@@ -17,7 +17,7 @@ export const db = {
 
     async run() {
         try {
-            await mongoose.connect(appConfig.MONGO_URL + "/" + appConfig.DB_NAME)
+            await mongoose.connect(appConfig.MONGO_URL)
             await this.client.connect()
             await this.getDbName().command({ping: 1})
             console.log('db connected')
