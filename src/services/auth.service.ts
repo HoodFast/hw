@@ -124,7 +124,7 @@ export class authService {
         try{
             await emailAdapter.sendEmail(email, subject, message)
         }catch (e){
-
+            return {code: ResultCode.Error}
         }
 
         return {code: ResultCode.Success}

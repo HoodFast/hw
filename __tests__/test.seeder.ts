@@ -4,9 +4,9 @@ import {add} from "date-fns/add";
 import {userModel} from "../src/db/db";
 
 export type RegisterUserType = {
-    login:string,
-    password:string,
-    email:string,
+    login?:string,
+    password?:string,
+    email?:string,
     code?:string,
     expirationDate?:Date,
     isConfirmed?:boolean
@@ -34,9 +34,9 @@ export const testSeeder = {
     },
 
     async registerUser({
-                           login,
-                           password,
-                           email,
+                           login='test2',
+                           password='1234567',
+                           email='test2@mail.ru',
                            code,
                            expirationDate,
                            isConfirmed
