@@ -142,6 +142,7 @@ class authService {
                 yield email_adapter_1.emailAdapter.sendEmail(email, subject, message);
             }
             catch (e) {
+                return { code: common_1.ResultCode.Error };
             }
             return { code: common_1.ResultCode.Success };
         });

@@ -19,109 +19,135 @@ const post_validators_1 = require("../validators/post-validators");
 const blog_service_1 = require("../services/blog.service");
 const blog_repository_1 = require("../repositories/blog.repository");
 const sortQueryFields_util_1 = require("../utils/sortQueryFields.util");
+const blog_db_1 = require("../models/blog/db/blog-db");
 exports.blogRoute = (0, express_1.Router)({});
-exports.blogRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
-    const sortData = {
-        searchNameTerm: (_a = req.query.searchNameTerm) !== null && _a !== void 0 ? _a : null,
-        sortBy: (_b = req.query.sortBy) !== null && _b !== void 0 ? _b : 'createdAt',
-        sortDirection: (_c = req.query.sortDirection) !== null && _c !== void 0 ? _c : 'desc',
-        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
-        pageSize: req.query.pageSize ? +req.query.pageSize : 10
-    };
-    const blogs = yield blog_query_repository_1.BlogQueryRepository.getAll(sortData);
-    res.send(blogs);
-}));
-exports.blogRoute.get('/:id/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    if (!mongodb_1.ObjectId.isValid(id)) {
-        res.sendStatus(404);
-        return;
+class BlogsController {
+    createBlog(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const newBlog = new blog_db_1.BlogDbType(req.body.name, req.body.description, req.body.websiteUrl, new Date().toISOString(), false);
+            const newBlog_ = {
+                name: req.body.name,
+                description: req.body.description,
+                websiteUrl: req.body.websiteUrl,
+                isMembership: false,
+                createdAt: new Date().toISOString()
+            };
+            const createBlog = yield blog_service_1.BlogService.createBlog(newBlog);
+            if (!createBlog) {
+                res.sendStatus(404);
+                return;
+            }
+            res.status(201).send(createBlog);
+        });
     }
-    const blog = yield blog_repository_1.BlogRepository.getById(id);
-    if (!blog) {
-        res.sendStatus(404);
-        return;
+    updateBlog(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            if (!mongodb_1.ObjectId.isValid(id)) {
+                res.sendStatus(404);
+                return;
+            }
+            const updateBlogModel = {
+                name: req.body.name,
+                description: req.body.description,
+                websiteUrl: req.body.websiteUrl
+            };
+            const updatedBlog = yield blog_service_1.BlogService.updateBlog(id, updateBlogModel);
+            if (!updatedBlog) {
+                res.sendStatus(404);
+                return;
+            }
+            res.sendStatus(204);
+        });
     }
-    const { sortBy, sortDirection, pageNumber, pageSize } = req.query;
-    const sortData = (0, sortQueryFields_util_1.sortQueryFieldsUtil)({ sortBy, sortDirection, pageNumber, pageSize });
-    const posts = yield blog_query_repository_1.BlogQueryRepository.getAllPostsToBlog(id, sortData);
-    res.send(posts);
-}));
-exports.blogRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    if (!mongodb_1.ObjectId.isValid(id)) {
-        res.sendStatus(404);
-        return;
+    createPostToBlog(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            if (!mongodb_1.ObjectId.isValid(id)) {
+                res.sendStatus(404);
+                return;
+            }
+            const createPostFromBlogModel = {
+                title: req.body.title,
+                shortDescription: req.body.shortDescription,
+                content: req.body.content
+            };
+            const post = yield blog_service_1.BlogService.createPostToBlog(id, createPostFromBlogModel);
+            if (!post) {
+                res.sendStatus(404);
+                return;
+            }
+            res.status(201).send(post);
+        });
     }
-    const blog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(req.params.id));
-    if (!blog) {
-        res.sendStatus(404);
-        return;
+    getAllBlogs(req, res) {
+        var _a, _b, _c;
+        return __awaiter(this, void 0, void 0, function* () {
+            const sortData = {
+                searchNameTerm: (_a = req.query.searchNameTerm) !== null && _a !== void 0 ? _a : null,
+                sortBy: (_b = req.query.sortBy) !== null && _b !== void 0 ? _b : 'createdAt',
+                sortDirection: (_c = req.query.sortDirection) !== null && _c !== void 0 ? _c : 'desc',
+                pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+                pageSize: req.query.pageSize ? +req.query.pageSize : 10
+            };
+            const blogs = yield blog_query_repository_1.BlogQueryRepository.getAll(sortData);
+            res.send(blogs);
+        });
     }
-    res.send(blog);
-}));
-exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newBlog = {
-        name: req.body.name,
-        description: req.body.description,
-        websiteUrl: req.body.websiteUrl,
-        isMembership: false,
-        createdAt: new Date().toISOString()
-    };
-    const createBlog = yield blog_service_1.BlogService.createBlog(newBlog);
-    if (!createBlog) {
-        res.sendStatus(404);
-        return;
+    getAllPostsToBlogId(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            if (!mongodb_1.ObjectId.isValid(id)) {
+                res.sendStatus(404);
+                return;
+            }
+            const blog = yield blog_repository_1.BlogRepository.getById(id);
+            if (!blog) {
+                res.sendStatus(404);
+                return;
+            }
+            const { sortBy, sortDirection, pageNumber, pageSize } = req.query;
+            const sortData = (0, sortQueryFields_util_1.sortQueryFieldsUtil)({ sortBy, sortDirection, pageNumber, pageSize });
+            const posts = yield blog_query_repository_1.BlogQueryRepository.getAllPostsToBlog(id, sortData);
+            res.send(posts);
+        });
     }
-    res.status(201).send(createBlog);
-}));
-exports.blogRoute.post('/:id/posts', auth_middleware_1.authMiddleware, (0, post_validators_1.createPostFromBlogValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    if (!mongodb_1.ObjectId.isValid(id)) {
-        res.sendStatus(404);
-        return;
+    getBlogById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            if (!mongodb_1.ObjectId.isValid(id)) {
+                res.sendStatus(404);
+                return;
+            }
+            const blog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(req.params.id));
+            if (!blog) {
+                res.sendStatus(404);
+                return;
+            }
+            res.send(blog);
+        });
     }
-    const createPostFromBlogModel = {
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        content: req.body.content
-    };
-    const post = yield blog_service_1.BlogService.createPostToBlog(id, createPostFromBlogModel);
-    if (!post) {
-        res.sendStatus(404);
-        return;
+    deleteBlogById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            if (!mongodb_1.ObjectId.isValid(id)) {
+                res.sendStatus(404);
+                return;
+            }
+            const blogIsDeleted = yield blog_service_1.BlogService.deleteBlog(id);
+            if (!blogIsDeleted) {
+                res.sendStatus(404);
+                return;
+            }
+            res.sendStatus(204);
+        });
     }
-    res.status(201).send(post);
-}));
-exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    if (!mongodb_1.ObjectId.isValid(id)) {
-        res.sendStatus(404);
-        return;
-    }
-    const updateBlogModel = {
-        name: req.body.name,
-        description: req.body.description,
-        websiteUrl: req.body.websiteUrl
-    };
-    const updatedBlog = yield blog_service_1.BlogService.updateBlog(id, updateBlogModel);
-    if (!updatedBlog) {
-        res.sendStatus(404);
-        return;
-    }
-    res.sendStatus(204);
-}));
-exports.blogRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    if (!mongodb_1.ObjectId.isValid(id)) {
-        res.sendStatus(404);
-        return;
-    }
-    const blogIsDeleted = yield blog_service_1.BlogService.deleteBlog(id);
-    if (!blogIsDeleted) {
-        res.sendStatus(404);
-        return;
-    }
-    res.sendStatus(204);
-}));
+}
+const blogsController = new BlogsController();
+exports.blogRoute.get('/', blogsController.getAllBlogs);
+exports.blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId);
+exports.blogRoute.get('/:id', blogsController.getBlogById);
+exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.createBlog);
+exports.blogRoute.post('/:id/posts', auth_middleware_1.authMiddleware, (0, post_validators_1.createPostFromBlogValidation)(), blogsController.createPostToBlog);
+exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.updateBlog);
+exports.blogRoute.delete('/:id', auth_middleware_1.authMiddleware, blogsController.deleteBlogById);
