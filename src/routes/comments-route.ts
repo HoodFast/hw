@@ -16,47 +16,59 @@ import {commentsValidation} from "../validators/comments-validators";
 
 export const commentsRoute = Router({})
 
-
-commentsRoute.get('/:id', async (req: RequestWithParams<ParamsType>, res: ResponseType<CommentsOutputType>) => {
-    const id = req.params.id
-    if (!ObjectId.isValid(id)) return res.sendStatus(404)
-
-    const comment = await CommentsQueryRepository.getById(new ObjectId(id))
-
-    if (!comment) return res.sendStatus(404)
-
-    return res.send(comment)
-})
-commentsRoute.delete('/:id', accessTokenGuard, async (req: RequestWithParams<ParamsType>, res) => {
-    const id = req.params.id
-    const userId = req.userId!.toString()
-    if (!ObjectId.isValid(id)) return res.sendStatus(404)
-    const deleted = await CommentsService.deleteCommentById(id, userId)
-    switch (deleted.code) {
-        case ResultCode.NotFound:
-            return res.sendStatus(404)
-        case ResultCode.Forbidden:
-            return res.sendStatus(403)
-        case ResultCode.Success:
-            return res.sendStatus(204)
-        default:
-            return res.sendStatus(404)
+class CommentController {
+    private commentService:CommentsService
+    constructor() {
+        this.commentService=new CommentsService()
     }
-})
+    async getCommentById(req: RequestWithParams<ParamsType>, res: ResponseType<CommentsOutputType>) {
+        const id = req.params.id
+        if (!ObjectId.isValid(id)) return res.sendStatus(404)
 
-commentsRoute.put('/:id', accessTokenGuard, commentsValidation(), async (req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: ResponseType<void>) => {
-    const id = req.params.id
-    const userId = req.userId!.toString()
-    if (!ObjectId.isValid(id)) return res.sendStatus(404)
-    const updateComment = await CommentsService.updateComment(id, req.body.content, userId)
-    switch (updateComment.code) {
-        case ResultCode.NotFound:
-            return res.sendStatus(404)
-        case ResultCode.Forbidden:
-            return res.sendStatus(403)
-        case ResultCode.Success:
-            return res.sendStatus(204)
-        default:
-            return res.sendStatus(404)
+        const comment = await CommentsQueryRepository.getById(new ObjectId(id))
+
+        if (!comment) return res.sendStatus(404)
+
+        return res.send(comment)
     }
-})
+
+    async deleteCommentById(req: RequestWithParams<ParamsType>, res:ResponseType<void>) {
+        const id = req.params.id
+        const userId = req.userId!.toString()
+        if (!ObjectId.isValid(id)) return res.sendStatus(404)
+        const deleted = await  this.commentService.deleteCommentById(id, userId)
+        switch (deleted.code) {
+            case ResultCode.NotFound:
+                return res.sendStatus(404)
+            case ResultCode.Forbidden:
+                return res.sendStatus(403)
+            case ResultCode.Success:
+                return res.sendStatus(204)
+            default:
+                return res.sendStatus(404)
+        }
+    }
+
+    async updateComment(req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: ResponseType<void>) {
+        const id = req.params.id
+        const userId = req.userId!.toString()
+        if (!ObjectId.isValid(id)) return res.sendStatus(404)
+        const updateComment = await  this.commentService.updateComment(id, req.body.content, userId)
+        switch (updateComment.code) {
+            case ResultCode.NotFound:
+                return res.sendStatus(404)
+            case ResultCode.Forbidden:
+                return res.sendStatus(403)
+            case ResultCode.Success:
+                return res.sendStatus(204)
+            default:
+                return res.sendStatus(404)
+        }
+    }
+}
+
+const commentController = new CommentController()
+
+commentsRoute.get('/:id', commentController.getCommentById.bind(commentController))
+commentsRoute.delete('/:id', accessTokenGuard, commentController.deleteCommentById.bind(commentController))
+commentsRoute.put('/:id', accessTokenGuard, commentsValidation(), commentController.updateComment.bind(commentController))

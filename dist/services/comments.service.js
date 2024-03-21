@@ -17,10 +17,13 @@ const comment_repository_1 = require("../repositories/comment.repository");
 const comment_query_repository_1 = require("../repositories/comment.query.repository");
 const mongodb_1 = require("mongodb");
 class CommentsService {
-    static createComment(data) {
+    constructor() {
+        this.postQueryRepository = new post_query_repository_1.PostQueryRepository();
+    }
+    createComment(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const { userId, postId, content, createdAt } = data;
-            const post = yield post_query_repository_1.PostQueryRepository.getById(new mongodb_1.ObjectId(postId));
+            const post = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(postId));
             if (!post) {
                 return null;
             }
@@ -44,7 +47,7 @@ class CommentsService {
             return createComment;
         });
     }
-    static updateComment(id, content, userId) {
+    updateComment(id, content, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
             if (!comment)
@@ -60,7 +63,7 @@ class CommentsService {
             return { code: common_1.ResultCode.Success };
         });
     }
-    static deleteCommentById(id, userId) {
+    deleteCommentById(id, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
             if (!comment)

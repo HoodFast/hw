@@ -16,10 +16,14 @@ const post_query_repository_1 = require("../repositories/post.query.repository")
 const blog_query_repository_1 = require("../repositories/blog.query.repository");
 const mongodb_1 = require("mongodb");
 class BlogService {
-    static createPostToBlog(blogId, CreatePostData) {
+    constructor() {
+        this.blogRepository = new blog_repository_1.BlogRepository();
+        this.postQueryRepository = new post_query_repository_1.PostQueryRepository();
+    }
+    createPostToBlog(blogId, CreatePostData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { title, content, shortDescription } = CreatePostData;
-            const blog = yield blog_repository_1.BlogRepository.getById(blogId);
+            const blog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(blogId));
             if (!blog) {
                 return null;
             }
@@ -35,26 +39,26 @@ class BlogService {
             if (!createPost) {
                 return null;
             }
-            const post = yield post_query_repository_1.PostQueryRepository.getById(new mongodb_1.ObjectId(createPost.id));
+            const post = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(createPost.id));
             if (!post) {
                 return null;
             }
             return post;
         });
     }
-    static updateBlog(blogId, updateData) {
+    updateBlog(blogId, updateData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, description, websiteUrl } = updateData;
             const findUpdateBlog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(blogId));
             if (!findUpdateBlog) {
                 return null;
             }
-            return yield blog_repository_1.BlogRepository.updateBlog(Object.assign({ id: blogId }, updateData));
+            return yield this.blogRepository.updateBlog(Object.assign({ id: blogId }, updateData));
         });
     }
-    static createBlog(data) {
+    createBlog(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const createBlog = yield blog_repository_1.BlogRepository.createBlog(data);
+            const createBlog = yield this.blogRepository.createBlog(data);
             if (!createBlog) {
                 return null;
             }
@@ -65,13 +69,13 @@ class BlogService {
             return blog;
         });
     }
-    static deleteBlog(blogId) {
+    deleteBlog(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
             const findBlog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(blogId));
             if (!findBlog) {
                 return null;
             }
-            return yield blog_repository_1.BlogRepository.deleteById(blogId);
+            return yield this.blogRepository.deleteById(blogId);
         });
     }
 }

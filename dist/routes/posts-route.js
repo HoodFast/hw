@@ -22,104 +22,133 @@ const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middle
 const comment_query_repository_1 = require("../repositories/comment.query.repository");
 const db_1 = require("../db/db");
 exports.postRoute = (0, express_1.Router)({});
-exports.postRoute.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const sortData = {
-        sortBy: (_a = req.query.sortBy) !== null && _a !== void 0 ? _a : 'createdAt',
-        sortDirection: (_b = req.query.sortDirection) !== null && _b !== void 0 ? _b : 'desc',
-        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
-        pageSize: req.query.pageSize ? +req.query.pageSize : 10
-    };
-    const blogs = yield post_query_repository_1.PostQueryRepository.getAll(sortData);
-    if (!blogs) {
-        res.sendStatus(404);
-        return;
+class PostController {
+    constructor() {
+        this.postService = new post_service_1.PostService();
+        this.commentService = new comments_service_1.CommentsService();
+        this.postQueryRepository = new post_query_repository_1.PostQueryRepository();
     }
-    res.send(blogs);
-}));
-exports.postRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const foundPost = yield post_query_repository_1.PostQueryRepository.getById(new mongodb_1.ObjectId(req.params.id));
-    if (!foundPost) {
-        res.sendStatus(404);
-        return;
+    getAllPosts(req, res) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            const sortData = {
+                sortBy: (_a = req.query.sortBy) !== null && _a !== void 0 ? _a : 'createdAt',
+                sortDirection: (_b = req.query.sortDirection) !== null && _b !== void 0 ? _b : 'desc',
+                pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+                pageSize: req.query.pageSize ? +req.query.pageSize : 10
+            };
+            const blogs = yield this.postQueryRepository.getAll(sortData);
+            if (!blogs) {
+                res.sendStatus(404);
+                return;
+            }
+            res.send(blogs);
+        });
     }
-    res.send(foundPost);
-}));
-exports.postRoute.post('/', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newPost = {
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        content: req.body.content,
-        blogId: req.body.blogId,
-        createdAt: new Date().toISOString()
-    };
-    const post = yield post_service_1.PostService.createPost(newPost);
-    if (!post) {
-        res.sendStatus(404);
-        return;
+    getPostBId(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const foundPost = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(req.params.id));
+            if (!foundPost) {
+                res.sendStatus(404);
+                return;
+            }
+            res.send(foundPost);
+        });
     }
-    res.status(201).send(post);
-}));
-exports.postRoute.put('/:id', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const updateData = {
-        id: req.params.id,
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        content: req.body.content,
-        blogId: req.body.blogId
-    };
-    const updatePost = yield post_service_1.PostService.updatePost(updateData);
-    if (!updatePost) {
-        res.sendStatus(404);
-        return;
+    createPost(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const newPost = {
+                title: req.body.title,
+                shortDescription: req.body.shortDescription,
+                content: req.body.content,
+                blogId: req.body.blogId,
+                createdAt: new Date().toISOString()
+            };
+            const post = yield this.postService.createPost(newPost);
+            if (!post) {
+                res.sendStatus(404);
+                return;
+            }
+            res.status(201).send(post);
+        });
     }
-    res.sendStatus(204);
-}));
-exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    if (!mongodb_1.ObjectId.isValid(id)) {
-        res.sendStatus(404);
-        return;
+    updatePost(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updateData = {
+                id: req.params.id,
+                title: req.body.title,
+                shortDescription: req.body.shortDescription,
+                content: req.body.content,
+                blogId: req.body.blogId
+            };
+            const updatePost = yield this.postService.updatePost(updateData);
+            if (!updatePost) {
+                res.sendStatus(404);
+                return;
+            }
+            res.sendStatus(204);
+        });
     }
-    const deletePost = yield post_service_1.PostService.deletePost(id);
-    if (!deletePost) {
-        res.sendStatus(404);
-        return;
+    deletePostById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            if (!mongodb_1.ObjectId.isValid(id)) {
+                res.sendStatus(404);
+                return;
+            }
+            const deletePost = yield this.postService.deletePost(id);
+            if (!deletePost) {
+                res.sendStatus(404);
+                return;
+            }
+            res.sendStatus(204);
+        });
     }
-    res.sendStatus(204);
-}));
-exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const createCommentData = {
-        userId: req.userId.toString(),
-        postId: req.params.id,
-        content: req.body.content,
-        createdAt: new Date().toISOString()
-    };
-    const createCommentToPost = yield comments_service_1.CommentsService.createComment(createCommentData);
-    if (!createCommentToPost) {
-        res.sendStatus(404);
-        return;
+    createCommentByPost(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const createCommentData = {
+                userId: req.userId.toString(),
+                postId: req.params.id,
+                content: req.body.content,
+                createdAt: new Date().toISOString()
+            };
+            const createCommentToPost = yield this.commentService.createComment(createCommentData);
+            if (!createCommentToPost) {
+                res.sendStatus(404);
+                return;
+            }
+            return res.status(201).send(createCommentToPost);
+        });
     }
-    return res.status(201).send(createCommentToPost);
-}));
-exports.postRoute.get('/:id/comments', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c, _d;
-    const id = req.params.id;
-    if (!mongodb_1.ObjectId.isValid(id)) {
-        res.sendStatus(404);
-        return;
+    getCommentsByPost(req, res) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            if (!mongodb_1.ObjectId.isValid(id)) {
+                res.sendStatus(404);
+                return;
+            }
+            const post = yield db_1.postModel.findOne({ _id: new mongodb_1.ObjectId(id) });
+            if (!post)
+                return res.sendStatus(404);
+            const sortData = {
+                sortBy: (_a = req.query.sortBy) !== null && _a !== void 0 ? _a : 'createdAt',
+                sortDirection: (_b = req.query.sortDirection) !== null && _b !== void 0 ? _b : 'desc',
+                pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+                pageSize: req.query.pageSize ? +req.query.pageSize : 10
+            };
+            const comments = yield comment_query_repository_1.CommentsQueryRepository.getAllByPostId(id, sortData);
+            if (!comments)
+                return res.sendStatus(404);
+            return res.send(comments);
+        });
     }
-    const post = yield db_1.postModel.findOne({ _id: new mongodb_1.ObjectId(id) });
-    if (!post)
-        return res.sendStatus(404);
-    const sortData = {
-        sortBy: (_c = req.query.sortBy) !== null && _c !== void 0 ? _c : 'createdAt',
-        sortDirection: (_d = req.query.sortDirection) !== null && _d !== void 0 ? _d : 'desc',
-        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
-        pageSize: req.query.pageSize ? +req.query.pageSize : 10
-    };
-    const comments = yield comment_query_repository_1.CommentsQueryRepository.getAllByPostId(id, sortData);
-    if (!comments)
-        return res.sendStatus(404);
-    return res.send(comments);
-}));
+}
+const postController = new PostController();
+exports.postRoute.get('/', postController.getAllPosts.bind(postController));
+exports.postRoute.get('/:id', postController.getPostBId.bind(postController));
+exports.postRoute.post('/', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), postController.createPost.bind(postController));
+exports.postRoute.put('/:id', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), postController.updatePost.bind(postController));
+exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, postController.deletePostById.bind(postController));
+exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), postController.createCommentByPost.bind(postController));
+exports.postRoute.get('/:id/comments', postController.getCommentsByPost.bind(postController));

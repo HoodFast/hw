@@ -10,15 +10,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostService = void 0;
-const blog_repository_1 = require("../repositories/blog.repository");
 const post_repository_1 = require("../repositories/post.repository");
 const post_query_repository_1 = require("../repositories/post.query.repository");
 const mongodb_1 = require("mongodb");
+const blog_query_repository_1 = require("../repositories/blog.query.repository");
 class PostService {
-    static createPost(data) {
+    constructor() {
+        this.postQueryRepository = new post_query_repository_1.PostQueryRepository();
+    }
+    createPost(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const { title, createdAt, blogId, content, shortDescription } = data;
-            const blog = yield blog_repository_1.BlogRepository.getById(blogId);
+            const blog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(blogId));
             if (!blog) {
                 return null;
             }
@@ -34,19 +37,19 @@ class PostService {
             if (!createPost) {
                 return null;
             }
-            const post = yield post_query_repository_1.PostQueryRepository.getById(new mongodb_1.ObjectId(createPost.id));
+            const post = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(createPost.id));
             if (!post) {
                 return null;
             }
             return post;
         });
     }
-    static updatePost(data) {
+    updatePost(data) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield post_repository_1.PostRepository.updatePost(data);
         });
     }
-    static deletePost(id) {
+    deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield post_repository_1.PostRepository.deletePost(id);
         });

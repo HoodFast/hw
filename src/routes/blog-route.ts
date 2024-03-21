@@ -23,6 +23,12 @@ import {BlogDbType} from "../models/blog/db/blog-db";
 export const blogRoute = Router({})
 
 class BlogsController {
+    private blogService: BlogService
+
+    constructor() {
+        this.blogService = new BlogService()
+    }
+
     async createBlog(req: RequestWithBody<UpdateBlogType>, res: ResponseType<OutputBlogType>) {
         const newBlog = new BlogDbType(
             req.body.name,
@@ -39,13 +45,14 @@ class BlogsController {
             createdAt: new Date().toISOString()
         }
 
-        const createBlog = await BlogService.createBlog(newBlog)
+        const createBlog = await this.blogService.createBlog(newBlog)
         if (!createBlog) {
             res.sendStatus(404)
             return
         }
         res.status(201).send(createBlog)
     }
+
     async updateBlog(req: RequestWithParamsAndBody<ParamsType, UpdateBlogType>, res: ResponseType<void>) {
         const id = req.params.id
 
@@ -59,7 +66,7 @@ class BlogsController {
             description: req.body.description,
             websiteUrl: req.body.websiteUrl
         }
-        const updatedBlog = await BlogService.updateBlog(id, updateBlogModel)
+        const updatedBlog = await this.blogService.updateBlog(id, updateBlogModel)
 
         if (!updatedBlog) {
             res.sendStatus(404)
@@ -67,6 +74,7 @@ class BlogsController {
         }
         res.sendStatus(204)
     }
+
     async createPostToBlog(req: RequestWithParamsAndBody<ParamsType, CreatePostFromBlogInputModel>, res: ResponseType<PostType>) {
 
         const id = req.params.id
@@ -81,7 +89,7 @@ class BlogsController {
             content: req.body.content
         }
 
-        const post = await BlogService.createPostToBlog(id, createPostFromBlogModel)
+        const post = await this.blogService.createPostToBlog(id, createPostFromBlogModel)
 
         if (!post) {
             res.sendStatus(404)
@@ -90,6 +98,7 @@ class BlogsController {
 
         res.status(201).send(post)
     }
+
     async getAllBlogs(req: RequestWithQuery<QueryBlogInputModel>, res: ResponseType<Pagination<OutputBlogType>>) {
         const sortData = {
             searchNameTerm: req.query.searchNameTerm ?? null,
@@ -102,13 +111,14 @@ class BlogsController {
         const blogs = await BlogQueryRepository.getAll(sortData)
         res.send(blogs)
     }
+
     async getAllPostsToBlogId(req: RequestWithQueryAndParams<ParamsType, QueryBlogInputModel>, res: ResponseType<Pagination<PostType>>) {
         const id = req.params.id
         if (!ObjectId.isValid(id)) {
             res.sendStatus(404)
             return
         }
-        const blog = await BlogRepository.getById(id)
+        const blog = await BlogQueryRepository.getById(new ObjectId(id))
         if (!blog) {
             res.sendStatus(404)
             return
@@ -120,6 +130,7 @@ class BlogsController {
 
         res.send(posts)
     }
+
     async getBlogById(req: RequestWithParams<{ id: string }>, res: ResponseType<OutputBlogType>) {
         const id = req.params.id
         if (!ObjectId.isValid(id)) {
@@ -133,6 +144,7 @@ class BlogsController {
         }
         res.send(blog)
     }
+
     async deleteBlogById(req: RequestWithParams<{ id: string }>, res: ResponseType<void>) {
         const id = req.params.id
         if (!ObjectId.isValid(id)) {
@@ -140,7 +152,7 @@ class BlogsController {
             return
         }
 
-        const blogIsDeleted = await BlogService.deleteBlog(id)
+        const blogIsDeleted = await this.blogService.deleteBlog(id)
         if (!blogIsDeleted) {
             res.sendStatus(404)
             return
@@ -151,10 +163,10 @@ class BlogsController {
 
 const blogsController = new BlogsController()
 
-blogRoute.get('/', blogsController.getAllBlogs)
-blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId)
-blogRoute.get('/:id', blogsController.getBlogById)
-blogRoute.post('/', authMiddleware, blogValidation(), blogsController.createBlog)
-blogRoute.post('/:id/posts', authMiddleware, createPostFromBlogValidation(), blogsController.createPostToBlog)
-blogRoute.put('/:id', authMiddleware, blogValidation(), blogsController.updateBlog)
-blogRoute.delete('/:id', authMiddleware,blogsController.deleteBlogById)
+blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController))
+blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController))
+blogRoute.get('/:id', blogsController.getBlogById.bind(blogsController))
+blogRoute.post('/', authMiddleware, blogValidation(), blogsController.createBlog.bind(blogsController))
+blogRoute.post('/:id/posts', authMiddleware, createPostFromBlogValidation(), blogsController.createPostToBlog.bind(blogsController))
+blogRoute.put('/:id', authMiddleware, blogValidation(), blogsController.updateBlog.bind(blogsController))
+blogRoute.delete('/:id', authMiddleware, blogsController.deleteBlogById.bind(blogsController))

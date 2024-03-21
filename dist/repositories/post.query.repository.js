@@ -13,7 +13,7 @@ exports.PostQueryRepository = void 0;
 const db_1 = require("../db/db");
 const post_mappers_1 = require("../models/blog/mappers/post-mappers");
 class PostQueryRepository {
-    static getAll(sortData) {
+    getAll(sortData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
             const posts = yield db_1.postModel
@@ -33,7 +33,7 @@ class PostQueryRepository {
             };
         });
     }
-    static getById(id) {
+    getById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const post = yield db_1.postModel.findOne({ _id: id });
             if (!post) {

@@ -17,11 +17,13 @@ const mongodb_1 = require("mongodb");
 const blog_query_repository_1 = require("../repositories/blog.query.repository");
 const post_validators_1 = require("../validators/post-validators");
 const blog_service_1 = require("../services/blog.service");
-const blog_repository_1 = require("../repositories/blog.repository");
 const sortQueryFields_util_1 = require("../utils/sortQueryFields.util");
 const blog_db_1 = require("../models/blog/db/blog-db");
 exports.blogRoute = (0, express_1.Router)({});
 class BlogsController {
+    constructor() {
+        this.blogService = new blog_service_1.BlogService();
+    }
     createBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const newBlog = new blog_db_1.BlogDbType(req.body.name, req.body.description, req.body.websiteUrl, new Date().toISOString(), false);
@@ -32,7 +34,7 @@ class BlogsController {
                 isMembership: false,
                 createdAt: new Date().toISOString()
             };
-            const createBlog = yield blog_service_1.BlogService.createBlog(newBlog);
+            const createBlog = yield this.blogService.createBlog(newBlog);
             if (!createBlog) {
                 res.sendStatus(404);
                 return;
@@ -52,7 +54,7 @@ class BlogsController {
                 description: req.body.description,
                 websiteUrl: req.body.websiteUrl
             };
-            const updatedBlog = yield blog_service_1.BlogService.updateBlog(id, updateBlogModel);
+            const updatedBlog = yield this.blogService.updateBlog(id, updateBlogModel);
             if (!updatedBlog) {
                 res.sendStatus(404);
                 return;
@@ -72,7 +74,7 @@ class BlogsController {
                 shortDescription: req.body.shortDescription,
                 content: req.body.content
             };
-            const post = yield blog_service_1.BlogService.createPostToBlog(id, createPostFromBlogModel);
+            const post = yield this.blogService.createPostToBlog(id, createPostFromBlogModel);
             if (!post) {
                 res.sendStatus(404);
                 return;
@@ -101,7 +103,7 @@ class BlogsController {
                 res.sendStatus(404);
                 return;
             }
-            const blog = yield blog_repository_1.BlogRepository.getById(id);
+            const blog = yield blog_query_repository_1.BlogQueryRepository.getById(new mongodb_1.ObjectId(id));
             if (!blog) {
                 res.sendStatus(404);
                 return;
@@ -134,7 +136,7 @@ class BlogsController {
                 res.sendStatus(404);
                 return;
             }
-            const blogIsDeleted = yield blog_service_1.BlogService.deleteBlog(id);
+            const blogIsDeleted = yield this.blogService.deleteBlog(id);
             if (!blogIsDeleted) {
                 res.sendStatus(404);
                 return;
@@ -144,10 +146,10 @@ class BlogsController {
     }
 }
 const blogsController = new BlogsController();
-exports.blogRoute.get('/', blogsController.getAllBlogs);
-exports.blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId);
-exports.blogRoute.get('/:id', blogsController.getBlogById);
-exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.createBlog);
-exports.blogRoute.post('/:id/posts', auth_middleware_1.authMiddleware, (0, post_validators_1.createPostFromBlogValidation)(), blogsController.createPostToBlog);
-exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.updateBlog);
-exports.blogRoute.delete('/:id', auth_middleware_1.authMiddleware, blogsController.deleteBlogById);
+exports.blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController));
+exports.blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController));
+exports.blogRoute.get('/:id', blogsController.getBlogById.bind(blogsController));
+exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.createBlog.bind(blogsController));
+exports.blogRoute.post('/:id/posts', auth_middleware_1.authMiddleware, (0, post_validators_1.createPostFromBlogValidation)(), blogsController.createPostToBlog.bind(blogsController));
+exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.updateBlog.bind(blogsController));
+exports.blogRoute.delete('/:id', auth_middleware_1.authMiddleware, blogsController.deleteBlogById.bind(blogsController));

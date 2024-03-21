@@ -8,6 +8,7 @@ import {CommentsOutputType} from "../models/comments/otput/comments.output.model
 import {CommentsQueryRepository} from "../repositories/comment.query.repository";
 import {Result} from "../types/result.type";
 import {ObjectId} from "mongodb";
+import {PostService} from "./post.service";
 
 export type CreateCommentDataType = {
     userId: string,
@@ -17,9 +18,14 @@ export type CreateCommentDataType = {
 }
 
 export class CommentsService {
-    static async createComment(data: CreateCommentDataType): Promise<CommentsOutputType | null> {
+    private postQueryRepository:PostQueryRepository
+
+    constructor() {
+        this.postQueryRepository = new PostQueryRepository()
+    }
+     async createComment(data: CreateCommentDataType): Promise<CommentsOutputType | null> {
         const {userId, postId, content, createdAt} = data
-        const post = await PostQueryRepository.getById(new ObjectId(postId))
+        const post = await this.postQueryRepository.getById(new ObjectId(postId))
 
         if (!post) {
             return null
@@ -48,7 +54,7 @@ export class CommentsService {
         return createComment
     }
 
-    static async updateComment(id:string,content:string,userId:string): Promise<Result> {
+     async updateComment(id:string,content:string,userId:string): Promise<Result> {
         const comment = await CommentsQueryRepository.getById(new ObjectId(id))
 
         if (!comment) return {code: ResultCode.NotFound}
@@ -66,7 +72,7 @@ export class CommentsService {
         return {code: ResultCode.Success}
     }
 
-    static async deleteCommentById(id: string,userId:string): Promise<Result> {
+     async deleteCommentById(id: string,userId:string): Promise<Result> {
 
         const comment = await CommentsQueryRepository.getById(new ObjectId(id))
 

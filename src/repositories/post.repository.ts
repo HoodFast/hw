@@ -3,6 +3,7 @@ import {PostType, PostTypeDb, UpdatePostType} from "../models/common/common";
 import {ObjectId} from "mongodb";
 import {BlogQueryRepository} from "./blog.query.repository";
 import {PostQueryRepository} from "./post.query.repository";
+import {postMapper} from "../models/blog/mappers/post-mappers";
 
 
 export class PostRepository {
@@ -10,12 +11,11 @@ export class PostRepository {
     static async createPost(data: PostTypeDb): Promise<PostType | null> {
 
         const res = await postModel.insertMany(data)
-
-        const post = await PostQueryRepository.getById(res[0]._id)
+        const post = await postModel.findOne(res[0]._id)
         if (!post) {
             return null
         }
-        return post
+        return postMapper(post)
     }
 
     static async updatePost(data: UpdatePostType): Promise<boolean> {

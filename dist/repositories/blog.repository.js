@@ -14,7 +14,7 @@ const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
 const blog_query_repository_1 = require("./blog.query.repository");
 class BlogRepository {
-    static createBlog(createData) {
+    createBlog(createData) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.blogModel.insertMany(createData);
             const blog = yield blog_query_repository_1.BlogQueryRepository.getById(res[0]._id);
@@ -24,7 +24,7 @@ class BlogRepository {
             return blog;
         });
     }
-    static updateBlog(data) {
+    updateBlog(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.blogModel.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
                 $set: {
@@ -36,16 +36,7 @@ class BlogRepository {
             return !!res.matchedCount;
         });
     }
-    static getById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield db_1.blogModel.findOne({ _id: new mongodb_1.ObjectId(id) });
-            if (!blog) {
-                return null;
-            }
-            return blog;
-        });
-    }
-    static deleteById(id) {
+    deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.blogModel.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return !!res.deletedCount;

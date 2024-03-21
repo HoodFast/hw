@@ -18,46 +18,61 @@ const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middle
 const comments_service_1 = require("../services/comments.service");
 const comments_validators_1 = require("../validators/comments-validators");
 exports.commentsRoute = (0, express_1.Router)({});
-exports.commentsRoute.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    if (!mongodb_1.ObjectId.isValid(id))
-        return res.sendStatus(404);
-    const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
-    if (!comment)
-        return res.sendStatus(404);
-    return res.send(comment);
-}));
-exports.commentsRoute.delete('/:id', accesstoken_middleware_1.accessTokenGuard, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const userId = req.userId.toString();
-    if (!mongodb_1.ObjectId.isValid(id))
-        return res.sendStatus(404);
-    const deleted = yield comments_service_1.CommentsService.deleteCommentById(id, userId);
-    switch (deleted.code) {
-        case common_1.ResultCode.NotFound:
-            return res.sendStatus(404);
-        case common_1.ResultCode.Forbidden:
-            return res.sendStatus(403);
-        case common_1.ResultCode.Success:
-            return res.sendStatus(204);
-        default:
-            return res.sendStatus(404);
+class CommentController {
+    constructor() {
+        this.commentService = new comments_service_1.CommentsService();
     }
-}));
-exports.commentsRoute.put('/:id', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const userId = req.userId.toString();
-    if (!mongodb_1.ObjectId.isValid(id))
-        return res.sendStatus(404);
-    const updateComment = yield comments_service_1.CommentsService.updateComment(id, req.body.content, userId);
-    switch (updateComment.code) {
-        case common_1.ResultCode.NotFound:
-            return res.sendStatus(404);
-        case common_1.ResultCode.Forbidden:
-            return res.sendStatus(403);
-        case common_1.ResultCode.Success:
-            return res.sendStatus(204);
-        default:
-            return res.sendStatus(404);
+    getCommentById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            if (!mongodb_1.ObjectId.isValid(id))
+                return res.sendStatus(404);
+            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
+            if (!comment)
+                return res.sendStatus(404);
+            return res.send(comment);
+        });
     }
-}));
+    deleteCommentById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            const userId = req.userId.toString();
+            if (!mongodb_1.ObjectId.isValid(id))
+                return res.sendStatus(404);
+            const deleted = yield this.commentService.deleteCommentById(id, userId);
+            switch (deleted.code) {
+                case common_1.ResultCode.NotFound:
+                    return res.sendStatus(404);
+                case common_1.ResultCode.Forbidden:
+                    return res.sendStatus(403);
+                case common_1.ResultCode.Success:
+                    return res.sendStatus(204);
+                default:
+                    return res.sendStatus(404);
+            }
+        });
+    }
+    updateComment(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            const userId = req.userId.toString();
+            if (!mongodb_1.ObjectId.isValid(id))
+                return res.sendStatus(404);
+            const updateComment = yield this.commentService.updateComment(id, req.body.content, userId);
+            switch (updateComment.code) {
+                case common_1.ResultCode.NotFound:
+                    return res.sendStatus(404);
+                case common_1.ResultCode.Forbidden:
+                    return res.sendStatus(403);
+                case common_1.ResultCode.Success:
+                    return res.sendStatus(204);
+                default:
+                    return res.sendStatus(404);
+            }
+        });
+    }
+}
+const commentController = new CommentController();
+exports.commentsRoute.get('/:id', commentController.getCommentById.bind(commentController));
+exports.commentsRoute.delete('/:id', accesstoken_middleware_1.accessTokenGuard, commentController.deleteCommentById.bind(commentController));
+exports.commentsRoute.put('/:id', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), commentController.updateComment.bind(commentController));

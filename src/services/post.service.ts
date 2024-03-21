@@ -7,12 +7,19 @@ import {
 import {PostRepository} from "../repositories/post.repository";
 import {PostQueryRepository} from "../repositories/post.query.repository";
 import {ObjectId} from "mongodb";
+import {BlogQueryRepository} from "../repositories/blog.query.repository";
 
 
 export class PostService {
-    static async createPost(data: PostTypeCreate): Promise<PostType | null> {
+    private postQueryRepository:PostQueryRepository
+
+    constructor() {
+        this.postQueryRepository = new PostQueryRepository()
+    }
+
+    async createPost(data: PostTypeCreate): Promise<PostType | null> {
         const {title, createdAt, blogId, content, shortDescription} = data
-        const blog = await BlogRepository.getById(blogId)
+        const blog = await BlogQueryRepository.getById(new ObjectId(blogId))
         if (!blog) {
             return null
         }
@@ -30,7 +37,7 @@ export class PostService {
             return null
         }
 
-        const post = await PostQueryRepository.getById(new ObjectId(createPost.id))
+        const post = await this.postQueryRepository.getById(new ObjectId(createPost.id))
 
         if (!post) {
             return null
@@ -39,11 +46,11 @@ export class PostService {
         return post
     }
 
-    static async updatePost(data: UpdatePostType): Promise<boolean | null> {
+    async updatePost(data: UpdatePostType): Promise<boolean | null> {
         return await PostRepository.updatePost(data)
     }
 
-    static async deletePost(id: string): Promise<boolean> {
+    async deletePost(id: string): Promise<boolean> {
         return await PostRepository.deletePost(id)
     }
 

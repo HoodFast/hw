@@ -13,16 +13,16 @@ exports.PostRepository = void 0;
 const db_1 = require("../db/db");
 const mongodb_1 = require("mongodb");
 const blog_query_repository_1 = require("./blog.query.repository");
-const post_query_repository_1 = require("./post.query.repository");
+const post_mappers_1 = require("../models/blog/mappers/post-mappers");
 class PostRepository {
     static createPost(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield db_1.postModel.insertMany(data);
-            const post = yield post_query_repository_1.PostQueryRepository.getById(res[0]._id);
+            const post = yield db_1.postModel.findOne(res[0]._id);
             if (!post) {
                 return null;
             }
-            return post;
+            return (0, post_mappers_1.postMapper)(post);
         });
     }
     static updatePost(data) {

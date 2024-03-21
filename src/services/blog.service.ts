@@ -12,9 +12,15 @@ import {BlogQueryRepository} from "../repositories/blog.query.repository";
 import {ObjectId} from "mongodb";
 
 export class BlogService {
-    static async createPostToBlog(blogId: string, CreatePostData: createPostFromBlog): Promise<PostType | null> {
+    private blogRepository:BlogRepository
+    private postQueryRepository:PostQueryRepository
+    constructor() {
+        this.blogRepository = new BlogRepository()
+        this.postQueryRepository = new PostQueryRepository()
+    }
+     async createPostToBlog(blogId: string, CreatePostData: createPostFromBlog): Promise<PostType | null> {
         const {title, content, shortDescription} = CreatePostData
-        const blog = await BlogRepository.getById(blogId)
+        const blog = await BlogQueryRepository.getById(new ObjectId(blogId))
         if (!blog) {
             return null
         }
@@ -32,7 +38,7 @@ export class BlogService {
 
             return null
         }
-        const post = await PostQueryRepository.getById(new ObjectId(createPost.id))
+        const post = await this.postQueryRepository.getById(new ObjectId(createPost.id))
         if (!post) {
 
             return null
@@ -40,18 +46,18 @@ export class BlogService {
         return post
     }
 
-    static async updateBlog(blogId: string, updateData: UpdateBlogType): Promise<boolean | null> {
+     async updateBlog(blogId: string, updateData: UpdateBlogType): Promise<boolean | null> {
         const {name, description, websiteUrl} = updateData
         const findUpdateBlog = await BlogQueryRepository.getById(new ObjectId(blogId))
         if (!findUpdateBlog) {
             return null
         }
 
-        return await BlogRepository.updateBlog({id: blogId, ...updateData})
+        return await this.blogRepository.updateBlog({id: blogId, ...updateData})
     }
 
-    static async createBlog(data: OutputBlogType): Promise<OutputBlogType | null> {
-        const createBlog = await BlogRepository.createBlog(data)
+     async createBlog(data: OutputBlogType): Promise<OutputBlogType | null> {
+        const createBlog = await this.blogRepository.createBlog(data)
         if (!createBlog) {
             return null
         }
@@ -63,11 +69,11 @@ export class BlogService {
         return blog
     }
 
-    static async deleteBlog(blogId: string): Promise<boolean | null> {
+     async deleteBlog(blogId: string): Promise<boolean | null> {
         const findBlog = await BlogQueryRepository.getById(new ObjectId(blogId))
         if (!findBlog) {
             return null
         }
-        return await BlogRepository.deleteById(blogId)
+        return await this.blogRepository.deleteById(blogId)
     }
 }

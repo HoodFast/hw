@@ -26,123 +26,141 @@ import {postModel} from "../db/db";
 
 export const postRoute = Router({})
 
-postRoute.get('/', async (req: RequestWithQuery<QueryPostInputModel>, res: ResponseType<Pagination<PostType>>) => {
-    const sortData = {
-        sortBy: req.query.sortBy ?? 'createdAt',
-        sortDirection: req.query.sortDirection ?? 'desc',
-        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
-        pageSize: req.query.pageSize ? +req.query.pageSize : 10
+class PostController {
+    private commentService:CommentsService
+    private postService: PostService
+    private postQueryRepository:PostQueryRepository
+
+    constructor() {
+        this.postService = new PostService()
+        this.commentService = new CommentsService()
+        this.postQueryRepository = new PostQueryRepository()
     }
 
-    const blogs = await PostQueryRepository.getAll(sortData)
-    if (!blogs) {
-        res.sendStatus(404)
-        return
-    }
-    res.send(blogs)
-})
+    async getAllPosts(req: RequestWithQuery<QueryPostInputModel>, res: ResponseType<Pagination<PostType>>) {
+        const sortData = {
+            sortBy: req.query.sortBy ?? 'createdAt',
+            sortDirection: req.query.sortDirection ?? 'desc',
+            pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+            pageSize: req.query.pageSize ? +req.query.pageSize : 10
+        }
 
-postRoute.get('/:id', async (req: RequestWithParams<ParamsType>, res: ResponseType<PostType>) => {
-    const foundPost = await PostQueryRepository.getById(new ObjectId(req.params.id))
-    if (!foundPost) {
-        res.sendStatus(404)
-        return
-    }
-    res.send(foundPost)
-})
-
-postRoute.post('/', authMiddleware, postValidation(), async (req: RequestWithBody<CreatePostType>, res: ResponseType<PostType>) => {
-
-    const newPost: PostTypeCreate = {
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        content: req.body.content,
-        blogId: req.body.blogId,
-        createdAt: new Date().toISOString()
+        const blogs = await this.postQueryRepository.getAll(sortData)
+        if (!blogs) {
+            res.sendStatus(404)
+            return
+        }
+        res.send(blogs)
     }
 
-    const post = await PostService.createPost(newPost)
-
-    if (!post) {
-        res.sendStatus(404)
-        return
-    }
-    res.status(201).send(post)
-})
-
-
-postRoute.put('/:id', authMiddleware, postValidation(), async (req: RequestWithParamsAndBody<ParamsType, CreatePostType>, res: ResponseType<void>) => {
-
-    const updateData = {
-        id: req.params.id,
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        content: req.body.content,
-        blogId: req.body.blogId
-    }
-    const updatePost = await PostService.updatePost(updateData)
-    if (!updatePost) {
-        res.sendStatus(404)
-        return
-    }
-    res.sendStatus(204)
-})
-
-postRoute.delete('/:id', authMiddleware, async (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const id = req.params.id
-    if (!ObjectId.isValid(id)) {
-        res.sendStatus(404)
-        return
+    async getPostBId(req: RequestWithParams<ParamsType>, res: ResponseType<PostType>) {
+        const foundPost = await this.postQueryRepository.getById(new ObjectId(req.params.id))
+        if (!foundPost) {
+            res.sendStatus(404)
+            return
+        }
+        res.send(foundPost)
     }
 
-    const deletePost = await PostService.deletePost(id)
-    if (!deletePost) {
-        res.sendStatus(404)
-        return
+    async createPost(req: RequestWithBody<CreatePostType>, res: ResponseType<PostType>) {
+
+
+        const newPost: PostTypeCreate = {
+            title: req.body.title,
+            shortDescription: req.body.shortDescription,
+            content: req.body.content,
+            blogId: req.body.blogId,
+            createdAt: new Date().toISOString()
+        }
+
+        const post = await this.postService.createPost(newPost)
+
+        if (!post) {
+            res.sendStatus(404)
+            return
+        }
+        res.status(201).send(post)
     }
 
-    res.sendStatus(204)
-})
+    async updatePost(req: RequestWithParamsAndBody<ParamsType, CreatePostType>, res: ResponseType<void>) {
 
-
-postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), async (req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: ResponseType<CommentsOutputType>) => {
-
-
-    const createCommentData:CreateCommentDataType = {
-        userId:req.userId!.toString(),
-        postId : req.params.id,
-        content : req.body.content,
-        createdAt: new Date().toISOString()
+        const updateData = {
+            id: req.params.id,
+            title: req.body.title,
+            shortDescription: req.body.shortDescription,
+            content: req.body.content,
+            blogId: req.body.blogId
+        }
+        const updatePost = await this.postService.updatePost(updateData)
+        if (!updatePost) {
+            res.sendStatus(404)
+            return
+        }
+        res.sendStatus(204)
     }
 
-    const createCommentToPost = await CommentsService.createComment(createCommentData)
-    if (!createCommentToPost) {
-        res.sendStatus(404)
-        return
-    }
-    return res.status(201).send(createCommentToPost)
-})
+    async deletePostById(req: RequestWithParams<{ id: string }>, res: Response) {
+        const id = req.params.id
+        if (!ObjectId.isValid(id)) {
+            res.sendStatus(404)
+            return
+        }
 
+        const deletePost = await this.postService.deletePost(id)
+        if (!deletePost) {
+            res.sendStatus(404)
+            return
+        }
 
-postRoute.get('/:id/comments', async (req: RequestWithQueryAndParams<ParamsType, QueryParamsInputCommentType>, res: ResponseType<Pagination<CommentsOutputType>>) => {
-    const id = req.params.id
-    if (!ObjectId.isValid(id)) {
-        res.sendStatus(404)
-        return
-    }
-    const post = await postModel.findOne({_id:new ObjectId(id)})
-
-    if(!post) return res.sendStatus(404)
-
-    const sortData = {
-        sortBy: req.query.sortBy ?? 'createdAt',
-        sortDirection: req.query.sortDirection ?? 'desc',
-        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
-        pageSize: req.query.pageSize ? +req.query.pageSize : 10
+        res.sendStatus(204)
     }
 
-    const comments = await CommentsQueryRepository.getAllByPostId(id,sortData)
-    if(!comments) return res.sendStatus(404)
+    async createCommentByPost(req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: ResponseType<CommentsOutputType>) {
+        const createCommentData: CreateCommentDataType = {
+            userId: req.userId!.toString(),
+            postId: req.params.id,
+            content: req.body.content,
+            createdAt: new Date().toISOString()
+        }
 
-    return res.send(comments)
-})
+        const createCommentToPost = await this.commentService.createComment(createCommentData)
+        if (!createCommentToPost) {
+            res.sendStatus(404)
+            return
+        }
+        return res.status(201).send(createCommentToPost)
+    }
+
+    async getCommentsByPost(req: RequestWithQueryAndParams<ParamsType, QueryParamsInputCommentType>, res: ResponseType<Pagination<CommentsOutputType>>) {
+        const id = req.params.id
+        if (!ObjectId.isValid(id)) {
+            res.sendStatus(404)
+            return
+        }
+        const post = await postModel.findOne({_id: new ObjectId(id)})
+
+        if (!post) return res.sendStatus(404)
+
+        const sortData = {
+            sortBy: req.query.sortBy ?? 'createdAt',
+            sortDirection: req.query.sortDirection ?? 'desc',
+            pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+            pageSize: req.query.pageSize ? +req.query.pageSize : 10
+        }
+
+        const comments = await CommentsQueryRepository.getAllByPostId(id, sortData)
+        if (!comments) return res.sendStatus(404)
+
+        return res.send(comments)
+    }
+}
+
+const postController = new PostController()
+
+postRoute.get('/', postController.getAllPosts.bind(postController))
+postRoute.get('/:id', postController.getPostBId.bind(postController))
+postRoute.post('/', authMiddleware, postValidation(), postController.createPost.bind(postController))
+postRoute.put('/:id', authMiddleware, postValidation(), postController.updatePost.bind(postController))
+postRoute.delete('/:id', authMiddleware, postController.deletePostById.bind(postController))
+postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), postController.createCommentByPost.bind(postController))
+postRoute.get('/:id/comments', postController.getCommentsByPost.bind(postController))

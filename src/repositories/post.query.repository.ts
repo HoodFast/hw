@@ -7,7 +7,7 @@ import {SortDataType} from "./blog.query.repository";
 
 
 export class PostQueryRepository {
-    static async getAll(sortData:SortDataType): Promise<Pagination<PostType>> {
+    async getAll(sortData:SortDataType): Promise<Pagination<PostType>> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
         const posts = await postModel
@@ -29,7 +29,7 @@ export class PostQueryRepository {
         }
     }
 
-    static async getById(id: ObjectId): Promise<PostType | null> {
+     async getById(id: ObjectId): Promise<PostType | null> {
         const post = await postModel.findOne({_id: id})
         if (!post) {
             return null
