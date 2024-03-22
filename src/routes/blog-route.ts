@@ -20,23 +20,25 @@ import {BlogRepository} from "../repositories/blog.repository";
 import {sortQueryFieldsUtil} from "../utils/sortQueryFields.util";
 import {BlogDbType} from "../models/blog/db/blog-db";
 
+import {blogsController} from "../../composition-root";
+
 export const blogRoute = Router({})
 
-class BlogsController {
-    private blogService: BlogService
-
-    constructor() {
-        this.blogService = new BlogService()
+export class BlogsController {
+    constructor(
+        protected blogService: BlogService,
+        protected blogQueryRepository: BlogQueryRepository
+    ) {
     }
 
     async createBlog(req: RequestWithBody<UpdateBlogType>, res: ResponseType<OutputBlogType>) {
-        const newBlog = new BlogDbType(
-            req.body.name,
-            req.body.description,
-            req.body.websiteUrl,
-            new Date().toISOString(),
-            false
-        )
+        const newBlog = {
+            name:req.body.name,
+            description:req.body.description,
+            websiteUrl:req.body.websiteUrl,
+            createdAt:new Date().toISOString(),
+            isMembership: false
+        }
         const newBlog_ = {
             name: req.body.name,
             description: req.body.description,
@@ -108,7 +110,7 @@ class BlogsController {
             pageSize: req.query.pageSize ? +req.query.pageSize : 10
         }
 
-        const blogs = await BlogQueryRepository.getAll(sortData)
+        const blogs = await this.blogQueryRepository.getAll(sortData)
         res.send(blogs)
     }
 
@@ -118,7 +120,7 @@ class BlogsController {
             res.sendStatus(404)
             return
         }
-        const blog = await BlogQueryRepository.getById(new ObjectId(id))
+        const blog = await this.blogQueryRepository.getById(new ObjectId(id))
         if (!blog) {
             res.sendStatus(404)
             return
@@ -126,7 +128,7 @@ class BlogsController {
         const {sortBy, sortDirection, pageNumber, pageSize} = req.query
         const sortData = sortQueryFieldsUtil({sortBy, sortDirection, pageNumber, pageSize})
 
-        const posts = await BlogQueryRepository.getAllPostsToBlog(id, sortData)
+        const posts = await this.blogQueryRepository.getAllPostsToBlog(id, sortData)
 
         res.send(posts)
     }
@@ -137,7 +139,7 @@ class BlogsController {
             res.sendStatus(404)
             return
         }
-        const blog = await BlogQueryRepository.getById(new ObjectId(req.params.id))
+        const blog = await this.blogQueryRepository.getById(new ObjectId(req.params.id))
         if (!blog) {
             res.sendStatus(404)
             return
@@ -161,7 +163,6 @@ class BlogsController {
     }
 }
 
-const blogsController = new BlogsController()
 
 blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController))
 blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController))

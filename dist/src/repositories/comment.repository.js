@@ -9,38 +9,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BlogRepository = void 0;
-const db_1 = require("../db/db");
+exports.CommentRepository = void 0;
 const mongodb_1 = require("mongodb");
-const blog_mappers_1 = require("../models/blog/mappers/blog-mappers");
-class BlogRepository {
-    createBlog(createData) {
+const comment_query_repository_1 = require("./comment.query.repository");
+const db_1 = require("../db/db");
+class CommentRepository {
+    static createComment(createData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.blogModel.insertMany(createData);
-            const blog = yield db_1.blogModel.findOne(res[0]._id);
-            if (!blog) {
+            const res = yield db_1.commentModel.insertMany(createData);
+            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(res[0]._id);
+            if (!comment) {
                 return null;
             }
-            return (0, blog_mappers_1.blogMapper)(blog);
+            return comment;
         });
     }
-    updateBlog(data) {
+    static updateComment(id, content) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.blogModel.updateOne({ _id: new mongodb_1.ObjectId(data.id) }, {
+            const res = yield db_1.commentModel.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
                 $set: {
-                    name: data.name,
-                    description: data.description,
-                    websiteUrl: data.websiteUrl
+                    content,
                 }
             });
             return !!res.matchedCount;
         });
     }
-    deleteById(id) {
+    static deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.blogModel.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+            const res = yield db_1.commentModel.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return !!res.deletedCount;
         });
     }
 }
-exports.BlogRepository = BlogRepository;
+exports.CommentRepository = CommentRepository;

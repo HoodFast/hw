@@ -12,14 +12,18 @@ import {BlogQueryRepository} from "../repositories/blog.query.repository";
 
 export class PostService {
     private postQueryRepository:PostQueryRepository
+    private blogQueryRepository:BlogQueryRepository
+    private postRepository:PostRepository
 
     constructor() {
         this.postQueryRepository = new PostQueryRepository()
+        this.blogQueryRepository = new BlogQueryRepository()
+        this.postRepository = new PostRepository()
     }
 
     async createPost(data: PostTypeCreate): Promise<PostType | null> {
         const {title, createdAt, blogId, content, shortDescription} = data
-        const blog = await BlogQueryRepository.getById(new ObjectId(blogId))
+        const blog = await  this.blogQueryRepository.getById(new ObjectId(blogId))
         if (!blog) {
             return null
         }
@@ -32,7 +36,7 @@ export class PostService {
             createdAt
         }
 
-        const createPost = await PostRepository.createPost(newPost)
+        const createPost = await this.postRepository.createPost(newPost)
         if (!createPost) {
             return null
         }
@@ -47,11 +51,11 @@ export class PostService {
     }
 
     async updatePost(data: UpdatePostType): Promise<boolean | null> {
-        return await PostRepository.updatePost(data)
+        return await this.postRepository.updatePost(data)
     }
 
     async deletePost(id: string): Promise<boolean> {
-        return await PostRepository.deletePost(id)
+        return await this.postRepository.deletePost(id)
     }
 
 }

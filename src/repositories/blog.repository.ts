@@ -1,10 +1,7 @@
 import {blogModel} from "../db/db";
-
 import {ObjectId} from "mongodb";
 import {BlogType, OutputBlogMapType, OutputBlogType} from "../models/common/common";
-
-import {BlogQueryRepository} from "./blog.query.repository";
-import {BlogDbType} from "../models/blog/db/blog-db";
+import {blogMapper} from "../models/blog/mappers/blog-mappers";
 
 
 
@@ -16,11 +13,11 @@ export class BlogRepository {
 
     async createBlog(createData: OutputBlogType):Promise<OutputBlogMapType | null> {
         const res = await blogModel.insertMany(createData)
-        const blog = await BlogQueryRepository.getById(res[0]._id)
+        const blog = await blogModel.findOne(res[0]._id)
         if (!blog) {
             return null
         }
-        return blog
+        return blogMapper(blog)
     }
 
     async updateBlog(data: BlogType):Promise<boolean> {

@@ -21,7 +21,7 @@ export type SortDataType = {
 
 
 export class BlogQueryRepository {
-    static async getAll(sortData: SortDataSearchType): Promise<Pagination<OutputBlogType>> {
+    async getAll(sortData: SortDataSearchType): Promise<Pagination<OutputBlogType>> {
         const {sortBy, sortDirection, pageSize, pageNumber, searchNameTerm} = sortData
         let filter = {}
         if (searchNameTerm) {
@@ -50,7 +50,7 @@ export class BlogQueryRepository {
         }
     }
 
-    static async getAllPostsToBlog(blogId: string, sortData: SortDataType): Promise<Pagination<PostType>> {
+    async getAllPostsToBlog(blogId: string, sortData: SortDataType): Promise<Pagination<PostType>> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
         const posts = await postModel
@@ -73,7 +73,7 @@ export class BlogQueryRepository {
     }
 
 
-    static async getById(id: ObjectId): Promise<OutputBlogMapType | null> {
+    async getById(id: ObjectId): Promise<OutputBlogMapType | null> {
         const blog = await blogModel.findOne({_id: new ObjectId(id)})
         if (!blog) {
             return null

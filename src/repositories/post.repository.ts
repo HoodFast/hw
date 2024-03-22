@@ -1,4 +1,4 @@
-import {postModel} from "../db/db";
+import {blogModel, postModel} from "../db/db";
 import {PostType, PostTypeDb, UpdatePostType} from "../models/common/common";
 import {ObjectId} from "mongodb";
 import {BlogQueryRepository} from "./blog.query.repository";
@@ -8,7 +8,7 @@ import {postMapper} from "../models/blog/mappers/post-mappers";
 
 export class PostRepository {
 
-    static async createPost(data: PostTypeDb): Promise<PostType | null> {
+    async createPost(data: PostTypeDb): Promise<PostType | null> {
 
         const res = await postModel.insertMany(data)
         const post = await postModel.findOne(res[0]._id)
@@ -18,9 +18,9 @@ export class PostRepository {
         return postMapper(post)
     }
 
-    static async updatePost(data: UpdatePostType): Promise<boolean> {
+    async updatePost(data: UpdatePostType): Promise<boolean> {
         try {
-            const blog = await BlogQueryRepository.getById(new ObjectId(data.blogId))
+            const blog = await blogModel.findOne(new ObjectId(data.blogId))
             if (!blog) {
                 return false
             }
@@ -41,7 +41,7 @@ export class PostRepository {
         }
     }
 
-    static async deletePost(id: string) {
+    async deletePost(id: string) {
         const res = await postModel.deleteOne({_id: new ObjectId(id)})
         return !!res.deletedCount
     }
