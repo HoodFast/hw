@@ -35,8 +35,8 @@ commentSchema.methods.addLike =
 
         if (!myStatus) {
             likes.push(newLike)
-            this.likesCount = likes.filter(i => i.likesStatus === likesStatuses.like).length
-            this.dislikesCount = likes.filter(i => i.likesStatus === likesStatuses.dislike).length
+            this.likesCount = likes.filter(i => i.likesStatus === likesStatuses.like).length || 0
+            this.dislikesCount = likes.filter(i => i.likesStatus === likesStatuses.dislike).length || 0
 
             return {code: ResultCode.Success}
         }
@@ -45,8 +45,8 @@ commentSchema.methods.addLike =
 
         myStatus.likesStatus = likeStatus
         myStatus.updatedAt = new Date()
-        this.likesCount = likes.filter(i => i.likesStatus === likesStatuses.like).length
-        this.dislikesCount = likes.filter(i => i.likesStatus === likesStatuses.dislike).length
+        this.likesCount = likes.filter(i => i.likesStatus === likesStatuses.like).length || 0
+        this.dislikesCount = likes.filter(i => i.likesStatus === likesStatuses.dislike).length || 0
 
         return {code: ResultCode.Success}
     }
