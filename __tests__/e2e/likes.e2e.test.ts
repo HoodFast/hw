@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import {appConfig} from "../../src/app/config";
 import {ADMIN_LOGIN, ADMIN_PASS} from "../../src/auth/guards/base.auth.guard";
 import {createNewBlogDto, createNewPostDto} from "./utils/createDto";
+import {getNewLike, likesPut} from "./utils/LikesPut";
 
 
 const request = require('supertest');
@@ -15,9 +16,7 @@ const path = {
     comments: '/ht_02/api/comments/'
 }
 
-const getNewLike = (myStatus: string) => {
-    return {likeStatus: myStatus}
-}
+
 
 const errorMessages = {
     errorsMessages: [
@@ -26,8 +25,6 @@ const errorMessages = {
     ],
 }
 describe('COMMENT LIKES', () => {
-
-
     let tokensList:string[] = []
     let commentId: string
     beforeAll(async () => {
@@ -67,14 +64,7 @@ describe('COMMENT LIKES', () => {
 
     it('+put correct like-statuses', async () => {
         const likeStatuses = ['Like', 'Like', 'Like', 'Like', 'Dislike']
-        for (let i = 0; i < likeStatuses.length; i++) {
-            const res = await request(app)
-                .put(routerPaths.comments+'/'+commentId+'/like-status')
-                .set('Authorization',`Bearer ${tokensList[i]}`)
-                .send(
-                    getNewLike(likeStatuses[i])
-                ).expect(204)
-        }
+        await likesPut(app,likeStatuses,commentId,tokensList)
         const res = await request(app)
             .get(routerPaths.comments+'/'+commentId)
             .set('Authorization',`Bearer ${tokensList[0]}`)
@@ -105,18 +95,26 @@ describe('COMMENT LIKES', () => {
 
     it('+update like-status ', async () => {
         const likeStatuses = ['Like', 'Like', 'Like', 'Like', 'Like']
-        for (let i = 0; i < likeStatuses.length; i++) {
-            const res = await request(app)
-                .put(routerPaths.comments+'/'+commentId+'/like-status')
-                .set('Authorization',`Bearer ${tokensList[i]}`)
-                .send(
-                    getNewLike(likeStatuses[i])
-                ).expect(204)
-        }
+        await likesPut(app,likeStatuses,commentId,tokensList)
         const res = await request(app)
             .get(routerPaths.comments+'/'+commentId)
             .set('Authorization',`Bearer ${tokensList[0]}`)
             .expect(200)
+
+        expect(res.body.likesInfo.likesCount).toBe(5)
+        expect(res.body.likesInfo.dislikesCount).toBe(0)
+        expect(res.body.likesInfo.myStatus).toBe('Like')
+
+        const NewLikeStatuses = ['Dislike', 'Dislike', 'Dislike', 'Dislike', 'Dislike']
+        await likesPut(app,NewLikeStatuses,commentId,tokensList)
+
+        const updatedRes = await request(app)
+            .get(routerPaths.comments+'/'+commentId)
+            .set('Authorization',`Bearer ${tokensList[0]}`)
+            .expect(200)
+        expect(updatedRes.body.likesInfo.likesCount).toBe(0)
+        expect(updatedRes.body.likesInfo.dislikesCount).toBe(5)
+        expect(updatedRes.body.likesInfo.myStatus).toBe('Dislike')
     })
 
 
