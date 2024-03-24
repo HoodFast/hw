@@ -92,7 +92,7 @@ class CommentController {
 
 const commentController = new CommentController()
 
-commentsRoute.get('/:id',accessTokenGuard, commentController.getCommentById.bind(commentController))
+commentsRoute.get('/:id', commentController.getCommentById.bind(commentController))
 commentsRoute.delete('/:id', accessTokenGuard, commentController.deleteCommentById.bind(commentController))
 commentsRoute.put('/:id', accessTokenGuard, commentsValidation(), commentController.updateComment.bind(commentController))
 commentsRoute.put('/:id/like-status', accessTokenGuard,likesValidators(), commentController.updateLikes.bind(commentController))
