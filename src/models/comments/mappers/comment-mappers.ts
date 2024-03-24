@@ -5,27 +5,26 @@ import {CommentsQueryRepository} from "../../../repositories/comment.query.repos
 import {CommentRepository} from "../../../repositories/comment.repository";
 
 
-
-export const commentMapper = (comment: WithId<CommentDbType>,userId:string): CommentsOutputType => {
-
-    // @ts-ignore
-    let myStatus = comment.getMyStatus(userId)
-
-    if(!myStatus){
-        myStatus=likesStatuses.none
+export const commentMapper = (comment: WithId<CommentDbType>, userId: string): CommentsOutputType => {
+    let myStatus = likesStatuses.none
+    if (userId) {
+        // @ts-ignore
+        myStatus = comment.getMyStatus(userId)
     }
+
+
     return {
         id: comment._id.toString(),
-        content:comment.content,
+        content: comment.content,
         commentatorInfo: {
-            userId:comment.commentatorInfo.userId,
-            userLogin:comment.commentatorInfo.userLogin
+            userId: comment.commentatorInfo.userId,
+            userLogin: comment.commentatorInfo.userLogin
         },
-        createdAt:comment.createdAt,
+        createdAt: comment.createdAt,
         likesInfo: {
             likesCount: comment.likesCount,
             dislikesCount: comment.dislikesCount,
-            myStatus:myStatus
+            myStatus: myStatus
         }
     }
 }
