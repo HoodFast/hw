@@ -16,11 +16,17 @@ const db_1 = require("../db/db");
 class CommentRepository {
     getCommentById(commentId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield db_1.commentModel.findOne({ _id: new mongodb_1.ObjectId(commentId) });
-            if (!res) {
+            try {
+                const res = yield db_1.commentModel.findOne({ _id: new mongodb_1.ObjectId(commentId) });
+                if (!res) {
+                    return null;
+                }
+                return res;
+            }
+            catch (e) {
+                console.log(e);
                 return null;
             }
-            return res;
         });
     }
     static createComment(createData) {

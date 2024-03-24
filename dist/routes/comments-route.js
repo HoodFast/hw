@@ -17,6 +17,7 @@ const comment_query_repository_1 = require("../repositories/comment.query.reposi
 const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
 const comments_service_1 = require("../services/comments.service");
 const comments_validators_1 = require("../validators/comments-validators");
+const likes_validator_1 = require("../validators/likes-validator");
 exports.commentsRoute = (0, express_1.Router)({});
 class CommentController {
     constructor() {
@@ -25,10 +26,9 @@ class CommentController {
     getCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const userId = req.userId.toString();
+            const userId = req.userId.toString() || '';
             if (!mongodb_1.ObjectId.isValid(id))
                 return res.sendStatus(404);
-            debugger;
             const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id), userId);
             if (!comment)
                 return res.sendStatus(404);
@@ -93,7 +93,7 @@ class CommentController {
     }
 }
 const commentController = new CommentController();
-exports.commentsRoute.get('/:id', accesstoken_middleware_1.accessTokenGuard, commentController.getCommentById.bind(commentController));
+exports.commentsRoute.get('/:id', commentController.getCommentById.bind(commentController));
 exports.commentsRoute.delete('/:id', accesstoken_middleware_1.accessTokenGuard, commentController.deleteCommentById.bind(commentController));
 exports.commentsRoute.put('/:id', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), commentController.updateComment.bind(commentController));
-exports.commentsRoute.put('/:id/like-status', accesstoken_middleware_1.accessTokenGuard, commentController.updateLikes.bind(commentController));
+exports.commentsRoute.put('/:id/like-status', accesstoken_middleware_1.accessTokenGuard, (0, likes_validator_1.likesValidators)(), commentController.updateLikes.bind(commentController));

@@ -85,13 +85,21 @@ class CommentsService {
     }
     updateLike(userId, commentId, likeStatus) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comment = yield this.commentRepository.getCommentById(commentId);
-            if (!comment)
-                return { code: common_1.ResultCode.NotFound };
-            // @ts-ignore
-            yield comment.addLike(userId, likeStatus);
-            yield comment.save();
-            return { code: common_1.ResultCode.Success };
+            try {
+                let comment = yield this.commentRepository.getCommentById(commentId);
+                if (!comment) {
+                    console.log(comment);
+                    return { code: common_1.ResultCode.NotFound };
+                }
+                // @ts-ignore
+                yield comment.addLike(userId, likeStatus);
+                yield comment.save();
+                return { code: common_1.ResultCode.Success };
+            }
+            catch (e) {
+                console.log(e);
+                return { code: common_1.ResultCode.Forbidden };
+            }
         });
     }
 }

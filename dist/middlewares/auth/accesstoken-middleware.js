@@ -16,13 +16,16 @@ const user_repository_1 = require("../../repositories/user.repository");
 const mongodb_1 = require("mongodb");
 const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.headers.authorization) {
+        console.log(`Авторизация не пройдена - ${req.headers.authorization}`);
         return res.sendStatus(401);
     }
     let tokenBearer = req.headers.authorization;
+    console.log(tokenBearer);
     const token = tokenBearer.split(' ');
     const userId = yield jwt_service_1.jwtService.getUserIdByToken(token[1]);
     if (userId) {
         const user = yield user_repository_1.UserRepository.doesExistById(userId);
+        console.log(`прроверка на сущ юзера ${user}`);
         if (!user) {
             return res.sendStatus(401);
         }
