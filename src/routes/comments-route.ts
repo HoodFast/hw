@@ -27,7 +27,13 @@ class CommentController {
 
     async getCommentById(req: RequestWithParams<ParamsType>, res: ResponseType<CommentsOutputType>) {
         const id = req.params.id
-        const userId = req.userId!.toString() || ''
+        let userId:string
+        if(!req.userId){
+            userId=''
+        }else{
+            userId = req.userId!.toString()
+        }
+
         if (!ObjectId.isValid(id)) return res.sendStatus(404)
 
         const comment = await CommentsQueryRepository.getById(new ObjectId(id),userId)

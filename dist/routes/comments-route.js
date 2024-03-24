@@ -26,7 +26,13 @@ class CommentController {
     getCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const userId = req.userId.toString() || '';
+            let userId;
+            if (!req.userId) {
+                userId = '';
+            }
+            else {
+                userId = req.userId.toString();
+            }
             if (!mongodb_1.ObjectId.isValid(id))
                 return res.sendStatus(404);
             const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id), userId);
