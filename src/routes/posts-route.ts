@@ -27,9 +27,9 @@ import {postModel} from "../db/db";
 export const postRoute = Router({})
 
 class PostController {
-    private commentService:CommentsService
+    private commentService: CommentsService
     private postService: PostService
-    private postQueryRepository:PostQueryRepository
+    private postQueryRepository: PostQueryRepository
 
     constructor() {
         this.postService = new PostService()
@@ -138,7 +138,7 @@ class PostController {
             return
         }
         const post = await postModel.findOne({_id: new ObjectId(id)})
-
+        const userId = req.userId ? req.userId.toString() : ''
         if (!post) return res.sendStatus(404)
 
         const sortData = {
@@ -148,7 +148,7 @@ class PostController {
             pageSize: req.query.pageSize ? +req.query.pageSize : 10
         }
 
-        const comments = await CommentsQueryRepository.getAllByPostId(id, sortData)
+        const comments = await CommentsQueryRepository.getAllByPostId(id, sortData, userId)
         if (!comments) return res.sendStatus(404)
 
         return res.send(comments)
@@ -163,4 +163,4 @@ postRoute.post('/', authMiddleware, postValidation(), postController.createPost.
 postRoute.put('/:id', authMiddleware, postValidation(), postController.updatePost.bind(postController))
 postRoute.delete('/:id', authMiddleware, postController.deletePostById.bind(postController))
 postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), postController.createCommentByPost.bind(postController))
-postRoute.get('/:id/comments', postController.getCommentsByPost.bind(postController))
+postRoute.get('/:id/comments', accessTokenGuard, postController.getCommentsByPost.bind(postController))

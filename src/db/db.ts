@@ -2,10 +2,11 @@ import {MongoClient, ObjectId} from "mongodb";
 import {BlogDbType} from "../models/blog/db/blog-db";
 import {PostTypeDb} from "../models/common/common";
 import {accountDataType, emailConfirmationType, UsersTypeDb} from "../models/users/db/usersDBModel";
-import {CommentDbType} from "../models/comments/db/comment.db.model";
+import {CommentDbType, likesStatuses, likesType} from "../models/comments/db/comment.db.model";
 import {appConfig} from "../app/config";
 import {tokensMetaDbType} from "../models/tokens/token.db.model";
 import mongoose from "mongoose";
+import {commentSchema} from "../models/comments/db/likesModel";
 
 
 export const db = {
@@ -88,15 +89,6 @@ const userSchema = new mongoose.Schema<UsersTypeDb>({
     }
 )
 
-const commentSchema = new mongoose.Schema<CommentDbType>({
-    content: String,
-    postId: {type: String, require},
-    commentatorInfo: {
-        userId: {type: String, require},
-        userLogin: {type: String, require},
-    },
-    createdAt: String
-})
 
 const tokenMetaSchema = new mongoose.Schema<tokensMetaDbType>(
     {

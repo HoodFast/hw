@@ -15,7 +15,6 @@ const users_query_repository_1 = require("../../repositories/users.query.reposit
 const user_repository_1 = require("../../repositories/user.repository");
 const mongodb_1 = require("mongodb");
 const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    debugger;
     if (!req.headers.authorization) {
         return res.sendStatus(401);
     }

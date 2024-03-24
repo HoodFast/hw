@@ -1,11 +1,19 @@
 import {WithId} from "mongodb";
-import {CommentDbType} from "../db/comment.db.model";
+import {CommentDbType, likesStatuses} from "../db/comment.db.model";
 import {CommentsOutputType} from "../otput/comments.output.model";
+import {CommentsQueryRepository} from "../../../repositories/comment.query.repository";
+import {CommentRepository} from "../../../repositories/comment.repository";
 
 
 
-export const commentMapper = (comment: WithId<CommentDbType>): CommentsOutputType => {
+export const commentMapper = (comment: WithId<CommentDbType>,userId:string): CommentsOutputType => {
 
+    // @ts-ignore
+    let myStatus = comment.getMyStatus(userId)
+
+    if(!myStatus){
+        myStatus=likesStatuses.none
+    }
     return {
         id: comment._id.toString(),
         content:comment.content,
@@ -13,6 +21,11 @@ export const commentMapper = (comment: WithId<CommentDbType>): CommentsOutputTyp
             userId:comment.commentatorInfo.userId,
             userLogin:comment.commentatorInfo.userLogin
         },
-        createdAt:comment.createdAt
+        createdAt:comment.createdAt,
+        likesInfo: {
+            likesCount: comment.likesCount,
+            dislikesCount: comment.dislikesCount,
+            myStatus:myStatus
+        }
     }
 }

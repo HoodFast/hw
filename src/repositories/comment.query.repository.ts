@@ -9,15 +9,16 @@ import {commentModel} from "../db/db";
 export class CommentsQueryRepository {
 
 
-    static async getById(id: ObjectId): Promise<CommentsOutputType | null> {
+    static async getById(id: ObjectId,userId:string) {
         const comment = await commentModel.findOne({_id: new ObjectId(id)})
         if (!comment) {
             return null
         }
-        return commentMapper(comment)
+
+        return commentMapper(comment,userId)
     }
 
-    static async getAllByPostId(id: string, sortData: SortDataType):Promise<Pagination<CommentsOutputType> | null> {
+    static async getAllByPostId(id: string, sortData: SortDataType,userId:string):Promise<Pagination<CommentsOutputType> | null> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
         const comments = await commentModel
@@ -25,7 +26,7 @@ export class CommentsQueryRepository {
             .sort({sortBy: sortDirection})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .lean()
+
 
         const totalCount = await commentModel.countDocuments({postId: id})
         const pagesCount = Math.ceil(totalCount / pageSize)
@@ -35,9 +36,7 @@ export class CommentsQueryRepository {
             page: pageNumber,
             pageSize,
             totalCount,
-            items:  comments.map(commentMapper)
+            items:  comments.map(i=>commentMapper(i,userId))
         }
-
-
     }
 }

@@ -25,9 +25,11 @@ class CommentController {
     getCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
+            const userId = req.userId.toString();
             if (!mongodb_1.ObjectId.isValid(id))
                 return res.sendStatus(404);
-            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
+            debugger;
+            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id), userId);
             if (!comment)
                 return res.sendStatus(404);
             return res.send(comment);
@@ -71,8 +73,27 @@ class CommentController {
             }
         });
     }
+    updateLikes(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = req.userId.toString();
+            const commentId = req.params.id;
+            const likeStatus = req.body.likeStatus;
+            const updateLike = yield this.commentService.updateLike(userId, commentId, likeStatus);
+            switch (updateLike.code) {
+                case common_1.ResultCode.NotFound:
+                    return res.sendStatus(404);
+                case common_1.ResultCode.Forbidden:
+                    return res.sendStatus(403);
+                case common_1.ResultCode.Success:
+                    return res.sendStatus(204);
+                default:
+                    return res.sendStatus(404);
+            }
+        });
+    }
 }
 const commentController = new CommentController();
-exports.commentsRoute.get('/:id', commentController.getCommentById.bind(commentController));
+exports.commentsRoute.get('/:id', accesstoken_middleware_1.accessTokenGuard, commentController.getCommentById.bind(commentController));
 exports.commentsRoute.delete('/:id', accesstoken_middleware_1.accessTokenGuard, commentController.deleteCommentById.bind(commentController));
 exports.commentsRoute.put('/:id', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), commentController.updateComment.bind(commentController));
+exports.commentsRoute.put('/:id/like-status', accesstoken_middleware_1.accessTokenGuard, commentController.updateLikes.bind(commentController));

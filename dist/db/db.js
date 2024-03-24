@@ -16,6 +16,7 @@ exports.tokenMetaModel = exports.commentModel = exports.userModel = exports.post
 const mongodb_1 = require("mongodb");
 const config_1 = require("../app/config");
 const mongoose_1 = __importDefault(require("mongoose"));
+const likesModel_1 = require("../models/comments/db/likesModel");
 exports.db = {
     client: new mongodb_1.MongoClient(config_1.appConfig.MONGO_URL),
     getDbName() {
@@ -90,15 +91,6 @@ const userSchema = new mongoose_1.default.Schema({
     emailConfirmation: emailSchema,
     tokensBlackList: [String]
 });
-const commentSchema = new mongoose_1.default.Schema({
-    content: String,
-    postId: { type: String, require },
-    commentatorInfo: {
-        userId: { type: String, require },
-        userLogin: { type: String, require },
-    },
-    createdAt: String
-});
 const tokenMetaSchema = new mongoose_1.default.Schema({
     iat: Date,
     expireDate: Date,
@@ -110,5 +102,5 @@ const tokenMetaSchema = new mongoose_1.default.Schema({
 exports.blogModel = mongoose_1.default.model('blogs', blogSchema);
 exports.postModel = mongoose_1.default.model('posts', postSchema);
 exports.userModel = mongoose_1.default.model('users', userSchema);
-exports.commentModel = mongoose_1.default.model('comments', commentSchema);
+exports.commentModel = mongoose_1.default.model('comments', likesModel_1.commentSchema);
 exports.tokenMetaModel = mongoose_1.default.model('tokensMeta', tokenMetaSchema);

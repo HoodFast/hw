@@ -16,11 +16,14 @@ import {BlogQueryRepository} from "../repositories/blog.query.repository";
 import {createPostFromBlogValidation} from "../validators/post-validators";
 import {CreatePostFromBlogInputModel} from "../models/blog/input/create.post.from.blog.input.model";
 import {BlogService} from "../services/blog.service";
-import {BlogRepository} from "../repositories/blog.repository";
-import {sortQueryFieldsUtil} from "../utils/sortQueryFields.util";
-import {BlogDbType} from "../models/blog/db/blog-db";
 
-import {blogsController} from "../../composition-root";
+import {sortQueryFieldsUtil} from "../utils/sortQueryFields.util";
+import {PostQueryRepository} from "../repositories/post.query.repository";
+import {BlogRepository} from "../repositories/blog.repository";
+import {PostRepository} from "../repositories/post.repository";
+
+
+// import {blogsController} from "../composition-root";
 
 export const blogRoute = Router({})
 
@@ -163,6 +166,12 @@ export class BlogsController {
     }
 }
 
+const blogRepo = new BlogRepository()
+const blogQueryRepository = new BlogQueryRepository()
+const postRepository = new PostRepository()
+const postQueryRepository = new PostQueryRepository()
+const blogService = new BlogService(blogRepo,blogQueryRepository,postRepository,postQueryRepository)
+export const blogsController = new BlogsController(blogService,blogQueryRepository)
 
 blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController))
 blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController))

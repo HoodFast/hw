@@ -14,24 +14,23 @@ const mongodb_1 = require("mongodb");
 const comment_mappers_1 = require("../models/comments/mappers/comment-mappers");
 const db_1 = require("../db/db");
 class CommentsQueryRepository {
-    static getById(id) {
+    static getById(id, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comment = yield db_1.commentModel.findOne({ _id: new mongodb_1.ObjectId(id) });
             if (!comment) {
                 return null;
             }
-            return (0, comment_mappers_1.commentMapper)(comment);
+            return (0, comment_mappers_1.commentMapper)(comment, userId);
         });
     }
-    static getAllByPostId(id, sortData) {
+    static getAllByPostId(id, sortData, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
             const comments = yield db_1.commentModel
                 .find({ postId: id })
                 .sort({ sortBy: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
-                .limit(pageSize)
-                .lean();
+                .limit(pageSize);
             const totalCount = yield db_1.commentModel.countDocuments({ postId: id });
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {
@@ -39,7 +38,7 @@ class CommentsQueryRepository {
                 page: pageNumber,
                 pageSize,
                 totalCount,
-                items: comments.map(comment_mappers_1.commentMapper)
+                items: comments.map(i => (0, comment_mappers_1.commentMapper)(i, userId))
             };
         });
     }

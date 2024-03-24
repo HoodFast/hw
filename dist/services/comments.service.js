@@ -19,6 +19,7 @@ const mongodb_1 = require("mongodb");
 class CommentsService {
     constructor() {
         this.postQueryRepository = new post_query_repository_1.PostQueryRepository();
+        this.commentRepository = new comment_repository_1.CommentRepository();
     }
     createComment(data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,7 +39,10 @@ class CommentsService {
                     userId,
                     userLogin: user.login
                 },
-                createdAt
+                createdAt,
+                likesCount: 0,
+                dislikesCount: 0,
+                likes: []
             };
             const createComment = yield comment_repository_1.CommentRepository.createComment(newComment);
             if (!createComment) {
@@ -49,7 +53,7 @@ class CommentsService {
     }
     updateComment(id, content, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
+            const comment = yield this.commentRepository.getCommentById(id);
             if (!comment)
                 return { code: common_1.ResultCode.NotFound };
             const user = yield users_query_repository_1.UserQueryRepository.getById(new mongodb_1.ObjectId(userId));
@@ -57,7 +61,7 @@ class CommentsService {
                 return { code: common_1.ResultCode.NotFound };
             if (comment.commentatorInfo.userId !== user.id)
                 return { code: common_1.ResultCode.Forbidden };
-            const update = yield comment_repository_1.CommentRepository.updateComment(id, content);
+            const update = yield this.commentRepository.updateComment(id, content);
             if (!update)
                 return { code: common_1.ResultCode.NotFound };
             return { code: common_1.ResultCode.Success };
@@ -65,7 +69,7 @@ class CommentsService {
     }
     deleteCommentById(id, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id));
+            const comment = yield comment_query_repository_1.CommentsQueryRepository.getById(new mongodb_1.ObjectId(id), userId);
             if (!comment)
                 return { code: common_1.ResultCode.NotFound };
             const user = yield users_query_repository_1.UserQueryRepository.getById(new mongodb_1.ObjectId(userId));
@@ -76,6 +80,17 @@ class CommentsService {
             const deleted = yield comment_repository_1.CommentRepository.deleteById(id);
             if (!deleted)
                 return { code: common_1.ResultCode.NotFound };
+            return { code: common_1.ResultCode.Success };
+        });
+    }
+    updateLike(userId, commentId, likeStatus) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const comment = yield this.commentRepository.getCommentById(commentId);
+            if (!comment)
+                return { code: common_1.ResultCode.NotFound };
+            // @ts-ignore
+            yield comment.addLike(userId, likeStatus);
+            yield comment.save();
             return { code: common_1.ResultCode.Success };
         });
     }

@@ -1,14 +1,13 @@
-import {ResultCode, UpdatePostType} from "../models/common/common";
-import {PostRepository} from "../repositories/post.repository";
+import {ResultCode} from "../models/common/common";
 import {PostQueryRepository} from "../repositories/post.query.repository";
 import {UserQueryRepository} from "../repositories/users.query.repository";
-import {CommentDbType} from "../models/comments/db/comment.db.model";
+import {CommentDbType, likesStatuses} from "../models/comments/db/comment.db.model";
 import {CommentRepository} from "../repositories/comment.repository";
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 import {CommentsQueryRepository} from "../repositories/comment.query.repository";
 import {Result} from "../types/result.type";
 import {ObjectId} from "mongodb";
-import {PostService} from "./post.service";
+
 
 export type CreateCommentDataType = {
     userId: string,
@@ -18,12 +17,16 @@ export type CreateCommentDataType = {
 }
 
 export class CommentsService {
-    private postQueryRepository:PostQueryRepository
+    private postQueryRepository: PostQueryRepository
+    private commentRepository: CommentRepository
 
     constructor() {
         this.postQueryRepository = new PostQueryRepository()
+        this.commentRepository = new CommentRepository()
+
     }
-     async createComment(data: CreateCommentDataType): Promise<CommentsOutputType | null> {
+
+    async createComment(data: CreateCommentDataType): Promise<CommentsOutputType | null> {
         const {userId, postId, content, createdAt} = data
         const post = await this.postQueryRepository.getById(new ObjectId(postId))
 
@@ -42,9 +45,12 @@ export class CommentsService {
             postId,
             commentatorInfo: {
                 userId,
-                userLogin:user.login
+                userLogin: user.login
             },
-            createdAt
+            createdAt,
+            likesCount: 0,
+            dislikesCount: 0,
+            likes: []
         }
         const createComment = await CommentRepository.createComment(newComment)
         if (!createComment) {
@@ -54,8 +60,8 @@ export class CommentsService {
         return createComment
     }
 
-     async updateComment(id:string,content:string,userId:string): Promise<Result> {
-        const comment = await CommentsQueryRepository.getById(new ObjectId(id))
+    async updateComment(id: string, content: string, userId: string): Promise<Result> {
+        const comment = await this.commentRepository.getCommentById(id)
 
         if (!comment) return {code: ResultCode.NotFound}
 
@@ -65,16 +71,16 @@ export class CommentsService {
 
         if (comment.commentatorInfo.userId !== user.id) return {code: ResultCode.Forbidden}
 
-        const update = await CommentRepository.updateComment(id,content)
+        const update = await this.commentRepository.updateComment(id, content)
 
         if (!update) return {code: ResultCode.NotFound}
 
         return {code: ResultCode.Success}
     }
 
-     async deleteCommentById(id: string,userId:string): Promise<Result> {
+    async deleteCommentById(id: string, userId: string): Promise<Result> {
 
-        const comment = await CommentsQueryRepository.getById(new ObjectId(id))
+        const comment = await CommentsQueryRepository.getById(new ObjectId(id), userId)
 
         if (!comment) return {code: ResultCode.NotFound}
 
@@ -89,6 +95,26 @@ export class CommentsService {
         if (!deleted) return {code: ResultCode.NotFound}
 
         return {code: ResultCode.Success}
+    }
+
+    async updateLike(userId: string, commentId: string, likeStatus: likesStatuses) {
+        try {
+            let comment = await this.commentRepository.getCommentById(commentId)
+            if (!comment) {
+                console.log(comment)
+                return{code: ResultCode.NotFound}
+            }
+
+            // @ts-ignore
+            await comment.addLike(userId, likeStatus)
+            await comment.save()
+
+            return {code: ResultCode.Success}
+        } catch (e) {
+            console.log(e)
+            return{code: ResultCode.Forbidden}
+        }
+
     }
 
 }

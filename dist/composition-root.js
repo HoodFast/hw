@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsController = void 0;
-const blog_repository_1 = require("./src/repositories/blog.repository");
-const blog_query_repository_1 = require("./src/repositories/blog.query.repository");
-const post_repository_1 = require("./src/repositories/post.repository");
-const post_query_repository_1 = require("./src/repositories/post.query.repository");
-const blog_service_1 = require("./src/services/blog.service");
-const blog_route_1 = require("./src/routes/blog-route");
+const blog_repository_1 = require("./repositories/blog.repository");
+const blog_query_repository_1 = require("./repositories/blog.query.repository");
+const post_repository_1 = require("./repositories/post.repository");
+const post_query_repository_1 = require("./repositories/post.query.repository");
+const blog_service_1 = require("./services/blog.service");
+const blog_route_1 = require("./routes/blog-route");
 const blogRepo = new blog_repository_1.BlogRepository();
 const blogQueryRepository = new blog_query_repository_1.BlogQueryRepository();
 const postRepository = new post_repository_1.PostRepository();

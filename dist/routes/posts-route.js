@@ -129,6 +129,7 @@ class PostController {
                 return;
             }
             const post = yield db_1.postModel.findOne({ _id: new mongodb_1.ObjectId(id) });
+            const userId = req.userId ? req.userId.toString() : '';
             if (!post)
                 return res.sendStatus(404);
             const sortData = {
@@ -137,7 +138,7 @@ class PostController {
                 pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
                 pageSize: req.query.pageSize ? +req.query.pageSize : 10
             };
-            const comments = yield comment_query_repository_1.CommentsQueryRepository.getAllByPostId(id, sortData);
+            const comments = yield comment_query_repository_1.CommentsQueryRepository.getAllByPostId(id, sortData, userId);
             if (!comments)
                 return res.sendStatus(404);
             return res.send(comments);
@@ -151,4 +152,4 @@ exports.postRoute.post('/', auth_middleware_1.authMiddleware, (0, post_validator
 exports.postRoute.put('/:id', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), postController.updatePost.bind(postController));
 exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, postController.deletePostById.bind(postController));
 exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), postController.createCommentByPost.bind(postController));
-exports.postRoute.get('/:id/comments', postController.getCommentsByPost.bind(postController));
+exports.postRoute.get('/:id/comments', accesstoken_middleware_1.accessTokenGuard, postController.getCommentsByPost.bind(postController));
