@@ -92,8 +92,8 @@ class CommentsService {
                     return { code: common_1.ResultCode.NotFound };
                 }
                 // @ts-ignore
-                yield comment.addLike(userId, likeStatus);
-                yield comment.save();
+                comment.addLike(userId, likeStatus);
+                comment.save();
                 return { code: common_1.ResultCode.Success };
             }
             catch (e) {

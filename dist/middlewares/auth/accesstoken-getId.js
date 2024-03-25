@@ -9,29 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.accessTokenGuard = void 0;
+exports.accessTokenGetId = void 0;
 const jwt_service_1 = require("../../application/jwt.service");
-const users_query_repository_1 = require("../../repositories/users.query.repository");
-const user_repository_1 = require("../../repositories/user.repository");
-const mongodb_1 = require("mongodb");
-const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const accessTokenGetId = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.headers.authorization) {
-        console.log(`Авторизация не пройдена - ${req.headers.authorization}`);
-        return res.sendStatus(401);
+        return next();
     }
     let tokenBearer = req.headers.authorization;
     const token = tokenBearer.split(' ');
     const userId = yield jwt_service_1.jwtService.getUserIdByToken(token[1]);
-    if (userId) {
-        const user = yield user_repository_1.UserRepository.doesExistById(userId);
-        if (!user) {
-            return res.sendStatus(401);
-        }
-        const userData = yield users_query_repository_1.UserQueryRepository.getById(userId);
-        req.userId = new mongodb_1.ObjectId(userData.id);
-        return next();
-    }
-    res.sendStatus(401);
-    return;
+    req.userId = userId;
+    return next();
 });
-exports.accessTokenGuard = accessTokenGuard;
+exports.accessTokenGetId = accessTokenGetId;

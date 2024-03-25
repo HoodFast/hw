@@ -18,6 +18,7 @@ const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middle
 const comments_service_1 = require("../services/comments.service");
 const comments_validators_1 = require("../validators/comments-validators");
 const likes_validator_1 = require("../validators/likes-validator");
+const accesstoken_getId_1 = require("../middlewares/auth/accesstoken-getId");
 exports.commentsRoute = (0, express_1.Router)({});
 class CommentController {
     constructor() {
@@ -99,7 +100,7 @@ class CommentController {
     }
 }
 const commentController = new CommentController();
-exports.commentsRoute.get('/:id', commentController.getCommentById.bind(commentController));
+exports.commentsRoute.get('/:id', accesstoken_getId_1.accessTokenGetId, commentController.getCommentById.bind(commentController));
 exports.commentsRoute.delete('/:id', accesstoken_middleware_1.accessTokenGuard, commentController.deleteCommentById.bind(commentController));
 exports.commentsRoute.put('/:id', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), commentController.updateComment.bind(commentController));
 exports.commentsRoute.put('/:id/like-status', accesstoken_middleware_1.accessTokenGuard, (0, likes_validator_1.likesValidators)(), commentController.updateLikes.bind(commentController));
