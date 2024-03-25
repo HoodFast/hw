@@ -47,16 +47,16 @@ exports.commentSchema.methods.addLike =
             };
             if (!myStatus) {
                 likes.push(newLike);
-                this.likesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.like).length || 0;
-                this.dislikesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.dislike).length || 0;
+                this.likesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.like).length;
+                this.dislikesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.dislike).length;
                 return { code: common_1.ResultCode.Success };
             }
             if (myStatus.likesStatus === likeStatus)
                 return { code: common_1.ResultCode.Success };
             myStatus.likesStatus = likeStatus;
             myStatus.updatedAt = new Date();
-            this.likesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.like).length || 0;
-            this.dislikesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.dislike).length || 0;
+            this.likesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.like).length;
+            this.dislikesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.dislike).length;
             return { code: common_1.ResultCode.Success };
         });
     };
