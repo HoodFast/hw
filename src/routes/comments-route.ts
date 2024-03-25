@@ -15,6 +15,7 @@ import {CreateCommentInputType} from "../models/comments/input/create.comment.in
 import {commentsValidation} from "../validators/comments-validators";
 import {likesStatuses} from "../models/comments/db/comment.db.model";
 import {likesValidators} from "../validators/likes-validator";
+import {accessTokenGetId} from "../middlewares/auth/accesstoken-getId";
 
 export const commentsRoute = Router({})
 
@@ -98,7 +99,7 @@ class CommentController {
 
 const commentController = new CommentController()
 
-commentsRoute.get('/:id', commentController.getCommentById.bind(commentController))
+commentsRoute.get('/:id',accessTokenGetId, commentController.getCommentById.bind(commentController))
 commentsRoute.delete('/:id', accessTokenGuard, commentController.deleteCommentById.bind(commentController))
 commentsRoute.put('/:id', accessTokenGuard, commentsValidation(), commentController.updateComment.bind(commentController))
 commentsRoute.put('/:id/like-status', accessTokenGuard,likesValidators(), commentController.updateLikes.bind(commentController))

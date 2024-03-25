@@ -94,27 +94,34 @@ describe('COMMENT LIKES', () => {
     })
 
     it('+update like-status ', async () => {
-        const likeStatuses = ['Like', 'Like', 'Like', 'Like', 'Like']
+        const likeStatuses = ['Like', 'Like', 'Dislike', 'Like', 'Like']
         await likesPut(app,likeStatuses,commentId,tokensList)
         const res = await request(app)
             .get(routerPaths.comments+'/'+commentId)
             .set('Authorization',`Bearer ${tokensList[0]}`)
             .expect(200)
 
-        expect(res.body.likesInfo.likesCount).toBe(5)
-        expect(res.body.likesInfo.dislikesCount).toBe(0)
+        expect(res.body.likesInfo.likesCount).toBe(4)
+        expect(res.body.likesInfo.dislikesCount).toBe(1)
         expect(res.body.likesInfo.myStatus).toBe('Like')
 
-        const NewLikeStatuses = ['Dislike', 'Dislike', 'Dislike', 'Dislike', 'Dislike']
+        const NewLikeStatuses = ['Dislike', 'Dislike', 'Like', 'Dislike', 'Dislike']
         await likesPut(app,NewLikeStatuses,commentId,tokensList)
 
         const updatedRes = await request(app)
             .get(routerPaths.comments+'/'+commentId)
             .set('Authorization',`Bearer ${tokensList[0]}`)
             .expect(200)
-        expect(updatedRes.body.likesInfo.likesCount).toBe(0)
-        expect(updatedRes.body.likesInfo.dislikesCount).toBe(5)
+        expect(updatedRes.body.likesInfo.likesCount).toBe(1)
+        expect(updatedRes.body.likesInfo.dislikesCount).toBe(4)
         expect(updatedRes.body.likesInfo.myStatus).toBe('Dislike')
+
+        const unauthorisedRes = await request(app)
+            .get(routerPaths.comments+'/'+commentId)
+            .expect(200)
+        expect(unauthorisedRes.body.likesInfo.likesCount).toBe(1)
+        expect(unauthorisedRes.body.likesInfo.dislikesCount).toBe(4)
+        expect(unauthorisedRes.body.likesInfo.myStatus).toBe('None')
     })
 
 

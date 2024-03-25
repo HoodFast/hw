@@ -3,12 +3,12 @@ import {CommentDbType, likesStatuses, likesType} from "./comment.db.model";
 import {Result} from "../../../types/result.type";
 import {ResultCode} from "../../common/common";
 
-const likesSchema = new mongoose.Schema<likesType>({
-    createdAt: Date,
-    updatedAt: Date,
-    userId: String,
-    likesStatus: {type: String, enum: likesStatuses}
-})
+// const likesSchema = new mongoose.Schema<likesType>({
+//     createdAt: Date,
+//     updatedAt: Date,
+//     userId: String,
+//     likesStatus: {type: String, enum: likesStatuses}
+// })
 
 export const commentSchema = new mongoose.Schema<CommentDbType>({
     content: String,
@@ -20,7 +20,12 @@ export const commentSchema = new mongoose.Schema<CommentDbType>({
     createdAt: String,
     likesCount: Number,
     dislikesCount: Number,
-    likes: [likesSchema]
+    likes: [{
+        createdAt: Date,
+        updatedAt: Date,
+        userId: String,
+        likesStatus: {type: String, enum: likesStatuses}
+    }]
 })
 commentSchema.methods.addLike =
     async function (userId: string, likeStatus: likesStatuses): Promise<Result> {

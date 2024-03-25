@@ -102,17 +102,17 @@ export class CommentsService {
             let comment = await this.commentRepository.getCommentById(commentId)
             if (!comment) {
                 console.log(comment)
-                return{code: ResultCode.NotFound}
+                return {code: ResultCode.NotFound}
             }
 
             // @ts-ignore
-            await comment.addLike(userId, likeStatus)
-            await comment.save()
+            comment.addLike(userId, likeStatus)
+            comment.save()
 
             return {code: ResultCode.Success}
         } catch (e) {
             console.log(e)
-            return{code: ResultCode.Forbidden}
+            return {code: ResultCode.Forbidden}
         }
 
     }
