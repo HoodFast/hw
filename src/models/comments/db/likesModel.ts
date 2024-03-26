@@ -39,7 +39,7 @@ commentSchema.methods.addLike =
         }
 
         if (!myStatus) {
-            likes.push(newLike)
+            likes.unshift(newLike)
             this.likesCount = likes.filter(i => i.likesStatus === likesStatuses.like).length
             this.dislikesCount = likes.filter(i => i.likesStatus === likesStatuses.dislike).length
 

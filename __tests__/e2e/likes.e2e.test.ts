@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 import {appConfig} from "../../src/app/config";
 import {ADMIN_LOGIN, ADMIN_PASS} from "../../src/auth/guards/base.auth.guard";
 import {createNewBlogDto, createNewPostDto} from "./utils/createDto";
-import {getNewLike, likesPut} from "./utils/LikesPut";
+import {getNewLike, likesPut, likesPutByOneUser} from "./utils/LikesPut";
 
 
 const request = require('supertest');
@@ -115,14 +115,28 @@ describe('COMMENT LIKES', () => {
         expect(updatedRes.body.likesInfo.likesCount).toBe(1)
         expect(updatedRes.body.likesInfo.dislikesCount).toBe(4)
         expect(updatedRes.body.likesInfo.myStatus).toBe('Dislike')
+        const NewLikeStatusesByOneComment = ['Dislike', 'Dislike', 'Like', 'Dislike', 'None']
 
         const unauthorisedRes = await request(app)
             .get(routerPaths.comments+'/'+commentId)
             .expect(200)
+
         expect(unauthorisedRes.body.likesInfo.likesCount).toBe(1)
         expect(unauthorisedRes.body.likesInfo.dislikesCount).toBe(4)
         expect(unauthorisedRes.body.likesInfo.myStatus).toBe('None')
     })
 
+    it('+update like-status by one user', async () => {
+        const likeStatuses = ['Like', 'Like', 'Dislike', 'Like', 'None']
+        await likesPutByOneUser(app,likeStatuses,commentId,tokensList)
+        const res = await request(app)
+            .get(routerPaths.comments+'/'+commentId)
+            .set('Authorization',`Bearer ${tokensList[0]}`)
+            .expect(200)
 
+        expect(res.body.likesInfo.likesCount).toBe(0)
+        expect(res.body.likesInfo.dislikesCount).toBe(0)
+        expect(res.body.likesInfo.myStatus).toBe('None')
+
+    })
 })
