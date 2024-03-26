@@ -24,7 +24,7 @@ exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awa
         searchLoginTerm: (_a = req.query.searchLoginTerm) !== null && _a !== void 0 ? _a : null,
         searchEmailTerm: (_b = req.query.searchEmailTerm) !== null && _b !== void 0 ? _b : null,
         sortBy: (_c = req.query.sortBy) !== null && _c !== void 0 ? _c : 'createdAt',
-        sortDirection: (_d = req.query.sortDirection) !== null && _d !== void 0 ? _d : 'desc',
+        sortDirection: (_d = req.query.sortDirection) !== null && _d !== void 0 ? _d : 'asc',
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     };
