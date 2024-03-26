@@ -98,7 +98,7 @@ class BlogsController {
             const sortData = {
                 searchNameTerm: (_a = req.query.searchNameTerm) !== null && _a !== void 0 ? _a : null,
                 sortBy: (_b = req.query.sortBy) !== null && _b !== void 0 ? _b : 'createdAt',
-                sortDirection: (_c = req.query.sortDirection) !== null && _c !== void 0 ? _c : 'desc',
+                sortDirection: (_c = req.query.sortDirection) !== null && _c !== void 0 ? _c : 'asc',
                 pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
                 pageSize: req.query.pageSize ? +req.query.pageSize : 10
             };
