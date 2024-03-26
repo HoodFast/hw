@@ -134,7 +134,7 @@ class PostController {
                 return res.sendStatus(404);
             const sortData = {
                 sortBy: (_a = req.query.sortBy) !== null && _a !== void 0 ? _a : 'createdAt',
-                sortDirection: (_b = req.query.sortDirection) !== null && _b !== void 0 ? _b : 'desc',
+                sortDirection: (_b = req.query.sortDirection) !== null && _b !== void 0 ? _b : 'asc',
                 pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
                 pageSize: req.query.pageSize ? +req.query.pageSize : 10
             };
