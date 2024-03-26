@@ -23,7 +23,7 @@ userRoute.get('/', authMiddleware, async (req: RequestWithQuery<UserSortDataSear
         searchLoginTerm: req.query.searchLoginTerm ?? null,
         searchEmailTerm: req.query.searchEmailTerm ?? null,
         sortBy: req.query.sortBy ?? 'createdAt',
-        sortDirection: req.query.sortDirection ?? 'desc',
+        sortDirection: req.query.sortDirection ?? 'asc',
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     }
