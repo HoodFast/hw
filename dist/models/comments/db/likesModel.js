@@ -51,7 +51,7 @@ exports.commentSchema.methods.addLike =
                 likesStatus: likeStatus
             };
             if (!myStatus) {
-                likes.unshift(newLike);
+                likes.push(newLike);
                 this.likesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.like).length;
                 this.dislikesCount = likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.dislike).length;
                 return { code: common_1.ResultCode.Success };

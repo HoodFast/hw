@@ -12,7 +12,6 @@ export const commentMapper = (comment: WithId<CommentDbType>, userId: string): C
         myStatus = comment.getMyStatus(userId)
     }
 
-
     return {
         id: comment._id.toString(),
         content: comment.content,
