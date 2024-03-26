@@ -23,7 +23,7 @@ export class CommentsQueryRepository {
 
         const comments = await commentModel
             .find({postId: id})
-            .sort({sortBy: sortDirection})
+            .sort({[sortBy]: sortDirection})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
 

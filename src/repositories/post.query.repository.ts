@@ -12,7 +12,7 @@ export class PostQueryRepository {
 
         const posts = await postModel
             .find({})
-            .sort({sortBy: sortDirection})
+            .sort({[sortBy]: sortDirection})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .lean()

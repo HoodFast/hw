@@ -28,7 +28,7 @@ class CommentsQueryRepository {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
             const comments = yield db_1.commentModel
                 .find({ postId: id })
-                .sort({ sortBy: sortDirection })
+                .sort({ [sortBy]: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize);
             const totalCount = yield db_1.commentModel.countDocuments({ postId: id });

@@ -18,7 +18,7 @@ class PostQueryRepository {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
             const posts = yield db_1.postModel
                 .find({})
-                .sort({ sortBy: sortDirection })
+                .sort({ [sortBy]: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .lean();

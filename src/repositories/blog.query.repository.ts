@@ -55,7 +55,7 @@ export class BlogQueryRepository {
 
         const posts = await postModel
             .find({blogId})
-            .sort({sortBy: sortDirection})
+            .sort({[sortBy]: sortDirection})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .lean()

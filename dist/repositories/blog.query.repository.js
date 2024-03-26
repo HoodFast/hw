@@ -49,7 +49,7 @@ class BlogQueryRepository {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
             const posts = yield db_1.postModel
                 .find({ blogId })
-                .sort({ sortBy: sortDirection })
+                .sort({ [sortBy]: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .lean();
