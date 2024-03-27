@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import {Response, Router} from "express";
 import {
     ParamsType,
@@ -16,14 +17,16 @@ import {commentsValidation} from "../validators/comments-validators";
 import {likesStatuses} from "../models/comments/db/comment.db.model";
 import {likesValidators} from "../validators/likes-validator";
 import {accessTokenGetId} from "../middlewares/auth/accesstoken-getId";
+import {injectable} from "inversify";
+import {container} from "../composition-root";
 
 export const commentsRoute = Router({})
-
+@injectable()
 class CommentController {
-    private commentService: CommentsService
 
-    constructor() {
-        this.commentService = new CommentsService()
+
+    constructor(protected commentService: CommentsService) {
+
     }
 
     async getCommentById(req: RequestWithParams<ParamsType>, res: ResponseType<CommentsOutputType>) {
@@ -97,7 +100,7 @@ class CommentController {
 
 }
 
-const commentController = new CommentController()
+const commentController = container.resolve<CommentController>(CommentController)
 
 commentsRoute.get('/:id',accessTokenGetId, commentController.getCommentById.bind(commentController))
 commentsRoute.delete('/:id', accessTokenGuard, commentController.deleteCommentById.bind(commentController))

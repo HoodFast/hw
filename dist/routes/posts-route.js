@@ -1,4 +1,13 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -21,12 +30,14 @@ const comments_service_1 = require("../services/comments.service");
 const accesstoken_middleware_1 = require("../middlewares/auth/accesstoken-middleware");
 const comment_query_repository_1 = require("../repositories/comment.query.repository");
 const db_1 = require("../db/db");
+const inversify_1 = require("inversify");
+const composition_root_1 = require("../composition-root");
 exports.postRoute = (0, express_1.Router)({});
-class PostController {
-    constructor() {
-        this.postService = new post_service_1.PostService();
-        this.commentService = new comments_service_1.CommentsService();
-        this.postQueryRepository = new post_query_repository_1.PostQueryRepository();
+let PostController = class PostController {
+    constructor(commentService, postService, postQueryRepository) {
+        this.commentService = commentService;
+        this.postService = postService;
+        this.postQueryRepository = postQueryRepository;
     }
     getAllPosts(req, res) {
         var _a, _b;
@@ -144,8 +155,14 @@ class PostController {
             return res.send(comments);
         });
     }
-}
-const postController = new PostController();
+};
+PostController = __decorate([
+    (0, inversify_1.injectable)(),
+    __metadata("design:paramtypes", [comments_service_1.CommentsService,
+        post_service_1.PostService,
+        post_query_repository_1.PostQueryRepository])
+], PostController);
+const postController = composition_root_1.container.resolve(PostController);
 exports.postRoute.get('/', postController.getAllPosts.bind(postController));
 exports.postRoute.get('/:id', postController.getPostBId.bind(postController));
 exports.postRoute.post('/', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), postController.createPost.bind(postController));

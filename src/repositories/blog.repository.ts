@@ -2,13 +2,14 @@ import {blogModel} from "../db/db";
 import {ObjectId} from "mongodb";
 import {BlogType, OutputBlogMapType, OutputBlogType} from "../models/common/common";
 import {blogMapper} from "../models/blog/mappers/blog-mappers";
+import {injectable} from "inversify";
 
 
 
 
 
 
-
+@injectable()
 export class BlogRepository {
 
     async createBlog(createData: OutputBlogType):Promise<OutputBlogMapType | null> {

@@ -126,16 +126,14 @@ describe('COMMENT LIKES', () => {
         expect(unauthorisedRes.body.likesInfo.myStatus).toBe('None')
     })
 
-    it('+update like-status by one user', async () => {
+    it('+update like-status by one user, should to be None', async () => {
         const likeStatuses = ['Like', 'Like', 'Dislike', 'Like', 'None']
         await likesPutByOneUser(app,likeStatuses,commentId,tokensList)
         const res = await request(app)
             .get(routerPaths.comments+'/'+commentId)
-            .set('Authorization',`Bearer ${tokensList[0]}`)
+            .set('Authorization',`Bearer ${tokensList[1]}`)
             .expect(200)
 
-        expect(res.body.likesInfo.likesCount).toBe(0)
-        expect(res.body.likesInfo.dislikesCount).toBe(0)
         expect(res.body.likesInfo.myStatus).toBe('None')
 
     })

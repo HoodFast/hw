@@ -4,8 +4,9 @@ import {ObjectId} from "mongodb";
 import {BlogQueryRepository} from "./blog.query.repository";
 import {PostQueryRepository} from "./post.query.repository";
 import {postMapper} from "../models/blog/mappers/post-mappers";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class PostRepository {
 
     async createPost(data: PostTypeDb): Promise<PostType | null> {

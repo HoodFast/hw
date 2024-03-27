@@ -4,8 +4,9 @@ import {Pagination, PostType} from "../models/common/common";
 import {postMapper} from "../models/blog/mappers/post-mappers";
 import {ObjectId} from "mongodb";
 import {SortDataType} from "./blog.query.repository";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class PostQueryRepository {
     async getAll(sortData:SortDataType): Promise<Pagination<PostType>> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData

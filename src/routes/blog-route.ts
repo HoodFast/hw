@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import {Router} from "express";
 import {authMiddleware} from "../middlewares/auth/auth-middleware";
 import {blogValidation} from "../validators/blog-validators";
@@ -18,15 +19,14 @@ import {CreatePostFromBlogInputModel} from "../models/blog/input/create.post.fro
 import {BlogService} from "../services/blog.service";
 
 import {sortQueryFieldsUtil} from "../utils/sortQueryFields.util";
-import {PostQueryRepository} from "../repositories/post.query.repository";
-import {BlogRepository} from "../repositories/blog.repository";
-import {PostRepository} from "../repositories/post.repository";
+import {injectable} from "inversify";
+import {container} from "../composition-root";
 
 
-// import {blogsController} from "../composition-root";
+
 
 export const blogRoute = Router({})
-
+@injectable()
 export class BlogsController {
     constructor(
         protected blogService: BlogService,
@@ -166,12 +166,7 @@ export class BlogsController {
     }
 }
 
-const blogRepo = new BlogRepository()
-const blogQueryRepository = new BlogQueryRepository()
-const postRepository = new PostRepository()
-const postQueryRepository = new PostQueryRepository()
-const blogService = new BlogService(blogRepo,blogQueryRepository,postRepository,postQueryRepository)
-export const blogsController = new BlogsController(blogService,blogQueryRepository)
+const blogsController = container.resolve<BlogsController>(BlogsController)
 
 blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController))
 blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController))

@@ -22,19 +22,18 @@ import {CommentsQueryRepository} from "../repositories/comment.query.repository"
 
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 import {postModel} from "../db/db";
+import {injectable} from "inversify";
+import {container} from "../composition-root";
 
 
 export const postRoute = Router({})
-
+@injectable()
 class PostController {
-    private commentService: CommentsService
-    private postService: PostService
-    private postQueryRepository: PostQueryRepository
 
-    constructor() {
-        this.postService = new PostService()
-        this.commentService = new CommentsService()
-        this.postQueryRepository = new PostQueryRepository()
+
+    constructor(private commentService: CommentsService,
+                private postService: PostService,
+                private postQueryRepository: PostQueryRepository) {
     }
 
     async getAllPosts(req: RequestWithQuery<QueryPostInputModel>, res: ResponseType<Pagination<PostType>>) {
@@ -155,7 +154,7 @@ class PostController {
     }
 }
 
-const postController = new PostController()
+const postController = container.resolve<PostController>(PostController)
 
 postRoute.get('/', postController.getAllPosts.bind(postController))
 postRoute.get('/:id', postController.getPostBId.bind(postController))

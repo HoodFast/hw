@@ -3,8 +3,9 @@ import {CommentDbType} from "../models/comments/db/comment.db.model";
 import {CommentsOutputType} from "../models/comments/otput/comments.output.model";
 import {CommentsQueryRepository} from "./comment.query.repository";
 import {commentModel} from "../db/db";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class CommentRepository {
      async getCommentById(commentId:string){
          try {

@@ -10,7 +10,9 @@ import {PostRepository} from "../repositories/post.repository";
 import {PostQueryRepository} from "../repositories/post.query.repository";
 import {BlogQueryRepository} from "../repositories/blog.query.repository";
 import {ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
+@injectable()
 export class BlogService {
 
     constructor(

@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import {ResultCode} from "../models/common/common";
 import {PostQueryRepository} from "../repositories/post.query.repository";
 import {UserQueryRepository} from "../repositories/users.query.repository";
@@ -7,6 +8,7 @@ import {CommentsOutputType} from "../models/comments/otput/comments.output.model
 import {CommentsQueryRepository} from "../repositories/comment.query.repository";
 import {Result} from "../types/result.type";
 import {ObjectId} from "mongodb";
+import {inject, injectable} from "inversify";
 
 
 export type CreateCommentDataType = {
@@ -16,13 +18,15 @@ export type CreateCommentDataType = {
     createdAt: string
 }
 
+@injectable()
 export class CommentsService {
-    private postQueryRepository: PostQueryRepository
-    private commentRepository: CommentRepository
 
-    constructor() {
-        this.postQueryRepository = new PostQueryRepository()
-        this.commentRepository = new CommentRepository()
+
+    constructor(
+        protected postQueryRepository: PostQueryRepository,
+        protected commentRepository: CommentRepository
+    ) {
+
 
     }
 

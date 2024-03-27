@@ -1,4 +1,13 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,7 +18,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogsController = exports.BlogsController = exports.blogRoute = void 0;
+exports.BlogsController = exports.blogRoute = void 0;
+require("reflect-metadata");
 const express_1 = require("express");
 const auth_middleware_1 = require("../middlewares/auth/auth-middleware");
 const blog_validators_1 = require("../validators/blog-validators");
@@ -18,12 +28,10 @@ const blog_query_repository_1 = require("../repositories/blog.query.repository")
 const post_validators_1 = require("../validators/post-validators");
 const blog_service_1 = require("../services/blog.service");
 const sortQueryFields_util_1 = require("../utils/sortQueryFields.util");
-const post_query_repository_1 = require("../repositories/post.query.repository");
-const blog_repository_1 = require("../repositories/blog.repository");
-const post_repository_1 = require("../repositories/post.repository");
-// import {blogsController} from "../composition-root";
+const inversify_1 = require("inversify");
+const composition_root_1 = require("../composition-root");
 exports.blogRoute = (0, express_1.Router)({});
-class BlogsController {
+let BlogsController = class BlogsController {
     constructor(blogService, blogQueryRepository) {
         this.blogService = blogService;
         this.blogQueryRepository = blogQueryRepository;
@@ -154,18 +162,18 @@ class BlogsController {
             res.sendStatus(204);
         });
     }
-}
+};
 exports.BlogsController = BlogsController;
-const blogRepo = new blog_repository_1.BlogRepository();
-const blogQueryRepository = new blog_query_repository_1.BlogQueryRepository();
-const postRepository = new post_repository_1.PostRepository();
-const postQueryRepository = new post_query_repository_1.PostQueryRepository();
-const blogService = new blog_service_1.BlogService(blogRepo, blogQueryRepository, postRepository, postQueryRepository);
-exports.blogsController = new BlogsController(blogService, blogQueryRepository);
-exports.blogRoute.get('/', exports.blogsController.getAllBlogs.bind(exports.blogsController));
-exports.blogRoute.get('/:id/posts', exports.blogsController.getAllPostsToBlogId.bind(exports.blogsController));
-exports.blogRoute.get('/:id', exports.blogsController.getBlogById.bind(exports.blogsController));
-exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), exports.blogsController.createBlog.bind(exports.blogsController));
-exports.blogRoute.post('/:id/posts', auth_middleware_1.authMiddleware, (0, post_validators_1.createPostFromBlogValidation)(), exports.blogsController.createPostToBlog.bind(exports.blogsController));
-exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), exports.blogsController.updateBlog.bind(exports.blogsController));
-exports.blogRoute.delete('/:id', auth_middleware_1.authMiddleware, exports.blogsController.deleteBlogById.bind(exports.blogsController));
+exports.BlogsController = BlogsController = __decorate([
+    (0, inversify_1.injectable)(),
+    __metadata("design:paramtypes", [blog_service_1.BlogService,
+        blog_query_repository_1.BlogQueryRepository])
+], BlogsController);
+const blogsController = composition_root_1.container.resolve(BlogsController);
+exports.blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController));
+exports.blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController));
+exports.blogRoute.get('/:id', blogsController.getBlogById.bind(blogsController));
+exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.createBlog.bind(blogsController));
+exports.blogRoute.post('/:id/posts', auth_middleware_1.authMiddleware, (0, post_validators_1.createPostFromBlogValidation)(), blogsController.createPostToBlog.bind(blogsController));
+exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.updateBlog.bind(blogsController));
+exports.blogRoute.delete('/:id', auth_middleware_1.authMiddleware, blogsController.deleteBlogById.bind(blogsController));

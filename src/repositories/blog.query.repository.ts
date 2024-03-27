@@ -3,6 +3,7 @@ import {blogMapper} from "../models/blog/mappers/blog-mappers";
 import {ObjectId} from "mongodb";
 import { OutputBlogMapType, OutputBlogType, Pagination, PostType} from "../models/common/common";
 import {postMapper} from "../models/blog/mappers/post-mappers";
+import {injectable} from "inversify";
 
 export type SortDataSearchType = {
     searchNameTerm: string | null
@@ -19,7 +20,7 @@ export type SortDataType = {
     pageSize: number
 }
 
-
+@injectable()
 export class BlogQueryRepository {
     async getAll(sortData: SortDataSearchType): Promise<Pagination<OutputBlogType>> {
         const {sortBy, sortDirection, pageSize, pageNumber, searchNameTerm} = sortData

@@ -8,17 +8,16 @@ import {PostRepository} from "../repositories/post.repository";
 import {PostQueryRepository} from "../repositories/post.query.repository";
 import {ObjectId} from "mongodb";
 import {BlogQueryRepository} from "../repositories/blog.query.repository";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class PostService {
-    private postQueryRepository:PostQueryRepository
-    private blogQueryRepository:BlogQueryRepository
-    private postRepository:PostRepository
 
-    constructor() {
-        this.postQueryRepository = new PostQueryRepository()
-        this.blogQueryRepository = new BlogQueryRepository()
-        this.postRepository = new PostRepository()
+
+    constructor( private postQueryRepository:PostQueryRepository,
+    private blogQueryRepository:BlogQueryRepository,
+    private postRepository:PostRepository) {
+
     }
 
     async createPost(data: PostTypeCreate): Promise<PostType | null> {
