@@ -11,16 +11,19 @@ import {UserQueryRepository} from "../repositories/users.query.repository";
 import bcrypt from "bcrypt";
 import {ResultCode} from "../models/common/common";
 import {Result} from "../types/result.type";
+import {injectable} from "inversify";
 
 let jwt = require('jsonwebtoken');
-
-export class jwtService {
-    static async createJWT(user: WithId<UsersTypeDb>): Promise<string> {
+@injectable()
+export class JwtService {
+    constructor(protected tokenMetaRepository:TokenMetaRepository) {
+    }
+    async createJWT(user: WithId<UsersTypeDb>): Promise<string> {
         const token = jwt.sign({userId: user._id}, appConfig.AC_SECRET, {expiresIn: appConfig.AC_TIME})
         return token
     }
 
-    static async createRecoveryCode(email: string) {
+    async createRecoveryCode(email: string) {
         try {
             const user = await UserQueryRepository.getByLoginOrEmail(email)
             let userId:ObjectId
@@ -38,7 +41,7 @@ export class jwtService {
 
     }
 
-    static async getMetaDataByToken(token: string) {
+    async getMetaDataByToken(token: string) {
         try {
             const result = jwt.verify(token, appConfig.RT_SECRET)
             const decoded = jwt.decode(token, {complete: true})
@@ -53,7 +56,7 @@ export class jwtService {
 
     }
 
-    static async createRefreshJWT(user: WithId<UsersTypeDb>, deviceId: string = randomUUID(), ip: string, title: string): Promise<string | null> {
+    async createRefreshJWT(user: WithId<UsersTypeDb>, deviceId: string = randomUUID(), ip: string, title: string): Promise<string | null> {
         const userId = user._id
         const token = jwt.sign({userId, deviceId}, appConfig.RT_SECRET, {expiresIn: appConfig.RT_TIME})
         const decoded = jwt.decode(token, {complete: true})
@@ -66,7 +69,7 @@ export class jwtService {
             ip,
             title,
         }
-        const setTokenMetaData = await TokenMetaRepository.setTokenMetaData(tokenMetaData)
+        const setTokenMetaData = await this.tokenMetaRepository.setTokenMetaData(tokenMetaData)
         if (!setTokenMetaData) return null
         return token
     }

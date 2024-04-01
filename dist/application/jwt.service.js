@@ -1,4 +1,13 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,22 +18,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jwtService = void 0;
+exports.JwtService = void 0;
 const mongodb_1 = require("mongodb");
 const config_1 = require("../app/config");
 const user_repository_1 = require("../repositories/user.repository");
 const crypto_1 = require("crypto");
 const tokenMeta_repository_1 = require("../repositories/tokenMeta.repository");
 const users_query_repository_1 = require("../repositories/users.query.repository");
+const inversify_1 = require("inversify");
 let jwt = require('jsonwebtoken');
-class jwtService {
-    static createJWT(user) {
+let JwtService = class JwtService {
+    constructor(tokenMetaRepository) {
+        this.tokenMetaRepository = tokenMetaRepository;
+    }
+    createJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
             const token = jwt.sign({ userId: user._id }, config_1.appConfig.AC_SECRET, { expiresIn: config_1.appConfig.AC_TIME });
             return token;
         });
     }
-    static createRecoveryCode(email) {
+    createRecoveryCode(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const user = yield users_query_repository_1.UserQueryRepository.getByLoginOrEmail(email);
@@ -43,7 +56,7 @@ class jwtService {
             }
         });
     }
-    static getMetaDataByToken(token) {
+    getMetaDataByToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const result = jwt.verify(token, config_1.appConfig.RT_SECRET);
@@ -59,7 +72,7 @@ class jwtService {
             }
         });
     }
-    static createRefreshJWT(user, deviceId = (0, crypto_1.randomUUID)(), ip, title) {
+    createRefreshJWT(user, deviceId = (0, crypto_1.randomUUID)(), ip, title) {
         return __awaiter(this, void 0, void 0, function* () {
             const userId = user._id;
             const token = jwt.sign({ userId, deviceId }, config_1.appConfig.RT_SECRET, { expiresIn: config_1.appConfig.RT_TIME });
@@ -73,7 +86,7 @@ class jwtService {
                 ip,
                 title,
             };
-            const setTokenMetaData = yield tokenMeta_repository_1.TokenMetaRepository.setTokenMetaData(tokenMetaData);
+            const setTokenMetaData = yield this.tokenMetaRepository.setTokenMetaData(tokenMetaData);
             if (!setTokenMetaData)
                 return null;
             return token;
@@ -133,5 +146,9 @@ class jwtService {
             }
         });
     }
-}
-exports.jwtService = jwtService;
+};
+exports.JwtService = JwtService;
+exports.JwtService = JwtService = __decorate([
+    (0, inversify_1.injectable)(),
+    __metadata("design:paramtypes", [tokenMeta_repository_1.TokenMetaRepository])
+], JwtService);

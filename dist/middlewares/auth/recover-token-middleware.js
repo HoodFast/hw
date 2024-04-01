@@ -14,7 +14,7 @@ const jwt_service_1 = require("../../application/jwt.service");
 const user_repository_1 = require("../../repositories/user.repository");
 const recoverTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let token = req.body.recoveryCode;
-    const userId = yield jwt_service_1.jwtService.getUserByRecoverToken(token);
+    const userId = yield jwt_service_1.JwtService.getUserByRecoverToken(token);
     if (!userId)
         return res.sendStatus(400);
     const user = yield user_repository_1.UserRepository.getUserById(userId);

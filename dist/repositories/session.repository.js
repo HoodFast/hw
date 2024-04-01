@@ -9,14 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sessionRepository = void 0;
+exports.SessionRepository = void 0;
 const mongodb_1 = require("mongodb");
-const jwt_service_1 = require("../application/jwt.service");
 const db_1 = require("../db/db");
-class sessionRepository {
-    static getAllSessions(token) {
+class SessionRepository {
+    constructor(jwtService) {
+        this.jwtService = jwtService;
+    }
+    getAllSessions(token) {
         return __awaiter(this, void 0, void 0, function* () {
-            const metaData = yield jwt_service_1.jwtService.getMetaDataByToken(token);
+            const metaData = yield this.jwtService.getMetaDataByToken(token);
             if (!metaData)
                 return null;
             const userId = metaData.userId;
@@ -27,4 +29,4 @@ class sessionRepository {
         });
     }
 }
-exports.sessionRepository = sessionRepository;
+exports.SessionRepository = SessionRepository;

@@ -7,24 +7,29 @@ import {UserRepository} from "../repositories/user.repository";
 import {v4 as uuidv4} from "uuid";
 import {Result} from "../types/result.type";
 import {ResultCode} from "../models/common/common";
-import {jwtService} from "../application/jwt.service";
+import {JwtService} from "../application/jwt.service";
 import {TokenMetaRepository} from "../repositories/tokenMeta.repository";
-import {randomUUID} from "crypto";
-import {userService} from "./user.service";
 
-export class authService {
-    static async me(userId: ObjectId) {
+import {injectable} from "inversify";
+@injectable()
+export class AuthService {
+    constructor(
+        protected tokenMetaRepository:TokenMetaRepository,
+        protected jwtService:JwtService
+    ) {
+    }
+    async me(userId: ObjectId) {
         const user = await UserQueryRepository.getById(userId)
         if (!user) return {code: ResultCode.NotFound}
         return {code: ResultCode.Success, data: {email: user.email, login: user.login, userId: user.id}}
     }
 
-    static async deleteSession(token: string) {
-        const metaData = await jwtService.getMetaDataByToken(token)
+    async deleteSession(token: string) {
+        const metaData = await this.jwtService.getMetaDataByToken(token)
         if (!metaData) return {code: ResultCode.Unauthorized}
-        const oldSession = await TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId)
+        const oldSession = await this.tokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId)
         if (oldSession) {
-            await TokenMetaRepository.deleteById(oldSession._id)
+            await this.tokenMetaRepository.deleteById(oldSession._id)
         } else {
             return {code: ResultCode.Unauthorized}
         }
@@ -42,44 +47,44 @@ export class authService {
     //     return {code: ResultCode.Success, data: {accessToken, refreshToken}}
     // }
 
-    static async loginTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string) {
+    async loginTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string) {
         const userId = user._id
-        const oldSession = await TokenMetaRepository.getSessionForLogin(userId, title)
+        const oldSession = await this.tokenMetaRepository.getSessionForLogin(userId, title)
         const deviceId = oldSession?.deviceId
         if (oldSession) {
-            await TokenMetaRepository.deleteById(oldSession._id)
+            await this.tokenMetaRepository.deleteById(oldSession._id)
         }
 
-        const accessToken = await jwtService.createJWT(user)
+        const accessToken = await this.jwtService.createJWT(user)
         if (!accessToken) return {code: ResultCode.Forbidden}
 
-        const refreshToken = await jwtService.createRefreshJWT(user, deviceId, ip, title)
+        const refreshToken = await this.jwtService.createRefreshJWT(user, deviceId, ip, title)
         if (!refreshToken) return {code: ResultCode.Forbidden}
 
         return {code: ResultCode.Success, data: {accessToken, refreshToken}}
     }
 
-    static async refreshTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string, token: string) {
-        const metaData = await jwtService.getMetaDataByToken(token)
+    async refreshTokensPair(user: WithId<UsersTypeDb>, ip: string, title: string, token: string) {
+        const metaData = await this.jwtService.getMetaDataByToken(token)
         if (!metaData) return {code: ResultCode.Unauthorized}
-        const oldSession = await TokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId)
+        const oldSession = await this.tokenMetaRepository.getSessionForRefresh(metaData.iat, metaData.deviceId)
         const deviceId = oldSession?.deviceId
         if (oldSession) {
-            await TokenMetaRepository.deleteById(oldSession._id)
+            await this.tokenMetaRepository.deleteById(oldSession._id)
         } else {
             return {code: ResultCode.Unauthorized}
         }
-        const accessToken = await jwtService.createJWT(user)
+        const accessToken = await this.jwtService.createJWT(user)
         if (!accessToken) return {code: ResultCode.Forbidden}
 
-        const refreshToken = await jwtService.createRefreshJWT(user, deviceId, ip, title)
+        const refreshToken = await this.jwtService.createRefreshJWT(user, deviceId, ip, title)
         if (!refreshToken) return {code: ResultCode.Forbidden}
 
         return {code: ResultCode.Success, data: {accessToken, refreshToken}}
     }
 
 
-    static async resendConfirmationCode(email: string):
+    async resendConfirmationCode(email: string):
         Promise<Result> {
         const user = await UserQueryRepository.getByLoginOrEmail(email)
 
@@ -113,10 +118,10 @@ export class authService {
         return true
     }
 
-    static async sendRecoveryPass(email: string):Promise<Result> {
+    async sendRecoveryPass(email: string):Promise<Result> {
 
         const subject = "Password recovery"
-        const recoveryCode = await jwtService.createRecoveryCode(email)
+        const recoveryCode = await this.jwtService.createRecoveryCode(email)
         const message = `<h1>Password recovery</h1>
         <p>To finish password recovery please follow the link below:
           <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
@@ -147,7 +152,7 @@ export class authService {
         return {code: ResultCode.NotFound}
     }
 
-    static async checkCredentials(loginOrEmail: string, password: string):
+    async checkCredentials(loginOrEmail: string, password: string):
         Promise<WithId<UsersTypeDb> | null> {
         const user = await UserQueryRepository.getByLoginOrEmail(loginOrEmail)
         if (!user) return null

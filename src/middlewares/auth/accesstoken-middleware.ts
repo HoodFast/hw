@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {jwtService} from "../../application/jwt.service";
+import {JwtService} from "../../application/jwt.service";
 import {UserQueryRepository} from "../../repositories/users.query.repository";
 import {UserRepository} from "../../repositories/user.repository";
 import {ObjectId} from "mongodb";
@@ -15,7 +15,7 @@ export const accessTokenGuard = async (req: Request, res: Response, next: NextFu
 
     let tokenBearer = req.headers.authorization
     const token = tokenBearer.split(' ')
-    const userId = await jwtService.getUserIdByToken(token[1])
+    const userId = await JwtService.getUserIdByToken(token[1])
 
     if (userId) {
         const user = await UserRepository.doesExistById(userId)

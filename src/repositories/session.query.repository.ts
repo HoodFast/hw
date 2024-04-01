@@ -1,18 +1,21 @@
-
 import {ObjectId,} from "mongodb";
-import {jwtService} from "../application/jwt.service";
+import {JwtService} from "../application/jwt.service";
 import {sessionMapper} from "../models/sessions/mappers/session-mappers";
 import {SessionsOutputType} from "../models/sessions/output/session.output.type";
 import {tokenMetaModel} from "../db/db";
+import {injectable} from "inversify";
 
+@injectable()
+export class SessionQueryRepository {
 
-export class sessionQueryRepository {
+    constructor(protected jwtService: JwtService) {
+    }
 
-    static async getAllSessions(token: string): Promise<SessionsOutputType[] | null> {
-        const metaData = await jwtService.getMetaDataByToken(token)
+    async getAllSessions(token: string): Promise<SessionsOutputType[] | null> {
+        const metaData = await this.jwtService.getMetaDataByToken(token)
         if (!metaData) return null
         const userId = metaData.userId
-        const result = await tokenMetaModel.find({userId:new ObjectId(userId)}).lean()
+        const result = await tokenMetaModel.find({userId: new ObjectId(userId)}).lean()
         if (!result) return null
         return sessionMapper(result)
     }

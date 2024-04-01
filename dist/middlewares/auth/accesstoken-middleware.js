@@ -21,7 +21,7 @@ const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     }
     let tokenBearer = req.headers.authorization;
     const token = tokenBearer.split(' ');
-    const userId = yield jwt_service_1.jwtService.getUserIdByToken(token[1]);
+    const userId = yield jwt_service_1.JwtService.getUserIdByToken(token[1]);
     if (userId) {
         const user = yield user_repository_1.UserRepository.doesExistById(userId);
         if (!user) {
