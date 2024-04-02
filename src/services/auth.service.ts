@@ -1,3 +1,5 @@
+import "reflect-metadata"
+import {injectable} from "inversify";
 import bcrypt from "bcrypt";
 import {UserQueryRepository} from "../repositories/users.query.repository";
 import {ObjectId, WithId} from "mongodb";
@@ -7,10 +9,10 @@ import {UserRepository} from "../repositories/user.repository";
 import {v4 as uuidv4} from "uuid";
 import {Result} from "../types/result.type";
 import {ResultCode} from "../models/common/common";
-import {JwtService} from "../application/jwt.service";
 import {TokenMetaRepository} from "../repositories/tokenMeta.repository";
+import {JwtService} from "../application/jwt.service";
 
-import {injectable} from "inversify";
+
 @injectable()
 export class AuthService {
     constructor(
@@ -135,7 +137,7 @@ export class AuthService {
         return {code: ResultCode.Success}
     }
 
-    static async confirmEmail(code: string):
+    async confirmEmail(code: string):
         Promise<Result> {
         const user = await UserQueryRepository.getByCode(code)
         if (!

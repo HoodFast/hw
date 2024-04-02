@@ -1,8 +1,10 @@
+import "reflect-metadata"
+import {injectable} from "inversify";
 import {ObjectId} from "mongodb";
 import {tokensMetaDbType} from "../models/tokens/token.db.model";
 import {tokenMetaModel} from "../db/db";
 
-
+@injectable()
 export class TokenMetaRepository {
 
     async setTokenMetaData(data: tokensMetaDbType): Promise<boolean> {

@@ -4,18 +4,18 @@ import {v4 as uuidv4} from 'uuid'
 
 import {UserQueryRepository} from "../repositories/users.query.repository";
 import {add} from "date-fns/add";
-import {authService} from "./auth.service";
 import {Result} from "../types/result.type";
 import {ResultCode} from "../models/common/common";
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {ObjectId} from "mongodb";
-import {randomUUID} from "crypto";
+import {AuthService} from "./auth.service";
+
 
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-export class userService {
+export class UserService {
 
     static async createUser(login: string, email: string, password: string, isConfirmed?: boolean): Promise<Result<OutputUsersType>> {
         const user = await UserRepository.doesExistByLoginOrEmail(login, email)
@@ -43,7 +43,7 @@ export class userService {
         }
         try {
             if (!isConfirmed) {
-                await authService.sendConfirmCode(createdUser.email)
+                await AuthService.sendConfirmCode(createdUser.email)
             }
         } catch (e) {
             return {code: ResultCode.NotFound}

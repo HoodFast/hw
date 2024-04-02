@@ -1,6 +1,5 @@
 import {TokenMetaRepository} from "../repositories/tokenMeta.repository";
 import {SessionRepository} from "../repositories/session.repository";
-
 import {Result} from "../types/result.type";
 import {ResultCode} from "../models/common/common";
 import {injectable} from "inversify";

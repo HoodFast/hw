@@ -33,7 +33,7 @@ exports.userRoute.get('/', auth_middleware_1.authMiddleware, (req, res) => __awa
     return;
 }));
 exports.userRoute.post('/', auth_middleware_1.authMiddleware, (0, users_validator_1.userValidators)(), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const createdUser = yield user_service_1.userService.createUser(req.body.login, req.body.email, req.body.password, true);
+    const createdUser = yield user_service_1.UserService.createUser(req.body.login, req.body.email, req.body.password, true);
     switch (createdUser.code) {
         case common_1.ResultCode.NotFound:
             return res.sendStatus(404);
@@ -51,7 +51,7 @@ exports.userRoute.delete('/:id', auth_middleware_1.authMiddleware, (req, res) =>
         res.sendStatus(404);
         return;
     }
-    const userIsDeleted = yield user_service_1.userService.deleteUser(id);
+    const userIsDeleted = yield user_service_1.UserService.deleteUser(id);
     if (!userIsDeleted) {
         res.sendStatus(404);
         return;

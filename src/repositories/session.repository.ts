@@ -5,8 +5,9 @@ import {JwtService} from "../application/jwt.service";
 
 import {tokensMetaDbType} from "../models/tokens/token.db.model";
 import {tokenMetaModel} from "../db/db";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class SessionRepository {
 constructor(protected jwtService:JwtService) {
 }

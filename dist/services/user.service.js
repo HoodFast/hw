@@ -9,17 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userService = void 0;
+exports.UserService = void 0;
 const user_repository_1 = require("../repositories/user.repository");
 const uuid_1 = require("uuid");
 const users_query_repository_1 = require("../repositories/users.query.repository");
 const add_1 = require("date-fns/add");
-const auth_service_1 = require("./auth.service");
 const common_1 = require("../models/common/common");
 const mongodb_1 = require("mongodb");
+const auth_service_1 = require("./auth.service");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-class userService {
+class UserService {
     static createUser(login, email, password, isConfirmed) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_repository_1.UserRepository.doesExistByLoginOrEmail(login, email);
@@ -46,7 +46,7 @@ class userService {
             }
             try {
                 if (!isConfirmed) {
-                    yield auth_service_1.authService.sendConfirmCode(createdUser.email);
+                    yield auth_service_1.AuthService.sendConfirmCode(createdUser.email);
                 }
             }
             catch (e) {
@@ -75,4 +75,4 @@ class userService {
         });
     }
 }
-exports.userService = userService;
+exports.UserService = UserService;

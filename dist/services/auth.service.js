@@ -22,15 +22,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
+require("reflect-metadata");
+const inversify_1 = require("inversify");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_query_repository_1 = require("../repositories/users.query.repository");
 const email_adapter_1 = require("../adapters/email.adapter");
 const user_repository_1 = require("../repositories/user.repository");
 const uuid_1 = require("uuid");
 const common_1 = require("../models/common/common");
-const jwt_service_1 = require("../application/jwt.service");
 const tokenMeta_repository_1 = require("../repositories/tokenMeta.repository");
-const inversify_1 = require("inversify");
+const jwt_service_1 = require("../application/jwt.service");
 let AuthService = class AuthService {
     constructor(tokenMetaRepository, jwtService) {
         this.tokenMetaRepository = tokenMetaRepository;
@@ -161,7 +162,7 @@ let AuthService = class AuthService {
             return { code: common_1.ResultCode.Success };
         });
     }
-    static confirmEmail(code) {
+    confirmEmail(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_query_repository_1.UserQueryRepository.getByCode(code);
             if (!user)

@@ -1,7 +1,7 @@
 import {MongoMemoryServer} from "mongodb-memory-server"
 import {appConfig} from "../../src/app/config";
 import {db} from "../../src/db/db";
-import {userService} from "../../src/services/user.service";
+import {UserService} from "../../src/services/user.service";
 import {testSeeder} from "../test.seeder";
 import {emailAdapter} from "../../src/adapters/email.adapter";
 import {ResultCode} from "../../src/models/common/common";
@@ -26,7 +26,7 @@ describe('AUTH-INTEGRATION', () => {
     })
 
     describe('User Registration',  () => {
-        const registerUserUseCase = userService.createUser
+        const registerUserUseCase = UserService.createUser
         emailAdapter.sendEmail = jest.fn().mockImplementation((email: string, subject: string, message: string) => {
             return true
         })

@@ -10,7 +10,7 @@ import {
 } from "../models/common/common";
 import {OutputUsersType} from "../models/users/output/output.users.models";
 import {UserInputModelType} from "../models/users/input/user.input.model";
-import {userService} from "../services/user.service";
+import {UserService} from "../services/user.service";
 import {ObjectId} from "mongodb";
 import {authMiddleware} from "../middlewares/auth/auth-middleware";
 import {userValidators} from "../validators/users-validator";
@@ -34,7 +34,7 @@ userRoute.get('/', authMiddleware, async (req: RequestWithQuery<UserSortDataSear
 })
 
 userRoute.post('/', authMiddleware, userValidators(), async (req: RequestWithBody<UserInputModelType>, res: ResponseType<OutputUsersType | any>) => {
-    const createdUser = await userService.createUser(req.body.login, req.body.email, req.body.password,true)
+    const createdUser = await UserService.createUser(req.body.login, req.body.email, req.body.password,true)
 
     switch (createdUser.code) {
         case ResultCode.NotFound:
@@ -54,7 +54,7 @@ userRoute.delete('/:id', authMiddleware, async (req: RequestWithParams<ParamsTyp
         res.sendStatus(404)
         return
     }
-    const userIsDeleted = await userService.deleteUser(id)
+    const userIsDeleted = await UserService.deleteUser(id)
     if (!userIsDeleted) {
         res.sendStatus(404)
         return

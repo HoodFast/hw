@@ -2,14 +2,16 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {appConfig} from "../../src/app/config";
 import {db} from "../../src/db/db";
 import DoneCallback = jest.DoneCallback;
-import {userService} from "../../src/services/user.service";
+import {UserService} from "../../src/services/user.service";
 import {testSeeder} from "../test.seeder";
 import {ResultCode} from "../../src/models/common/common";
 import {emailAdapter} from "../../src/adapters/email.adapter";
-import {authService} from "../../src/services/auth.service";
+import {AuthService} from "../../src/services/auth.service";
 import {randomUUID} from "crypto";
 import {add} from "date-fns/add";
 import mongoose from "mongoose";
+import {TokenMetaRepository} from "../../src/repositories/tokenMeta.repository";
+import {JwtService} from "../../src/application/jwt.service";
 
 describe('AUTH-INTEGRATION', () => {
     beforeAll(async () => {
@@ -30,7 +32,7 @@ describe('AUTH-INTEGRATION', () => {
     afterAll((done: DoneCallback) => done())
 
     describe('USER Registration', () => {
-        const registerUserUseCase = userService.createUser
+        const registerUserUseCase = UserService.createUser
         // emailAdapter.sendEmail = emailServiceMock.sendEmail
         // emailAdapter.sendEmail=jest.fn()
         emailAdapter.sendEmail = jest.fn().mockImplementation((email: string, subject: string, message: string) => {
@@ -64,7 +66,12 @@ describe('AUTH-INTEGRATION', () => {
             expect(emailAdapter.sendEmail).toBeCalledTimes(1)
         })
     });
+
     describe('Confirm email', () => {
+        const tokenMetaRepository = new TokenMetaRepository()
+
+        const jwtService = new JwtService(tokenMetaRepository)
+        const authService = new AuthService(tokenMetaRepository,jwtService)
         const confirmedEmailUseCase = authService.confirmEmail
         it('should not confirm if user does not exist', async () => {
             const code = randomUUID()

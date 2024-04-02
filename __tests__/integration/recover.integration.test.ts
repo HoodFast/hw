@@ -2,14 +2,13 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {appConfig} from "../../src/app/config";
 import {db} from "../../src/db/db";
 import DoneCallback = jest.DoneCallback;
-import {userService} from "../../src/services/user.service";
 import {testSeeder} from "../test.seeder";
 import {ResultCode} from "../../src/models/common/common";
 import {emailAdapter} from "../../src/adapters/email.adapter";
-import {authService} from "../../src/services/auth.service";
-import {randomUUID} from "crypto";
-import {add} from "date-fns/add";
+import {AuthService} from "../../src/services/auth.service";
 import mongoose from "mongoose";
+import {TokenMetaRepository} from "../../src/repositories/tokenMeta.repository";
+import {JwtService} from "../../src/application/jwt.service";
 
 describe('RECOVER PASS', () => {
     beforeAll(async () => {
@@ -30,7 +29,12 @@ describe('RECOVER PASS', () => {
     afterAll((done: DoneCallback) => done())
 
     describe('USER Registration', () => {
-        const recoverPassUseCase = authService.sendRecoveryPass
+        const tokenMetaRepository = new TokenMetaRepository()
+
+        const jwtService = new JwtService(tokenMetaRepository)
+        const authService = new AuthService(tokenMetaRepository,jwtService)
+
+        const recoverPassUseCase = authService.sendRecoveryPass.bind(authService)
 
         emailAdapter.sendEmail = jest.fn().mockImplementation((email: string, subject: string, message: string) => {
             return true
