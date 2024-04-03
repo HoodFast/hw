@@ -190,4 +190,4 @@ exports.postRoute.put('/:id', auth_middleware_1.authMiddleware, (0, post_validat
 exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, postController.deletePostById.bind(postController));
 exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), postController.createCommentByPost.bind(postController));
 exports.postRoute.get('/:id/comments', accesstoken_middleware_1.accessTokenGuard, postController.getCommentsByPost.bind(postController));
-exports.postRoute.get('/:id/like-status', accesstoken_middleware_1.accessTokenGuard, (0, likes_validator_1.likesValidators)(), postController.updateLikes.bind(postController));
+exports.postRoute.put('/:id/like-status', accesstoken_middleware_1.accessTokenGuard, (0, likes_validator_1.likesValidators)(), postController.updateLikes.bind(postController));

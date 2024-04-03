@@ -181,4 +181,4 @@ postRoute.put('/:id', authMiddleware, postValidation(), postController.updatePos
 postRoute.delete('/:id', authMiddleware, postController.deletePostById.bind(postController))
 postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), postController.createCommentByPost.bind(postController))
 postRoute.get('/:id/comments', accessTokenGuard, postController.getCommentsByPost.bind(postController))
-postRoute.get('/:id/like-status',accessTokenGuard,likesValidators(), postController.updateLikes.bind(postController))
+postRoute.put('/:id/like-status',accessTokenGuard,likesValidators(), postController.updateLikes.bind(postController))
