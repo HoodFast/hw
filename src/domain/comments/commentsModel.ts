@@ -1,7 +1,6 @@
 import mongoose, {Model} from "mongoose";
-import {CommentDbType, likesStatuses, likesType} from "./comment.db.model";
-import {Result} from "../../../types/result.type";
-import {ResultCode} from "../../common/common";
+import {CommentDbType, likesStatuses, likesType} from "../../models/comments/db/comment.db.model";
+
 
 // const likesSchema = new mongoose.Schema<likesType>({
 //     createdAt: Date,
@@ -11,11 +10,11 @@ import {ResultCode} from "../../common/common";
 // })
 
 type commentMethodsType = {
-    addLike: (userId: string, likeStatus: likesStatuses)=>Promise<Result>,
-    getMyStatus:(userId: string)=>likesStatuses
+    addLike: (userId: string, likeStatus: likesStatuses) => boolean,
+    getMyStatus: (userId: string) => likesStatuses
 }
-type commentsModelType = Model<CommentDbType,{},commentMethodsType>
-export const commentSchema = new mongoose.Schema<CommentDbType,commentsModelType,commentMethodsType>({
+type commentsModelType = Model<CommentDbType, {}, commentMethodsType>
+export const commentSchema = new mongoose.Schema<CommentDbType, commentsModelType, commentMethodsType>({
     content: String,
     postId: {type: String, require},
     commentatorInfo: {
@@ -34,7 +33,7 @@ export const commentSchema = new mongoose.Schema<CommentDbType,commentsModelType
 })
 
 commentSchema.methods.addLike =
-    async function (userId: string, likeStatus: likesStatuses): Promise<Result> {
+    function (userId: string, likeStatus: likesStatuses): boolean {
         const likes: likesType[] = this.likes
         const myStatus = likes.find(i => i.userId === userId)
         const newLike: likesType = {
@@ -49,17 +48,17 @@ commentSchema.methods.addLike =
             this.likesCount = likes.filter(i => i.likesStatus === likesStatuses.like).length
             this.dislikesCount = likes.filter(i => i.likesStatus === likesStatuses.dislike).length
 
-            return {code: ResultCode.Success}
+            return true
         }
 
-        if (myStatus.likesStatus === likeStatus) return {code: ResultCode.Success}
+        if (myStatus.likesStatus === likeStatus) return true
 
         myStatus.likesStatus = likeStatus
         myStatus.updatedAt = new Date()
         this.likesCount = likes.filter(i => i.likesStatus === likesStatuses.like).length
         this.dislikesCount = likes.filter(i => i.likesStatus === likesStatuses.dislike).length
 
-        return {code: ResultCode.Success}
+        return true
     }
 
 commentSchema.methods.getMyStatus =

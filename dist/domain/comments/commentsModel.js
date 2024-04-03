@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commentSchema = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const comment_db_model_1 = require("./comment.db.model");
+const comment_db_model_1 = require("../../models/comments/db/comment.db.model");
 exports.commentSchema = new mongoose_1.default.Schema({
     content: String,
     postId: { type: String, require },

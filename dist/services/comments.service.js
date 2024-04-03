@@ -99,7 +99,6 @@ let CommentsService = class CommentsService {
             try {
                 let comment = yield this.commentRepository.getCommentById(commentId);
                 if (!comment) {
-                    console.log(comment);
                     return { code: common_1.ResultCode.NotFound };
                 }
                 comment.addLike(userId, likeStatus);

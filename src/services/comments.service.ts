@@ -105,7 +105,6 @@ export class CommentsService {
         try {
             let comment = await this.commentRepository.getCommentById(commentId)
             if (!comment) {
-                console.log(comment)
                 return {code: ResultCode.NotFound}
             }
 

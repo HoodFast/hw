@@ -76,7 +76,13 @@ describe('ht_02/api/posts', () => {
             content: 'string',
             blogId: 'string',
             blogName: 'string',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            extendedLikesInfo:{
+                dislikesCount:0,
+                likesCount:0,
+                myStatus:"None",
+                newestLikes:[]
+            }
         }
         const isValidType = typeof expectedObject
 
@@ -89,7 +95,13 @@ describe('ht_02/api/posts', () => {
             content: newPost.content,
             blogId: expect.any(String),
             blogName: blogs.body.items[0].name,
-            createdAt: expect.any(String)
+            createdAt: expect.any(String),
+            extendedLikesInfo:{
+                dislikesCount:expect.any(Number),
+                likesCount:expect.any(Number),
+                myStatus:expect.any(String),
+                newestLikes:expect.any(Array)
+            }
         })
 
         const getPosts = await request(app)

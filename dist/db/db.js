@@ -16,7 +16,8 @@ exports.tokenMetaModel = exports.commentModel = exports.userModel = exports.post
 const mongodb_1 = require("mongodb");
 const config_1 = require("../app/config");
 const mongoose_1 = __importDefault(require("mongoose"));
-const likesModel_1 = require("../models/comments/db/likesModel");
+const commentsModel_1 = require("../domain/comments/commentsModel");
+const postsModel_1 = require("../domain/posts/postsModel");
 exports.db = {
     client: new mongodb_1.MongoClient(config_1.appConfig.MONGO_URL),
     getDbName() {
@@ -66,14 +67,6 @@ const blogSchema = new mongoose_1.default.Schema({
     createdAt: String,
     isMembership: { type: Boolean },
 });
-const postSchema = new mongoose_1.default.Schema({
-    title: { type: String, require },
-    shortDescription: { type: String, require },
-    content: { type: String, require },
-    blogId: { type: String, require },
-    blogName: { type: String, require },
-    createdAt: { type: String, require },
-});
 const accountSchema = new mongoose_1.default.Schema({
     _passwordHash: { type: String, require },
     recoveryCode: String,
@@ -100,7 +93,7 @@ const tokenMetaSchema = new mongoose_1.default.Schema({
     title: String
 });
 exports.blogModel = mongoose_1.default.model('blogs', blogSchema);
-exports.postModel = mongoose_1.default.model('posts', postSchema);
+exports.postModel = mongoose_1.default.model('posts', postsModel_1.postSchema);
 exports.userModel = mongoose_1.default.model('users', userSchema);
-exports.commentModel = mongoose_1.default.model('comments', likesModel_1.commentSchema);
+exports.commentModel = mongoose_1.default.model('comments', commentsModel_1.commentSchema);
 exports.tokenMetaModel = mongoose_1.default.model('tokensMeta', tokenMetaSchema);

@@ -10,7 +10,7 @@ import {
     RequestWithParams,
     RequestWithParamsAndBody,
     UpdateBlogType,
-    ResponseType, OutputBlogType, RequestWithQuery, Pagination, PostTypeDb, PostType, RequestWithQueryAndParams
+    ResponseType, OutputBlogType, RequestWithQuery, Pagination, PostType, RequestWithQueryAndParams
 } from "../models/common/common";
 import {QueryBlogInputModel} from "../models/blog/input/query.blog.input.model";
 import {BlogQueryRepository} from "../repositories/blog.query.repository";

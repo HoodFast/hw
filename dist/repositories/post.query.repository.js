@@ -27,8 +27,7 @@ let PostQueryRepository = class PostQueryRepository {
                 .find({})
                 .sort({ [sortBy]: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
-                .limit(pageSize)
-                .lean();
+                .limit(pageSize);
             const totalCount = yield db_1.postModel.countDocuments({});
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {

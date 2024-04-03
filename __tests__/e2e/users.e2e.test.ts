@@ -1,10 +1,9 @@
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {appConfig} from "../../src/app/config";
 import {db} from "../../src/db/db";
 import {app} from "../../src/settings";
 import {routerPaths} from "../../src/models/common/paths/paths";
 import {ADMIN_LOGIN, ADMIN_PASS} from "../../src/auth/guards/base.auth.guard";
-import {RegisterUserType, testSeeder} from "../test.seeder";
+import {testSeeder} from "../test.seeder";
 import mongoose from "mongoose";
 
 const request = require('supertest');

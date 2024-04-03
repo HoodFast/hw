@@ -1,4 +1,6 @@
 import {Request, Response} from "express";
+import {likesStatuses} from "../comments/db/comment.db.model";
+import {newestLikesType} from "../post/mappers/newestLikes.mapper";
 
 export type ParamsType = { id: string }
 export type ResponseType<R> = Response<R, {}>
@@ -37,14 +39,7 @@ export type CreatePostType = {
     blogId: string
 }
 
-export type PostTypeDb = {
-    title: string
-    shortDescription: string
-    content: string
-    blogId: string
-    blogName: string
-    createdAt: string
-}
+
 
 export type PostTypeCreate = {
     title: string
@@ -62,6 +57,12 @@ export type PostType = {
     blogId: string
     blogName: string
     createdAt: string
+    extendedLikesInfo:{
+        likesCount:number,
+        dislikesCount:number,
+        myStatus:likesStatuses,
+        newestLikes:newestLikesType[]
+    }
 }
 
 export type UpdatePostType = {

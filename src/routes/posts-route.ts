@@ -7,7 +7,7 @@ import {
     PostType, PostTypeCreate,
     RequestWithBody,
     RequestWithParams, RequestWithParamsAndBody, RequestWithQuery, RequestWithQueryAndParams,
-    ResponseType
+    ResponseType, ResultCode
 } from "../models/common/common";
 import {ObjectId} from "mongodb";
 import {PostQueryRepository} from "../repositories/post.query.repository";
@@ -24,6 +24,8 @@ import {CommentsOutputType} from "../models/comments/otput/comments.output.model
 import {postModel} from "../db/db";
 import {injectable} from "inversify";
 import {container} from "../composition-root";
+import {likesValidators} from "../validators/likes-validator";
+import {likesStatuses} from "../models/comments/db/comment.db.model";
 
 
 export const postRoute = Router({})
@@ -152,6 +154,22 @@ class PostController {
 
         return res.send(comments)
     }
+    async updateLikes(req: RequestWithParamsAndBody<ParamsType, { likeStatus: likesStatuses }>, res: Response) {
+        const userId = req.userId!.toString()
+        const postId = req.params.id
+        const likeStatus = req.body.likeStatus
+        const updateLike = await this.postService.updateLike(userId, postId, likeStatus)
+        switch (updateLike.code) {
+            case ResultCode.NotFound:
+                return res.sendStatus(404)
+            case ResultCode.Forbidden:
+                return res.sendStatus(403)
+            case ResultCode.Success:
+                return res.sendStatus(204)
+            default:
+                return res.sendStatus(404)
+        }
+    }
 }
 
 const postController = container.resolve<PostController>(PostController)
@@ -163,3 +181,4 @@ postRoute.put('/:id', authMiddleware, postValidation(), postController.updatePos
 postRoute.delete('/:id', authMiddleware, postController.deletePostById.bind(postController))
 postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), postController.createCommentByPost.bind(postController))
 postRoute.get('/:id/comments', accessTokenGuard, postController.getCommentsByPost.bind(postController))
+postRoute.get('/:id/like-status',accessTokenGuard,likesValidators(), postController.updateLikes.bind(postController))

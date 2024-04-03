@@ -16,7 +16,7 @@ export class PostQueryRepository {
             .sort({[sortBy]: sortDirection})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .lean()
+
 
         const totalCount = await postModel.countDocuments({})
         const pagesCount = Math.ceil(totalCount / pageSize)
@@ -32,10 +32,11 @@ export class PostQueryRepository {
 
      async getById(id: ObjectId): Promise<PostType | null> {
         const post = await postModel.findOne({_id: id})
+
         if (!post) {
             return null
         }
-        return postMapper(post)
+         return postMapper(post)
     }
 
 }

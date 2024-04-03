@@ -19,11 +19,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostService = void 0;
+const common_1 = require("../models/common/common");
 const post_repository_1 = require("../repositories/post.repository");
 const post_query_repository_1 = require("../repositories/post.query.repository");
 const mongodb_1 = require("mongodb");
 const blog_query_repository_1 = require("../repositories/blog.query.repository");
 const inversify_1 = require("inversify");
+const user_repository_1 = require("../repositories/user.repository");
 let PostService = class PostService {
     constructor(postQueryRepository, blogQueryRepository, postRepository) {
         this.postQueryRepository = postQueryRepository;
@@ -42,8 +44,11 @@ let PostService = class PostService {
                 content,
                 shortDescription,
                 blogId,
+                likesCount: 0,
+                dislikesCount: 0,
                 blogName: blog.name,
-                createdAt
+                createdAt,
+                likes: []
             };
             const createPost = yield this.postRepository.createPost(newPost);
             if (!createPost) {
@@ -64,6 +69,24 @@ let PostService = class PostService {
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.postRepository.deletePost(id);
+        });
+    }
+    updateLike(userId, postId, likeStatus) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let post = yield this.postRepository.getPostById(postId);
+                if (!post)
+                    return { code: common_1.ResultCode.NotFound };
+                const user = yield user_repository_1.UserRepository.getUserById(userId);
+                if (!user)
+                    return { code: common_1.ResultCode.NotFound };
+                post.addLike(userId, likeStatus, user === null || user === void 0 ? void 0 : user.accountData.login);
+                yield post.save();
+                return { code: common_1.ResultCode.Success };
+            }
+            catch (e) {
+                return { code: common_1.ResultCode.Forbidden };
+            }
         });
     }
 };

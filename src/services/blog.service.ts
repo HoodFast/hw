@@ -3,7 +3,6 @@ import {
     createPostFromBlog,
     OutputBlogType,
     PostType,
-    PostTypeDb,
     UpdateBlogType
 } from "../models/common/common";
 import {PostRepository} from "../repositories/post.repository";
@@ -11,6 +10,7 @@ import {PostQueryRepository} from "../repositories/post.query.repository";
 import {BlogQueryRepository} from "../repositories/blog.query.repository";
 import {ObjectId} from "mongodb";
 import {injectable} from "inversify";
+import {PostTypeDb} from "../domain/posts/postsModel";
 
 @injectable()
 export class BlogService {
@@ -34,8 +34,11 @@ export class BlogService {
             content,
             shortDescription,
             blogId,
+            likesCount:0,
+            dislikesCount:0,
             blogName: blog.name,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            likes:[]
         }
 
         const createPost = await this.postRepository.createPost(newPost)

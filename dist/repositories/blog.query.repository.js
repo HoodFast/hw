@@ -58,8 +58,7 @@ let BlogQueryRepository = class BlogQueryRepository {
                 .find({ blogId })
                 .sort({ [sortBy]: sortDirection })
                 .skip((pageNumber - 1) * pageSize)
-                .limit(pageSize)
-                .lean();
+                .limit(pageSize);
             const totalCount = yield db_1.postModel.countDocuments({ blogId });
             const pagesCount = Math.ceil(totalCount / pageSize);
             return {

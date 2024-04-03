@@ -22,6 +22,7 @@ exports.postRoute = void 0;
 const express_1 = require("express");
 const post_validators_1 = require("../validators/post-validators");
 const auth_middleware_1 = require("../middlewares/auth/auth-middleware");
+const common_1 = require("../models/common/common");
 const mongodb_1 = require("mongodb");
 const post_query_repository_1 = require("../repositories/post.query.repository");
 const post_service_1 = require("../services/post.service");
@@ -32,6 +33,7 @@ const comment_query_repository_1 = require("../repositories/comment.query.reposi
 const db_1 = require("../db/db");
 const inversify_1 = require("inversify");
 const composition_root_1 = require("../composition-root");
+const likes_validator_1 = require("../validators/likes-validator");
 exports.postRoute = (0, express_1.Router)({});
 let PostController = class PostController {
     constructor(commentService, postService, postQueryRepository) {
@@ -155,6 +157,24 @@ let PostController = class PostController {
             return res.send(comments);
         });
     }
+    updateLikes(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userId = req.userId.toString();
+            const postId = req.params.id;
+            const likeStatus = req.body.likeStatus;
+            const updateLike = yield this.postService.updateLike(userId, postId, likeStatus);
+            switch (updateLike.code) {
+                case common_1.ResultCode.NotFound:
+                    return res.sendStatus(404);
+                case common_1.ResultCode.Forbidden:
+                    return res.sendStatus(403);
+                case common_1.ResultCode.Success:
+                    return res.sendStatus(204);
+                default:
+                    return res.sendStatus(404);
+            }
+        });
+    }
 };
 PostController = __decorate([
     (0, inversify_1.injectable)(),
@@ -170,3 +190,4 @@ exports.postRoute.put('/:id', auth_middleware_1.authMiddleware, (0, post_validat
 exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, postController.deletePostById.bind(postController));
 exports.postRoute.post('/:id/comments', accesstoken_middleware_1.accessTokenGuard, (0, comments_validators_1.commentsValidation)(), postController.createCommentByPost.bind(postController));
 exports.postRoute.get('/:id/comments', accesstoken_middleware_1.accessTokenGuard, postController.getCommentsByPost.bind(postController));
+exports.postRoute.get('/:id/like-status', accesstoken_middleware_1.accessTokenGuard, (0, likes_validator_1.likesValidators)(), postController.updateLikes.bind(postController));

@@ -1,10 +1,10 @@
 import {blogModel, postModel} from "../db/db";
-import {PostType, PostTypeDb, UpdatePostType} from "../models/common/common";
+import {PostType, UpdatePostType} from "../models/common/common";
 import {ObjectId} from "mongodb";
-import {BlogQueryRepository} from "./blog.query.repository";
-import {PostQueryRepository} from "./post.query.repository";
+
 import {postMapper} from "../models/blog/mappers/post-mappers";
 import {injectable} from "inversify";
+import {PostTypeDb} from "../domain/posts/postsModel";
 
 @injectable()
 export class PostRepository {
@@ -45,5 +45,9 @@ export class PostRepository {
     async deletePost(id: string) {
         const res = await postModel.deleteOne({_id: new ObjectId(id)})
         return !!res.deletedCount
+    }
+    async getPostById(id:string) {
+        const post = await postModel.findOne({_id: id})
+        return post
     }
 }

@@ -44,8 +44,11 @@ let BlogService = class BlogService {
                 content,
                 shortDescription,
                 blogId,
+                likesCount: 0,
+                dislikesCount: 0,
                 blogName: blog.name,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                likes: []
             };
             const createPost = yield this.postRepository.createPost(newPost);
             if (!createPost) {
