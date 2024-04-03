@@ -49,7 +49,7 @@ class CommentController {
 
     async deleteCommentById(req: RequestWithParams<ParamsType>, res: Response) {
         const id = req.params.id
-        const userId = req.userId!.toString()
+        let userId = req.userId!.toString()
         if (!ObjectId.isValid(id)) return res.sendStatus(404)
         const deleted = await this.commentService.deleteCommentById(id, userId)
         switch (deleted.code) {
@@ -66,7 +66,7 @@ class CommentController {
 
     async updateComment(req: RequestWithParamsAndBody<ParamsType, CreateCommentInputType>, res: Response) {
         const id = req.params.id
-        const userId = req.userId!.toString()
+        let userId = req.userId!.toString()
         if (!ObjectId.isValid(id)) return res.sendStatus(404)
         const updateComment = await this.commentService.updateComment(id, req.body.content, userId)
         switch (updateComment.code) {
@@ -82,7 +82,8 @@ class CommentController {
     }
 
     async updateLikes(req: RequestWithParamsAndBody<ParamsType, { likeStatus: likesStatuses }>, res: Response) {
-        const userId = req.userId!.toString()
+
+        let userId = req.userId!.toString()
         const commentId = req.params.id
         const likeStatus = req.body.likeStatus
         const updateLike = await this.commentService.updateLike(userId, commentId, likeStatus)

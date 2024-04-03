@@ -167,7 +167,9 @@ class PostController {
     }
 
     async updateLikes(req: RequestWithParamsAndBody<ParamsType, { likeStatus: likesStatuses }>, res: Response) {
+
         const userId = req.userId!.toString()
+
         const postId = req.params.id
         const likeStatus = req.body.likeStatus
         const updateLike = await this.postService.updateLike(userId, postId, likeStatus)

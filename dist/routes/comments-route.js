@@ -57,7 +57,7 @@ let CommentController = class CommentController {
     deleteCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const userId = req.userId.toString();
+            let userId = req.userId.toString();
             if (!mongodb_1.ObjectId.isValid(id))
                 return res.sendStatus(404);
             const deleted = yield this.commentService.deleteCommentById(id, userId);
@@ -76,7 +76,7 @@ let CommentController = class CommentController {
     updateComment(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const userId = req.userId.toString();
+            let userId = req.userId.toString();
             if (!mongodb_1.ObjectId.isValid(id))
                 return res.sendStatus(404);
             const updateComment = yield this.commentService.updateComment(id, req.body.content, userId);
@@ -94,7 +94,7 @@ let CommentController = class CommentController {
     }
     updateLikes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userId = req.userId.toString();
+            let userId = req.userId.toString();
             const commentId = req.params.id;
             const likeStatus = req.body.likeStatus;
             const updateLike = yield this.commentService.updateLike(userId, commentId, likeStatus);

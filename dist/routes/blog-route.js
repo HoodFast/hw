@@ -83,7 +83,10 @@ let BlogsController = class BlogsController {
     createPostToBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const userId = req.userId.toString();
+            let userId;
+            if (req.userId) {
+                userId = req.userId.toString();
+            }
             if (!mongodb_1.ObjectId.isValid(id)) {
                 res.sendStatus(404);
                 return;
@@ -118,7 +121,10 @@ let BlogsController = class BlogsController {
     getAllPostsToBlogId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const userId = req.userId.toString();
+            let userId;
+            if (req.userId) {
+                userId = req.userId.toString();
+            }
             if (!mongodb_1.ObjectId.isValid(id)) {
                 res.sendStatus(404);
                 return;

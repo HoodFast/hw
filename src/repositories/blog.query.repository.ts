@@ -51,7 +51,7 @@ export class BlogQueryRepository {
         }
     }
 
-    async getAllPostsToBlog(blogId: string, sortData: SortDataType, userId: string): Promise<Pagination<PostType>> {
+    async getAllPostsToBlog(blogId: string, sortData: SortDataType, userId?: string): Promise<Pagination<PostType>> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
         const posts = await postModel
