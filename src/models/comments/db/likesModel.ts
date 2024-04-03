@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {Model} from "mongoose";
 import {CommentDbType, likesStatuses, likesType} from "./comment.db.model";
 import {Result} from "../../../types/result.type";
 import {ResultCode} from "../../common/common";
@@ -10,7 +10,12 @@ import {ResultCode} from "../../common/common";
 //     likesStatus: {type: String, enum: likesStatuses}
 // })
 
-export const commentSchema = new mongoose.Schema<CommentDbType>({
+type commentMethodsType = {
+    addLike: (userId: string, likeStatus: likesStatuses)=>Promise<Result>,
+    getMyStatus:(userId: string)=>likesStatuses
+}
+type commentsModelType = Model<CommentDbType,{},commentMethodsType>
+export const commentSchema = new mongoose.Schema<CommentDbType,commentsModelType,commentMethodsType>({
     content: String,
     postId: {type: String, require},
     commentatorInfo: {
@@ -27,9 +32,10 @@ export const commentSchema = new mongoose.Schema<CommentDbType>({
         likesStatus: {type: String, enum: likesStatuses}
     }]
 })
+
 commentSchema.methods.addLike =
     async function (userId: string, likeStatus: likesStatuses): Promise<Result> {
-        const likes: [likesType] = this.likes
+        const likes: likesType[] = this.likes
         const myStatus = likes.find(i => i.userId === userId)
         const newLike: likesType = {
             createdAt: new Date(),
@@ -58,7 +64,7 @@ commentSchema.methods.addLike =
 
 commentSchema.methods.getMyStatus =
     function (userId: string): likesStatuses {
-        const likes: [likesType] = this.likes
+        const likes: likesType[] = this.likes
         const myStatus = likes.find(i => i.userId === userId)
 
         if (!myStatus) return likesStatuses.none

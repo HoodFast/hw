@@ -16,12 +16,6 @@ exports.commentSchema = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const comment_db_model_1 = require("./comment.db.model");
 const common_1 = require("../../common/common");
-// const likesSchema = new mongoose.Schema<likesType>({
-//     createdAt: Date,
-//     updatedAt: Date,
-//     userId: String,
-//     likesStatus: {type: String, enum: likesStatuses}
-// })
 exports.commentSchema = new mongoose_1.default.Schema({
     content: String,
     postId: { type: String, require },

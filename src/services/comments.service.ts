@@ -109,13 +109,12 @@ export class CommentsService {
                 return {code: ResultCode.NotFound}
             }
 
-            // @ts-ignore
             comment.addLike(userId, likeStatus)
             comment.save()
 
             return {code: ResultCode.Success}
         } catch (e) {
-            console.log(e)
+
             return {code: ResultCode.Forbidden}
         }
 

@@ -102,13 +102,11 @@ let CommentsService = class CommentsService {
                     console.log(comment);
                     return { code: common_1.ResultCode.NotFound };
                 }
-                // @ts-ignore
                 comment.addLike(userId, likeStatus);
                 comment.save();
                 return { code: common_1.ResultCode.Success };
             }
             catch (e) {
-                console.log(e);
                 return { code: common_1.ResultCode.Forbidden };
             }
         });
