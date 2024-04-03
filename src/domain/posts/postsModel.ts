@@ -94,6 +94,6 @@ postSchema.methods.getNewestLikes =
         const sortLikes: postLikesType[] = likes.sort((a,b)=>{
             return a.updatedAt.getTime() - b.updatedAt.getTime()
         })
-        return sortLikes.slice(0,3).map(newestLikesMapper)
+        return sortLikes.slice(0,2).map(newestLikesMapper)
     }
 

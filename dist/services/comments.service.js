@@ -35,7 +35,7 @@ let CommentsService = class CommentsService {
     createComment(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const { userId, postId, content, createdAt } = data;
-            const post = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(postId));
+            const post = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(postId), userId);
             if (!post) {
                 return null;
             }

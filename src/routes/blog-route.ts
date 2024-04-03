@@ -83,6 +83,7 @@ export class BlogsController {
     async createPostToBlog(req: RequestWithParamsAndBody<ParamsType, CreatePostFromBlogInputModel>, res: ResponseType<PostType>) {
 
         const id = req.params.id
+        const userId = req.userId!.toString()
         if (!ObjectId.isValid(id)) {
             res.sendStatus(404)
             return
@@ -94,7 +95,7 @@ export class BlogsController {
             content: req.body.content
         }
 
-        const post = await this.blogService.createPostToBlog(id, createPostFromBlogModel)
+        const post = await this.blogService.createPostToBlog(id, createPostFromBlogModel,userId)
 
         if (!post) {
             res.sendStatus(404)
@@ -119,6 +120,7 @@ export class BlogsController {
 
     async getAllPostsToBlogId(req: RequestWithQueryAndParams<ParamsType, QueryBlogInputModel>, res: ResponseType<Pagination<PostType>>) {
         const id = req.params.id
+        const userId = req.userId!.toString()
         if (!ObjectId.isValid(id)) {
             res.sendStatus(404)
             return
@@ -131,7 +133,7 @@ export class BlogsController {
         const {sortBy, sortDirection, pageNumber, pageSize} = req.query
         const sortData = sortQueryFieldsUtil({sortBy, sortDirection, pageNumber, pageSize})
 
-        const posts = await this.blogQueryRepository.getAllPostsToBlog(id, sortData)
+        const posts = await this.blogQueryRepository.getAllPostsToBlog(id, sortData,userId)
 
         res.send(posts)
     }

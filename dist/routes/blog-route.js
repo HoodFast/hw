@@ -83,6 +83,7 @@ let BlogsController = class BlogsController {
     createPostToBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
+            const userId = req.userId.toString();
             if (!mongodb_1.ObjectId.isValid(id)) {
                 res.sendStatus(404);
                 return;
@@ -92,7 +93,7 @@ let BlogsController = class BlogsController {
                 shortDescription: req.body.shortDescription,
                 content: req.body.content
             };
-            const post = yield this.blogService.createPostToBlog(id, createPostFromBlogModel);
+            const post = yield this.blogService.createPostToBlog(id, createPostFromBlogModel, userId);
             if (!post) {
                 res.sendStatus(404);
                 return;
@@ -117,6 +118,7 @@ let BlogsController = class BlogsController {
     getAllPostsToBlogId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
+            const userId = req.userId.toString();
             if (!mongodb_1.ObjectId.isValid(id)) {
                 res.sendStatus(404);
                 return;
@@ -128,7 +130,7 @@ let BlogsController = class BlogsController {
             }
             const { sortBy, sortDirection, pageNumber, pageSize } = req.query;
             const sortData = (0, sortQueryFields_util_1.sortQueryFieldsUtil)({ sortBy, sortDirection, pageNumber, pageSize });
-            const posts = yield this.blogQueryRepository.getAllPostsToBlog(id, sortData);
+            const posts = yield this.blogQueryRepository.getAllPostsToBlog(id, sortData, userId);
             res.send(posts);
         });
     }

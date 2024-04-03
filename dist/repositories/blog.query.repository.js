@@ -51,7 +51,7 @@ let BlogQueryRepository = class BlogQueryRepository {
             };
         });
     }
-    getAllPostsToBlog(blogId, sortData) {
+    getAllPostsToBlog(blogId, sortData, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
             const posts = yield db_1.postModel
@@ -66,7 +66,7 @@ let BlogQueryRepository = class BlogQueryRepository {
                 page: pageNumber,
                 pageSize,
                 totalCount,
-                items: posts.map(post_mappers_1.postMapper)
+                items: posts.map(i => (0, post_mappers_1.postMapper)(i, userId))
             };
         });
     }

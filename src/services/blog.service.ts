@@ -23,7 +23,7 @@ export class BlogService {
     ) {
 
     }
-     async createPostToBlog(blogId: string, CreatePostData: createPostFromBlog): Promise<PostType | null> {
+     async createPostToBlog(blogId: string, CreatePostData: createPostFromBlog,userId:string): Promise<PostType | null> {
         const {title, content, shortDescription} = CreatePostData
         const blog = await this.blogQueryRepository.getById(new ObjectId(blogId))
         if (!blog) {
@@ -46,7 +46,7 @@ export class BlogService {
 
             return null
         }
-        const post = await this.postQueryRepository.getById(new ObjectId(createPost.id))
+        const post = await this.postQueryRepository.getById(new ObjectId(createPost.id),userId)
         if (!post) {
 
             return null

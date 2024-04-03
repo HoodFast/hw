@@ -8,7 +8,7 @@ import {CommentsOutputType} from "../models/comments/otput/comments.output.model
 import {CommentsQueryRepository} from "../repositories/comment.query.repository";
 import {Result} from "../types/result.type";
 import {ObjectId} from "mongodb";
-import {inject, injectable} from "inversify";
+import {injectable} from "inversify";
 
 
 export type CreateCommentDataType = {
@@ -32,7 +32,7 @@ export class CommentsService {
 
     async createComment(data: CreateCommentDataType): Promise<CommentsOutputType | null> {
         const {userId, postId, content, createdAt} = data
-        const post = await this.postQueryRepository.getById(new ObjectId(postId))
+        const post = await this.postQueryRepository.getById(new ObjectId(postId),userId)
 
         if (!post) {
             return null

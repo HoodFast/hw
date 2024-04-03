@@ -63,5 +63,5 @@ exports.postSchema.methods.getNewestLikes =
         const sortLikes = likes.sort((a, b) => {
             return a.updatedAt.getTime() - b.updatedAt.getTime();
         });
-        return sortLikes.slice(0, 3).map(newestLikes_mapper_1.newestLikesMapper);
+        return sortLikes.slice(0, 2).map(newestLikes_mapper_1.newestLikesMapper);
     };

@@ -100,7 +100,7 @@ app.get('/', (req, res) => {
         publicationDate: publicationDate.toISOString(),
         availableResolutions: ['144']
     }
-    const test = {message: 'server is work 1.0 !'}
+    const test = {message: 'server is work 4.0 !'}
 
     res.send(test)
 })

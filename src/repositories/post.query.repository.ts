@@ -8,7 +8,7 @@ import {injectable} from "inversify";
 
 @injectable()
 export class PostQueryRepository {
-    async getAll(sortData:SortDataType): Promise<Pagination<PostType>> {
+    async getAll(sortData:SortDataType,userId?:string): Promise<Pagination<PostType>> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
         const posts = await postModel
@@ -26,17 +26,17 @@ export class PostQueryRepository {
             page: pageNumber,
             pageSize,
             totalCount,
-            items: posts.map(postMapper)
+            items: posts.map(i=>postMapper(i,userId))
         }
     }
 
-     async getById(id: ObjectId): Promise<PostType | null> {
+     async getById(id: ObjectId,userId?:string): Promise<PostType | null> {
         const post = await postModel.findOne({_id: id})
 
         if (!post) {
             return null
         }
-         return postMapper(post)
+         return postMapper(post,userId)
     }
 
 }

@@ -32,7 +32,7 @@ let BlogService = class BlogService {
         this.postRepository = postRepository;
         this.postQueryRepository = postQueryRepository;
     }
-    createPostToBlog(blogId, CreatePostData) {
+    createPostToBlog(blogId, CreatePostData, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const { title, content, shortDescription } = CreatePostData;
             const blog = yield this.blogQueryRepository.getById(new mongodb_1.ObjectId(blogId));
@@ -54,7 +54,7 @@ let BlogService = class BlogService {
             if (!createPost) {
                 return null;
             }
-            const post = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(createPost.id));
+            const post = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(createPost.id), userId);
             if (!post) {
                 return null;
             }

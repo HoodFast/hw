@@ -7,6 +7,7 @@ import {JwtService} from "../../application/jwt.service";
 export const accessTokenGetId = async (req: Request, res: Response, next: NextFunction) => {
 
     if (!req.headers.authorization) {
+        req.userId = null
         return next()
     }
 

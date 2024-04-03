@@ -9,6 +9,7 @@ import {ObjectId} from "mongodb";
 export const accessTokenGuard = async (req: Request, res: Response, next: NextFunction) => {
 
     if (!req.headers.authorization) {
+
         console.log(`Авторизация не пройдена - ${req.headers.authorization}`)
         return res.sendStatus(401)
     }

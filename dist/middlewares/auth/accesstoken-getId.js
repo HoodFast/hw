@@ -13,6 +13,7 @@ exports.accessTokenGetId = void 0;
 const jwt_service_1 = require("../../application/jwt.service");
 const accessTokenGetId = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.headers.authorization) {
+        req.userId = null;
         return next();
     }
     let tokenBearer = req.headers.authorization;

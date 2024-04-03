@@ -20,7 +20,7 @@ const db_1 = require("../db/db");
 const post_mappers_1 = require("../models/blog/mappers/post-mappers");
 const inversify_1 = require("inversify");
 let PostQueryRepository = class PostQueryRepository {
-    getAll(sortData) {
+    getAll(sortData, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = sortData;
             const posts = yield db_1.postModel
@@ -35,17 +35,17 @@ let PostQueryRepository = class PostQueryRepository {
                 page: pageNumber,
                 pageSize,
                 totalCount,
-                items: posts.map(post_mappers_1.postMapper)
+                items: posts.map(i => (0, post_mappers_1.postMapper)(i, userId))
             };
         });
     }
-    getById(id) {
+    getById(id, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const post = yield db_1.postModel.findOne({ _id: id });
             if (!post) {
                 return null;
             }
-            return (0, post_mappers_1.postMapper)(post);
+            return (0, post_mappers_1.postMapper)(post, userId);
         });
     }
 };

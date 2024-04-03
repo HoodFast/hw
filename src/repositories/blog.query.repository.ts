@@ -1,7 +1,7 @@
-import {blogModel,  postModel} from "../db/db";
+import {blogModel, postModel} from "../db/db";
 import {blogMapper} from "../models/blog/mappers/blog-mappers";
 import {ObjectId} from "mongodb";
-import { OutputBlogMapType, OutputBlogType, Pagination, PostType} from "../models/common/common";
+import {OutputBlogMapType, OutputBlogType, Pagination, PostType} from "../models/common/common";
 import {postMapper} from "../models/blog/mappers/post-mappers";
 import {injectable} from "inversify";
 
@@ -51,7 +51,7 @@ export class BlogQueryRepository {
         }
     }
 
-    async getAllPostsToBlog(blogId: string, sortData: SortDataType): Promise<Pagination<PostType>> {
+    async getAllPostsToBlog(blogId: string, sortData: SortDataType, userId: string): Promise<Pagination<PostType>> {
         const {sortBy, sortDirection, pageSize, pageNumber} = sortData
 
         const posts = await postModel
@@ -69,7 +69,7 @@ export class BlogQueryRepository {
             page: pageNumber,
             pageSize,
             totalCount,
-            items: posts.map(postMapper)
+            items: posts.map(i => postMapper(i, userId))
         }
     }
 

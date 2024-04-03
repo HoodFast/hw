@@ -2,8 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postMapper = void 0;
 const comment_db_model_1 = require("../../comments/db/comment.db.model");
-const postMapper = (post) => {
+const postMapper = (post, userId) => {
     const newestLikes = post.getNewestLikes();
+    let myStatus = comment_db_model_1.likesStatuses.none;
+    if (userId) {
+        myStatus = post.getMyStatus(userId);
+    }
     return {
         id: post._id.toString(),
         title: post.title,
@@ -13,9 +17,9 @@ const postMapper = (post) => {
         blogName: post.blogName,
         createdAt: post.createdAt,
         extendedLikesInfo: {
-            likesCount: 0,
-            dislikesCount: 0,
-            myStatus: comment_db_model_1.likesStatuses.none,
+            likesCount: post.likesCount,
+            dislikesCount: post.dislikesCount,
+            myStatus,
             newestLikes
         }
     };

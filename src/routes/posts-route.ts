@@ -26,9 +26,11 @@ import {injectable} from "inversify";
 import {container} from "../composition-root";
 import {likesValidators} from "../validators/likes-validator";
 import {likesStatuses} from "../models/comments/db/comment.db.model";
+import {accessTokenGetId} from "../middlewares/auth/accesstoken-getId";
 
 
 export const postRoute = Router({})
+
 @injectable()
 class PostController {
 
@@ -45,8 +47,12 @@ class PostController {
             pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
             pageSize: req.query.pageSize ? +req.query.pageSize : 10
         }
+        let userId
+        if(req.userId) {
+            userId = req.userId!.toString()
+        }
 
-        const blogs = await this.postQueryRepository.getAll(sortData)
+        const blogs = await this.postQueryRepository.getAll(sortData, userId)
         if (!blogs) {
             res.sendStatus(404)
             return
@@ -54,8 +60,13 @@ class PostController {
         res.send(blogs)
     }
 
-    async getPostBId(req: RequestWithParams<ParamsType>, res: ResponseType<PostType>) {
-        const foundPost = await this.postQueryRepository.getById(new ObjectId(req.params.id))
+    async getPostById(req: RequestWithParams<ParamsType>, res: ResponseType<PostType>) {
+        let userId
+        if( req.userId){
+            userId = req.userId.toString()
+        }
+
+        const foundPost = await this.postQueryRepository.getById(new ObjectId(req.params.id), userId)
         if (!foundPost) {
             res.sendStatus(404)
             return
@@ -154,6 +165,7 @@ class PostController {
 
         return res.send(comments)
     }
+
     async updateLikes(req: RequestWithParamsAndBody<ParamsType, { likeStatus: likesStatuses }>, res: Response) {
         const userId = req.userId!.toString()
         const postId = req.params.id
@@ -174,11 +186,11 @@ class PostController {
 
 const postController = container.resolve<PostController>(PostController)
 
-postRoute.get('/', postController.getAllPosts.bind(postController))
-postRoute.get('/:id', postController.getPostBId.bind(postController))
+postRoute.get('/',accessTokenGetId, postController.getAllPosts.bind(postController))
+postRoute.get('/:id',accessTokenGetId, postController.getPostById.bind(postController))
 postRoute.post('/', authMiddleware, postValidation(), postController.createPost.bind(postController))
 postRoute.put('/:id', authMiddleware, postValidation(), postController.updatePost.bind(postController))
 postRoute.delete('/:id', authMiddleware, postController.deletePostById.bind(postController))
 postRoute.post('/:id/comments', accessTokenGuard, commentsValidation(), postController.createCommentByPost.bind(postController))
 postRoute.get('/:id/comments', accessTokenGuard, postController.getCommentsByPost.bind(postController))
-postRoute.put('/:id/like-status',accessTokenGuard,likesValidators(), postController.updateLikes.bind(postController))
+postRoute.put('/:id/like-status', accessTokenGuard, likesValidators(), postController.updateLikes.bind(postController))

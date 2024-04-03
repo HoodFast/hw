@@ -34,6 +34,7 @@ const db_1 = require("../db/db");
 const inversify_1 = require("inversify");
 const composition_root_1 = require("../composition-root");
 const likes_validator_1 = require("../validators/likes-validator");
+const accesstoken_getId_1 = require("../middlewares/auth/accesstoken-getId");
 exports.postRoute = (0, express_1.Router)({});
 let PostController = class PostController {
     constructor(commentService, postService, postQueryRepository) {
@@ -50,7 +51,11 @@ let PostController = class PostController {
                 pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
                 pageSize: req.query.pageSize ? +req.query.pageSize : 10
             };
-            const blogs = yield this.postQueryRepository.getAll(sortData);
+            let userId;
+            if (req.userId) {
+                userId = req.userId.toString();
+            }
+            const blogs = yield this.postQueryRepository.getAll(sortData, userId);
             if (!blogs) {
                 res.sendStatus(404);
                 return;
@@ -58,9 +63,13 @@ let PostController = class PostController {
             res.send(blogs);
         });
     }
-    getPostBId(req, res) {
+    getPostById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const foundPost = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(req.params.id));
+            let userId;
+            if (req.userId) {
+                userId = req.userId.toString();
+            }
+            const foundPost = yield this.postQueryRepository.getById(new mongodb_1.ObjectId(req.params.id), userId);
             if (!foundPost) {
                 res.sendStatus(404);
                 return;
@@ -183,8 +192,8 @@ PostController = __decorate([
         post_query_repository_1.PostQueryRepository])
 ], PostController);
 const postController = composition_root_1.container.resolve(PostController);
-exports.postRoute.get('/', postController.getAllPosts.bind(postController));
-exports.postRoute.get('/:id', postController.getPostBId.bind(postController));
+exports.postRoute.get('/', accesstoken_getId_1.accessTokenGetId, postController.getAllPosts.bind(postController));
+exports.postRoute.get('/:id', accesstoken_getId_1.accessTokenGetId, postController.getPostById.bind(postController));
 exports.postRoute.post('/', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), postController.createPost.bind(postController));
 exports.postRoute.put('/:id', auth_middleware_1.authMiddleware, (0, post_validators_1.postValidation)(), postController.updatePost.bind(postController));
 exports.postRoute.delete('/:id', auth_middleware_1.authMiddleware, postController.deletePostById.bind(postController));
