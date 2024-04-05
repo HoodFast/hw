@@ -90,7 +90,8 @@ postSchema.methods.getMyStatus =
 
 postSchema.methods.getNewestLikes =
     function (): newestLikesType[]  {
-        const likes: postLikesType[] = this.likes
+        const likes: postLikesType[] = this.likes.filter(i=>i.likesStatus===likesStatuses.like
+        )
         const sortLikes: postLikesType[] = likes.sort((a,b)=>{
             return a.updatedAt.getTime() - b.updatedAt.getTime()
         })

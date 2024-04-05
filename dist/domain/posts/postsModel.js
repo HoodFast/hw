@@ -59,7 +59,7 @@ exports.postSchema.methods.getMyStatus =
     };
 exports.postSchema.methods.getNewestLikes =
     function () {
-        const likes = this.likes;
+        const likes = this.likes.filter(i => i.likesStatus === comment_db_model_1.likesStatuses.like);
         const sortLikes = likes.sort((a, b) => {
             return a.updatedAt.getTime() - b.updatedAt.getTime();
         });
