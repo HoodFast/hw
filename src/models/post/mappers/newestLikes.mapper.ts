@@ -11,10 +11,8 @@ export type newestLikesType = {
 }
 export const newestLikesMapper = (like: postLikesType): newestLikesType => {
     return {
-        addedAt: like.updatedAt.toISOString(),
+        addedAt: like.updatedAt.toString(),
         userId: like.userId,
         login: like.login
     }
-
-
 }
