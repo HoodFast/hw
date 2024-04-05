@@ -1,6 +1,4 @@
-import {likesType} from "../../comments/db/comment.db.model";
-import {UserQueryRepository} from "../../../repositories/users.query.repository";
-import {ObjectId} from "mongodb";
+
 import {postLikesType} from "../../../domain/posts/postsModel";
 
 

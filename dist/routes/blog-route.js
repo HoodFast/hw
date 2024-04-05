@@ -30,6 +30,7 @@ const blog_service_1 = require("../services/blog.service");
 const sortQueryFields_util_1 = require("../utils/sortQueryFields.util");
 const inversify_1 = require("inversify");
 const composition_root_1 = require("../composition-root");
+const accesstoken_getId_1 = require("../middlewares/auth/accesstoken-getId");
 exports.blogRoute = (0, express_1.Router)({});
 let BlogsController = class BlogsController {
     constructor(blogService, blogQueryRepository) {
@@ -180,7 +181,7 @@ exports.BlogsController = BlogsController = __decorate([
 const blogsController = composition_root_1.container.resolve(BlogsController);
 exports.blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController));
 exports.blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController));
-exports.blogRoute.get('/:id', blogsController.getBlogById.bind(blogsController));
+exports.blogRoute.get('/:id', accesstoken_getId_1.accessTokenGetId, blogsController.getBlogById.bind(blogsController));
 exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.createBlog.bind(blogsController));
 exports.blogRoute.post('/:id/posts', auth_middleware_1.authMiddleware, (0, post_validators_1.createPostFromBlogValidation)(), blogsController.createPostToBlog.bind(blogsController));
 exports.blogRoute.put('/:id', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.updateBlog.bind(blogsController));
