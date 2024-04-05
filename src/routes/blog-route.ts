@@ -175,7 +175,7 @@ export class BlogsController {
 const blogsController = container.resolve<BlogsController>(BlogsController)
 
 blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController))
-blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController))
+blogRoute.get('/:id/posts',accessTokenGetId, blogsController.getAllPostsToBlogId.bind(blogsController))
 blogRoute.get('/:id',accessTokenGetId, blogsController.getBlogById.bind(blogsController))
 blogRoute.post('/', authMiddleware, blogValidation(), blogsController.createBlog.bind(blogsController))
 blogRoute.post('/:id/posts', authMiddleware, createPostFromBlogValidation(), blogsController.createPostToBlog.bind(blogsController))

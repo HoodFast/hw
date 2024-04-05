@@ -180,7 +180,7 @@ exports.BlogsController = BlogsController = __decorate([
 ], BlogsController);
 const blogsController = composition_root_1.container.resolve(BlogsController);
 exports.blogRoute.get('/', blogsController.getAllBlogs.bind(blogsController));
-exports.blogRoute.get('/:id/posts', blogsController.getAllPostsToBlogId.bind(blogsController));
+exports.blogRoute.get('/:id/posts', accesstoken_getId_1.accessTokenGetId, blogsController.getAllPostsToBlogId.bind(blogsController));
 exports.blogRoute.get('/:id', accesstoken_getId_1.accessTokenGetId, blogsController.getBlogById.bind(blogsController));
 exports.blogRoute.post('/', auth_middleware_1.authMiddleware, (0, blog_validators_1.blogValidation)(), blogsController.createBlog.bind(blogsController));
 exports.blogRoute.post('/:id/posts', auth_middleware_1.authMiddleware, (0, post_validators_1.createPostFromBlogValidation)(), blogsController.createPostToBlog.bind(blogsController));
