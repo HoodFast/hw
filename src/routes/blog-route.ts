@@ -181,3 +181,5 @@ blogRoute.post('/', authMiddleware, blogValidation(), blogsController.createBlog
 blogRoute.post('/:id/posts', authMiddleware, createPostFromBlogValidation(), blogsController.createPostToBlog.bind(blogsController))
 blogRoute.put('/:id', authMiddleware, blogValidation(), blogsController.updateBlog.bind(blogsController))
 blogRoute.delete('/:id', authMiddleware, blogsController.deleteBlogById.bind(blogsController))
+
+

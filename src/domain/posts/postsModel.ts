@@ -26,7 +26,7 @@ export type PostTypeDb = {
 type postsMethodsType = {
     addLike: (userId: string, likeStatus: likesStatuses,login:string)=>boolean,
     getMyStatus:(userId: string)=>likesStatuses
-    getNewestLikes:()=>newestLikesType[]
+    getNewestLikes:()=>postLikesType[]
 }
 type postsModelType = Model<PostTypeDb,{},postsMethodsType>
 
@@ -89,12 +89,12 @@ postSchema.methods.getMyStatus =
     }
 
 postSchema.methods.getNewestLikes =
-    function (): newestLikesType[]  {
+    function (): postLikesType[]  {
         const likes: postLikesType[] = this.likes.filter(i=>i.likesStatus==likesStatuses.like)
         const sortLikes: postLikesType[] = likes.sort((a,b)=>{
-            return a.updatedAt.getTime() - b.updatedAt.getTime()
+            return b.createdAt.getTime() - a.createdAt.getTime()
         })
-        return sortLikes.slice(0,2).map(newestLikesMapper)
+        return sortLikes.slice(0,3)
     }
 
 

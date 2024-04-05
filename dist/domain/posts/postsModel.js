@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postSchema = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const comment_db_model_1 = require("../../models/comments/db/comment.db.model");
-const newestLikes_mapper_1 = require("../../models/post/mappers/newestLikes.mapper");
 exports.postSchema = new mongoose_1.default.Schema({
     title: { type: String, require },
     shortDescription: { type: String, require },
@@ -61,7 +60,7 @@ exports.postSchema.methods.getNewestLikes =
     function () {
         const likes = this.likes.filter(i => i.likesStatus == comment_db_model_1.likesStatuses.like);
         const sortLikes = likes.sort((a, b) => {
-            return a.updatedAt.getTime() - b.updatedAt.getTime();
+            return b.createdAt.getTime() - a.createdAt.getTime();
         });
-        return sortLikes.slice(0, 2).map(newestLikes_mapper_1.newestLikesMapper);
+        return sortLikes.slice(0, 3);
     };
