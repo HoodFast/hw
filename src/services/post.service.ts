@@ -54,7 +54,7 @@ export class PostService {
         return post
     }
 
-    async updatePost(data: UpdatePostType): Promise<boolean | null> {
+    async updatePost(postId:string,data: UpdatePostType): Promise<boolean | null> {
         return await this.postRepository.updatePost(data)
     }
 
